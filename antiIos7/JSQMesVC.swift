@@ -15,6 +15,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
     var messageOne: MesJSQ!
     var messages = [MesJSQ]()
     var currentUser: PubNub!
+    var mesJSQData = [JSQMessageData]()
     
     ///
     var avatars = Dictionary<String, UIImage>()
@@ -80,7 +81,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
                 let imgJson    = (json?["image"] as AnyObject as? String) ?? ""
                 //let imgStickerJ  = (json?["stickers"] as AnyObject? as? String) ?? ""
                 
-                list.append(MesJSQ(userN: usernameJson, textMes: textJson, time: timeJson, image: imgJson))
+                list.append(MesJSQ(username: usernameJson, textMes: textJson, time: timeJson, image: imgJson))
             }
             collectionView.reloadData()
             
@@ -137,7 +138,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
         //let stringSticker = stringData?["stickers"] as? String ?? ""
         
         
-        let newMessage = MesJSQ(userN: stringName, textMes: stringText, time: stringTime, image: stringImg)
+        let newMessage = MesJSQ(username: stringName, textMes: stringText, time: stringTime, image: stringImg)
         chatMesArray2.append(newMessage)
         updateChat()
     }
@@ -168,16 +169,18 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
         }
 //       cell.messageBubbleTopLabel.text = message.textMes
         
-
+        finishReceivingMessage()
         return cell
     }
     //////
     
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
-        return messages[indexPath.item]
-    }
+//    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
+//        let onemes = messages[indexPath.row]
+//        
+//        return onemes
+//    }
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        let message = MesJSQ(userN: senderDisplayName, textMes: text, time: getTime(), image: "")
+        let message = MesJSQ(username: senderDisplayName, textMes: text, time: getTime(), image: "")
         let newDict = chatMesToDicJSQ(message)
         
         appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
@@ -228,12 +231,14 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
     override func viewWillAppear(_ animated: Bool) {
         initPubNub()
         updateTableview()
+        finishReceivingMessage()
     }
     
 
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
         collectionView.collectionViewLayout.springinessEnabled = true
     }
 }
