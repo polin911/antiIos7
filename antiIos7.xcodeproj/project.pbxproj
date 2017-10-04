@@ -7,23 +7,46 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3621E9C01F838E6C0097EAB1 /* JSQ.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3621E9BF1F838E6C0097EAB1 /* JSQ.swift */; };
+		3621E9C21F83B7F90097EAB1 /* JSQMess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3621E9C11F83B7F90097EAB1 /* JSQMess.swift */; };
+		3621E9C41F83C4CB0097EAB1 /* JSQMesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3621E9C31F83C4CB0097EAB1 /* JSQMesVC.swift */; };
 		362DEB4A1F822CCF0085FBD1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362DEB491F822CCF0085FBD1 /* AppDelegate.swift */; };
-		362DEB4C1F822CCF0085FBD1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362DEB4B1F822CCF0085FBD1 /* ViewController.swift */; };
 		362DEB4F1F822CCF0085FBD1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 362DEB4D1F822CCF0085FBD1 /* Main.storyboard */; };
 		362DEB521F822CCF0085FBD1 /* antiIos7.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 362DEB501F822CCF0085FBD1 /* antiIos7.xcdatamodeld */; };
 		362DEB541F822CCF0085FBD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 362DEB531F822CCF0085FBD1 /* Assets.xcassets */; };
 		362DEB571F822CCF0085FBD1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 362DEB551F822CCF0085FBD1 /* LaunchScreen.storyboard */; };
+		3683F0131F82300100E08CF4 /* MainVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0121F82300100E08CF4 /* MainVc.swift */; };
+		3683F0161F82303F00E08CF4 /* WelcomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0151F82303F00E08CF4 /* WelcomeVC.swift */; };
+		3683F0181F82308D00E08CF4 /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0171F82308D00E08CF4 /* Global.swift */; };
+		3683F01B1F8230A900E08CF4 /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F01A1F8230A900E08CF4 /* ChatModel.swift */; };
+		3683F01E1F82356D00E08CF4 /* ImgCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F01D1F82356D00E08CF4 /* ImgCell.swift */; };
+		3683F0201F823D8400E08CF4 /* ChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F01F1F823D8400E08CF4 /* ChatCell.swift */; };
+		3683F0221F823E9C00E08CF4 /* StickerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0211F823E9C00E08CF4 /* StickerCell.swift */; };
+		A1B71FD9F64C3DB7C827F151 /* Pods_antiIos7.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 898D0B6B6891F4575A8A6914 /* Pods_antiIos7.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3621E9BF1F838E6C0097EAB1 /* JSQ.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSQ.swift; sourceTree = "<group>"; };
+		3621E9C11F83B7F90097EAB1 /* JSQMess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSQMess.swift; sourceTree = "<group>"; };
+		3621E9C31F83C4CB0097EAB1 /* JSQMesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSQMesVC.swift; sourceTree = "<group>"; };
+		3621E9C51F83C5950097EAB1 /* J.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = J.h; sourceTree = "<group>"; };
 		362DEB461F822CCF0085FBD1 /* antiIos7.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = antiIos7.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		362DEB491F822CCF0085FBD1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		362DEB4B1F822CCF0085FBD1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		362DEB4E1F822CCF0085FBD1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		362DEB511F822CCF0085FBD1 /* antiIos7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = antiIos7.xcdatamodel; sourceTree = "<group>"; };
 		362DEB531F822CCF0085FBD1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		362DEB561F822CCF0085FBD1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		362DEB581F822CCF0085FBD1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3683F0121F82300100E08CF4 /* MainVc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainVc.swift; sourceTree = "<group>"; };
+		3683F0151F82303F00E08CF4 /* WelcomeVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WelcomeVC.swift; sourceTree = "<group>"; };
+		3683F0171F82308D00E08CF4 /* Global.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
+		3683F01A1F8230A900E08CF4 /* ChatModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatModel.swift; sourceTree = "<group>"; };
+		3683F01D1F82356D00E08CF4 /* ImgCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImgCell.swift; sourceTree = "<group>"; };
+		3683F01F1F823D8400E08CF4 /* ChatCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatCell.swift; sourceTree = "<group>"; };
+		3683F0211F823E9C00E08CF4 /* StickerCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StickerCell.swift; sourceTree = "<group>"; };
+		705DA02BB5B6F068B6CC1C13 /* Pods-antiIos7.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-antiIos7.debug.xcconfig"; path = "Pods/Target Support Files/Pods-antiIos7/Pods-antiIos7.debug.xcconfig"; sourceTree = "<group>"; };
+		898D0B6B6891F4575A8A6914 /* Pods_antiIos7.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_antiIos7.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A62C76A617A808FC1B759687 /* Pods-antiIos7.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-antiIos7.release.xcconfig"; path = "Pods/Target Support Files/Pods-antiIos7/Pods-antiIos7.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1B71FD9F64C3DB7C827F151 /* Pods_antiIos7.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +66,8 @@
 			children = (
 				362DEB481F822CCF0085FBD1 /* antiIos7 */,
 				362DEB471F822CCF0085FBD1 /* Products */,
+				F133812043DBFFADCE224CD3 /* Pods */,
+				D7A228B72FD6D4067BC58362 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -56,15 +82,66 @@
 		362DEB481F822CCF0085FBD1 /* antiIos7 */ = {
 			isa = PBXGroup;
 			children = (
+				3683F01C1F82353300E08CF4 /* View */,
+				3683F0191F82309500E08CF4 /* Model */,
 				362DEB491F822CCF0085FBD1 /* AppDelegate.swift */,
-				362DEB4B1F822CCF0085FBD1 /* ViewController.swift */,
 				362DEB4D1F822CCF0085FBD1 /* Main.storyboard */,
 				362DEB531F822CCF0085FBD1 /* Assets.xcassets */,
 				362DEB551F822CCF0085FBD1 /* LaunchScreen.storyboard */,
 				362DEB581F822CCF0085FBD1 /* Info.plist */,
 				362DEB501F822CCF0085FBD1 /* antiIos7.xcdatamodeld */,
+				3683F0141F82300B00E08CF4 /* Controller */,
+				3683F0171F82308D00E08CF4 /* Global.swift */,
+				3621E9C51F83C5950097EAB1 /* J.h */,
 			);
 			path = antiIos7;
+			sourceTree = "<group>";
+		};
+		3683F0141F82300B00E08CF4 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				3621E9BF1F838E6C0097EAB1 /* JSQ.swift */,
+				3683F0121F82300100E08CF4 /* MainVc.swift */,
+				3683F0151F82303F00E08CF4 /* WelcomeVC.swift */,
+				3621E9C31F83C4CB0097EAB1 /* JSQMesVC.swift */,
+			);
+			name = Controller;
+			sourceTree = "<group>";
+		};
+		3683F0191F82309500E08CF4 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				3683F01A1F8230A900E08CF4 /* ChatModel.swift */,
+				3621E9C11F83B7F90097EAB1 /* JSQMess.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		3683F01C1F82353300E08CF4 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				3683F01D1F82356D00E08CF4 /* ImgCell.swift */,
+				3683F01F1F823D8400E08CF4 /* ChatCell.swift */,
+				3683F0211F823E9C00E08CF4 /* StickerCell.swift */,
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		D7A228B72FD6D4067BC58362 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				898D0B6B6891F4575A8A6914 /* Pods_antiIos7.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F133812043DBFFADCE224CD3 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				705DA02BB5B6F068B6CC1C13 /* Pods-antiIos7.debug.xcconfig */,
+				A62C76A617A808FC1B759687 /* Pods-antiIos7.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -74,9 +151,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 362DEB5B1F822CCF0085FBD1 /* Build configuration list for PBXNativeTarget "antiIos7" */;
 			buildPhases = (
+				1937B881FD4544E037413519 /* [CP] Check Pods Manifest.lock */,
 				362DEB421F822CCF0085FBD1 /* Sources */,
 				362DEB431F822CCF0085FBD1 /* Frameworks */,
 				362DEB441F822CCF0085FBD1 /* Resources */,
+				5931DB8B1E63230C8CF16FBD /* [CP] Embed Pods Frameworks */,
+				8EFD9B68F1F0F1227B6CA81E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -100,6 +180,7 @@
 					362DEB451F822CCF0085FBD1 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = CBVCE8QCE8;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -135,14 +216,71 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		1937B881FD4544E037413519 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		5931DB8B1E63230C8CF16FBD /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-antiIos7/Pods-antiIos7-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8EFD9B68F1F0F1227B6CA81E /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-antiIos7/Pods-antiIos7-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		362DEB421F822CCF0085FBD1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3621E9C01F838E6C0097EAB1 /* JSQ.swift in Sources */,
+				3621E9C41F83C4CB0097EAB1 /* JSQMesVC.swift in Sources */,
 				362DEB521F822CCF0085FBD1 /* antiIos7.xcdatamodeld in Sources */,
-				362DEB4C1F822CCF0085FBD1 /* ViewController.swift in Sources */,
+				3683F0221F823E9C00E08CF4 /* StickerCell.swift in Sources */,
+				3683F0201F823D8400E08CF4 /* ChatCell.swift in Sources */,
+				3683F0131F82300100E08CF4 /* MainVc.swift in Sources */,
+				3621E9C21F83B7F90097EAB1 /* JSQMess.swift in Sources */,
 				362DEB4A1F822CCF0085FBD1 /* AppDelegate.swift in Sources */,
+				3683F0181F82308D00E08CF4 /* Global.swift in Sources */,
+				3683F0161F82303F00E08CF4 /* WelcomeVC.swift in Sources */,
+				3683F01E1F82356D00E08CF4 /* ImgCell.swift in Sources */,
+				3683F01B1F8230A900E08CF4 /* ChatModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,27 +401,33 @@
 		};
 		362DEB5C1F822CCF0085FBD1 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 705DA02BB5B6F068B6CC1C13 /* Pods-antiIos7.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = CBVCE8QCE8;
 				INFOPLIST_FILE = antiIos7/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = polin911.antiIos7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
 		362DEB5D1F822CCF0085FBD1 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A62C76A617A808FC1B759687 /* Pods-antiIos7.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = CBVCE8QCE8;
 				INFOPLIST_FILE = antiIos7/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = polin911.antiIos7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};
@@ -306,6 +450,7 @@
 				362DEB5D1F822CCF0085FBD1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

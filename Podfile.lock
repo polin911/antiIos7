@@ -1,0 +1,20 @@
+PODS:
+  - JSQMessagesViewController (7.3.4):
+    - JSQSystemSoundPlayer (~> 2.0.1)
+  - JSQSystemSoundPlayer (2.0.1)
+  - PubNub (4.5.5):
+    - PubNub/Core (= 4.5.5)
+  - PubNub/Core (4.5.5)
+
+DEPENDENCIES:
+  - JSQMessagesViewController
+  - PubNub (~> 4)
+
+SPEC CHECKSUMS:
+  JSQMessagesViewController: 39fed975e3c9f8eba7292071e29eeb541d105e66
+  JSQSystemSoundPlayer: c5850e77a4363ffd374cd851154b9af93264ed8d
+  PubNub: 519594dfe84662686818591179470ff87a30a224
+
+PODFILE CHECKSUM: 15b81a0cd2a2b1add967fde505a78f880a5ef8e8
+
+COCOAPODS: 1.2.0
