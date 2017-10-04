@@ -159,13 +159,15 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
         let message = messages[indexPath.item]
+    
         ///SenderId!!
-        if message.senderId() == senderId{
+        if userName == message.username {
             cell.textView.textColor = UIColor.black
         } else {
             cell.textView.textColor = UIColor.white
         }
-       cell.messageBubbleTopLabel.text = message.textMes
+//       cell.messageBubbleTopLabel.text = message.textMes
+        
 
         return cell
     }
@@ -203,6 +205,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
+        
         return nil
     }
     ////
@@ -217,7 +220,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
         inputToolbar.contentView.leftBarButtonItem = nil
         navigationController?.navigationBar.topItem?.title = "Logout"
         
-        initPubNub()
+
        
         //self.messages = getMessages()
         
@@ -227,17 +230,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
         updateTableview()
     }
     
-//    func getMessages() -> [MesJSQ] {
-//        var messages = [M]()
-//
-//        let message1 = JSQMessage(senderId: "1", displayName: "Steve", text: "Hey Tim how are you?")
-//        let message2 = JSQMessage(senderId: "2", displayName: "Tim", text: "Fine thanks, and you?")
-//
-//        messages.append(message1!)
-//        messages.append(message2!)
-//
-//        return messages
-//    }
+
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)

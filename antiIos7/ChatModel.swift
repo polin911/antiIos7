@@ -46,11 +46,13 @@ class MesJSQ: NSObject ,JSQMessageData {
     }
     
     func isMediaMessage() -> Bool {
-       return true
+       return false
     }
     func messageHash() -> UInt {
-       return 100
+       return 0
     }
+    
+    
 }
 
 
