@@ -11,16 +11,38 @@ import JSQMessagesViewController
 import PubNub
 
 class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
-    
-    var messageOne: MesJSQ!
-    var messages = [MesJSQ]()
-    var currentUser: PubNub!
-    var mesJSQData = [JSQMessageData]()
+
+    var messageModel = [MesJSQ]()
+    var mesModelJSQ = [JSQMessage]()
+    var appDel = UIApplication.shared.delegate as! AppDelegate
+
     
     ///
     var avatars = Dictionary<String, UIImage>()
     let bubbleFactory = JSQMessagesBubbleImageFactory()
-   
+   ///////////////////////
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.title = chan
+        self.senderId = userName
+        self.senderDisplayName = userName
+        print("!!!!!!!!!!!!!!!!!!SenderId!!!!!!!!!!!!!!!!!!:\(senderId)")
+        print("!!!!!!!!!!!!!!!!!!SenderN!!!!!!!!!!!!!!!!!!:\(userName)")
+       
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        initPubNub()
+        updateTableview()
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        
+        super.viewDidAppear(animated)
+        self.collectionView.collectionViewLayout.springinessEnabled = true
+
+    }
     
     ///PubNub
     func initPubNub(){
@@ -81,7 +103,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
                 let imgJson    = (json?["image"] as AnyObject as? String) ?? ""
                 //let imgStickerJ  = (json?["stickers"] as AnyObject? as? String) ?? ""
                 
-                list.append(MesJSQ(username: usernameJson, textMes: textJson, time: timeJson, image: imgJson))
+                list.append(MesJSQ(userN: usernameJson, textMes: textJson, time: timeJson, image: imgJson))
             }
             collectionView.reloadData()
             
@@ -99,6 +121,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
             
             
             chatMesArray2 = self.parseJson(result!.data.messages as AnyObject)
+            self.mesModelJSQ = self.parseJsonforJSq(result?.data.messages as AnyObject)
             self.updateTableview()
             
         })
@@ -138,7 +161,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
         //let stringSticker = stringData?["stickers"] as? String ?? ""
         
         
-        let newMessage = MesJSQ(username: stringName, textMes: stringText, time: stringTime, image: stringImg)
+        let newMessage = MesJSQ(userN: stringName, textMes: stringText, time: stringTime, image: stringImg)
         chatMesArray2.append(newMessage)
         updateChat()
     }
@@ -153,92 +176,84 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
     }
     //////
     
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return messages.count
+    override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
+        
+        //for PubNub
+        let pubChat = MesJSQ(userN: senderDisplayName, textMes: text, time: getTime(), image: "")
+        let newDict = chatMessageToDictionary(pubChat)
+        appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
+        messageModel.append(pubChat)
+        updateTableview()
+        
+        //For JSq
+        let mes = JSQMessage(senderId: senderId, senderDisplayName: senderDisplayName, date: date, text: text)
+        mesModelJSQ.append(mes!)
+        finishSendingMessage()
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
-        let message = messages[indexPath.item]
-    
-        ///SenderId!!
-        if userName == message.username {
-            cell.textView.textColor = UIColor.black
-        } else {
-            cell.textView.textColor = UIColor.white
-        }
-//       cell.messageBubbleTopLabel.text = message.textMes
-        
-        finishReceivingMessage()
         return cell
     }
-    //////
     
-//    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
-//        let onemes = messages[indexPath.row]
-//        
-//        return onemes
-//    }
-    override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        let message = MesJSQ(username: senderDisplayName, textMes: text, time: getTime(), image: "")
-        let newDict = chatMesToDicJSQ(message)
-        
-        appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
-        messages.append(message)
-        updateTableview()
-        finishSendingMessage()
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return mesModelJSQ.count
+        // return messageModel.count
     }
-
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
+        //mesModelJSQ[indexPath.item].text == messageModel[indexPath.row].textMes
+        
+        return mesModelJSQ[indexPath.item]
+    }
+    
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
-        let message = messages[indexPath.row]
-        if userName == message.username {
-            return bubbleFactory?.outgoingMessagesBubbleImage(with: .green)
+        let buble = JSQMessagesBubbleImageFactory()
+        let message = mesModelJSQ[indexPath.item]
+        
+        if senderId == message.senderId {
+            return buble?.outgoingMessagesBubbleImage(with: .blue)
         } else {
-            return bubbleFactory?.incomingMessagesBubbleImage(with: .blue)
+            return buble?.incomingMessagesBubbleImage(with: .green)
         }
     }
-//    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
-//        let message = messages[indexPath.row]
-//        let messageUsername = message.senderDisplayName
-//
-//        return NSAttributedString(string: messageUsername())
-//    }
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat {
-        return 15
-    }
-    
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
-        
-        return nil
-    }
-    ////
-    var appDel = UIApplication.shared.delegate! as! AppDelegate
-
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        self.senderDisplayName = userName
-        automaticallyScrollsToMostRecentMessage = true
-        inputToolbar.contentView.leftBarButtonItem = nil
-        navigationController?.navigationBar.topItem?.title = "Logout"
-        
-
-       
-        //self.messages = getMessages()
-        
-    }
-    override func viewWillAppear(_ animated: Bool) {
-        initPubNub()
-        updateTableview()
-        finishReceivingMessage()
+        return  nil
     }
     
-
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
+        let message = mesModelJSQ[indexPath.item]
+        let mesUseeName = message.senderDisplayName
         
-        collectionView.collectionViewLayout.springinessEnabled = true
+        return NSAttributedString(string: mesUseeName!)
+    }
+    
+}
+extension JSQMesVC {
+    func parseJsonforJSq(_ anyObj:AnyObject) -> [JSQMessage] {
+        var list: [JSQMessage] = []
+         if  anyObj is [AnyObject] {
+        for jsonMsg in anyObj as! [AnyObject] {
+            let json = jsonMsg["message"] as? NSDictionary
+            
+            let usernameJson = (json?["username"] as AnyObject? as? String) ?? "" // to get rid of null
+            let textJson   = (json?["text"]  as AnyObject? as? String) ?? ""
+            let timeJson   = (json?["time"]  as AnyObject? as? String) ?? ""
+            let imgJson    = (json?["image"] as AnyObject as? String) ?? ""
+            let sendIdJ    = (json?["uuid"] as AnyObject? as? String) ?? ""
+            //let imgStickerJ  = (json?["stickers"] as AnyObject? as? String) ?? ""
+            
+            list.append(JSQMessage(senderId: usernameJson, displayName: usernameJson, text: textJson))
+        }
+        collectionView.reloadData()
+        
+    }
+    
+    return list
+    
     }
 }
+
+
+    
+

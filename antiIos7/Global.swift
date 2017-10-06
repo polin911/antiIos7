@@ -36,4 +36,5 @@ func chatMesToDicJSQ(_ chatmessage: MesJSQ) -> [String: NSString]{
         "time"    : NSString(string: chatmessage.time),
         "image"   : NSString(string: chatmessage.image)
     ]
+    
 }
