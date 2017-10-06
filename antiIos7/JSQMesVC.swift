@@ -28,6 +28,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
         self.title = chan
         self.senderId = userName
         self.senderDisplayName = userName
+        
         print("!!!!!!!!!!!!!!!!!!SenderId!!!!!!!!!!!!!!!!!!:\(senderId)")
         print("!!!!!!!!!!!!!!!!!!SenderN!!!!!!!!!!!!!!!!!!:\(userName)")
        
@@ -214,18 +215,24 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
         if senderId == message.senderId {
             return buble?.outgoingMessagesBubbleImage(with: .blue)
         } else {
-            return buble?.incomingMessagesBubbleImage(with: .green)
+            return buble?.incomingMessagesBubbleImage(with: .black)
         }
     }
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
-        return  nil
+        
+        
+        return nil
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
         let message = mesModelJSQ[indexPath.item]
         let mesUseeName = message.senderDisplayName
         
+        
         return NSAttributedString(string: mesUseeName!)
+    }
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat {
+        return 20
     }
     
 }
