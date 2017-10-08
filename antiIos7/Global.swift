@@ -18,7 +18,7 @@ var nameChanged = false
 var chan        = "antichat_hackathon"
 var imgName     = "1.png"
 var imgSticker  = ""
-var textGlobal  = ""
+
 
 func chatMessageToDictionary(_ chatmessage: ChatMessage) -> [String: NSString]{
     return [
@@ -34,7 +34,8 @@ func chatMesToDicJSQ(_ chatmessage: MesJSQ) -> [String: NSString]{
         "username": NSString(string: chatmessage.username),
         "text"    : NSString(string: chatmessage.textMes),
         "time"    : NSString(string: chatmessage.time),
-        "image"   : NSString(string: chatmessage.image)
+        "image"   : NSString(string: chatmessage.image),
+        "stickers": NSString(string: chatmessage.imgSticker)
     ]
     
 }

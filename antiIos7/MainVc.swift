@@ -286,8 +286,8 @@ class MainVC: UIViewController, PNObjectEventListener{
         let appDel = UIApplication.shared.delegate! as! AppDelegate
         let pubChat = ChatMessage(username: userName, text: messageTxtField.text!, time: getTime(), image: imgName, imgSticker: imgSticker)
         let newDict = chatMessageToDictionary(pubChat)
-        
         appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
+        imgSticker = ""
         updateTableview()
         
     }
