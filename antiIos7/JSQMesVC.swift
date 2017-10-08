@@ -131,7 +131,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
             
             chatMesArray2 = self.parseJson(result!.data.messages as AnyObject)
             self.mesModelJSQ = self.parseJsonforJSqMes(result?.data.messages as AnyObject)
-          //  self.mesModelJSQ = self.parseJsonforJSqMedia(result?.data.messages as AnyObject)
+            self.mesModelJSQ = self.parseJsonforJSqMedia(result?.data.messages as AnyObject)
             self.updateTableview()
             
         })
@@ -180,7 +180,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
 //        
         let newMes = JSQMessage(senderId: stringName, displayName: stringName, text: stringText)
 //        let newM = JSQMessage(senderId: stringName, displayName: stringName, media: phoForJSQ)
-      //  mesModelJSQ.append(newMes!)
+       mesModelJSQ.append(newMes!)
                 updateChat()
     }
     func getTime() -> String{
@@ -201,12 +201,12 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener {
         let pubChat = MesJSQ(username: senderDisplayName, textMes: text, time: getTime(), image: "", imgSticker: imgSticker)
         let newDict = chatMessageToDictionary(pubChat)
         appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
-        messageModel.append(pubChat)
-        updateTableview()
+       // messageModel.append(pubChat)
+       // updateTableview()
         
         //For JSq
         let mes = JSQMessage(senderId: senderId, senderDisplayName: senderDisplayName, date: date, text: text)
-        mesModelJSQ.append(mes!)
+      //  mesModelJSQ.append(mes!)
         finishSendingMessage()
     }
     
@@ -300,7 +300,7 @@ extension JSQMesVC {
           // list.append(JSQMessage(senderId: usernameJson, displayName: usernameJson, media: phoForJSQ))
            
         }
-        collectionView.reloadData()
+       // collectionView.reloadData()
         
     }
     
@@ -328,10 +328,10 @@ extension JSQMesVC {
                 imgSticker = imgStickerJ
                // mesModelJSQ.append(JSQMessage(senderId: usernameJson, displayName: usernameJson, media: phoForJSQ))
                // list.append(JSQMessage(senderId: usernameJson, displayName: usernameJson, text: textJson))
-                 list.append(JSQMessage(senderId: senderId , displayName: senderId, media: phoForJSQ))
+                 list.append(JSQMessage(senderId: usernameJson , displayName: usernameJson, media: phoForJSQ))
                 
             }
-            collectionView.reloadData()
+          //  collectionView.reloadData()
             
         }
         
