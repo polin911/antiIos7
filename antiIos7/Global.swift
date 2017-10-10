@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import JSQMessagesViewController
 var chatMesArray :[ChatMessage]  = []
 var usersArray   :[String]       = []
 

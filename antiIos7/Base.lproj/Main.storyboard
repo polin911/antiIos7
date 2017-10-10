@@ -172,12 +172,45 @@
                     <view key="view" contentMode="scaleToFill" id="Cs1-bc-h59">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="D6L-6G-b4A">
+                                <rect key="frame" x="0.0" y="538" width="375" height="69"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="69" id="5hC-na-kuJ"/>
+                                </constraints>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="in0-sL-5Wn">
+                                    <size key="itemSize" width="50" height="50"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="Ciq-Fy-0hb">
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO">
+                                            <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </view>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="D6L-6G-b4A" firstAttribute="leading" secondItem="Cs1-bc-h59" secondAttribute="leading" id="T8I-IJ-VUB"/>
+                            <constraint firstItem="ZvS-PR-skJ" firstAttribute="top" secondItem="D6L-6G-b4A" secondAttribute="bottom" constant="60" id="atO-vD-SPg"/>
+                            <constraint firstAttribute="trailing" secondItem="D6L-6G-b4A" secondAttribute="trailing" id="iUO-16-p78"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="stickersCollection" destination="D6L-6G-b4A" id="7MK-Ig-FMK"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jqr-3t-NUL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-65" y="729"/>
+            <point key="canvasLocation" x="-66.400000000000006" y="728.18590704647681"/>
         </scene>
         <!--Collection View Controller-->
         <scene sceneID="gfT-rU-hwL">
@@ -267,7 +300,7 @@
                                                 <rect key="frame" x="0.0" y="28" width="359" height="187"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fi6-we-or5" id="Q9G-gf-9sS">
-                                                    <rect key="frame" x="0.0" y="0.0" width="359" height="186.5"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="359" height="187"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="s2" translatesAutoresizingMaskIntoConstraints="NO" id="inT-fH-Z0u">
