@@ -127,6 +127,28 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
           
         })
     }
+    func parseData(_ data: NSDictionary) -> JSQMessage? {
+        
+        let stringData    = data
+        let stringName    = stringData["username"] as? String ?? ""
+        let stringTime    = stringData["time"] as? String ?? ""
+        let stringImg     = stringData["image"] as? String ?? ""
+        var newMessage: JSQMessage?
+        if  let stringSticker = stringData["stickers"] as? String ,
+            stringSticker.isEmpty == false {
+            
+            let imgForJSq = UIImage(named: stringSticker)
+            let phoForJSQ = JSQPhotoMediaItem(image: imgForJSq)
+            newMessage = JSQMessage(senderId: stringName, displayName: stringName, media: phoForJSQ)
+        } else if  let stringText  = stringData["text"] as? String {
+            newMessage = JSQMessage(senderId: stringName, displayName: stringName, text: stringText)
+            
+        }
+        guard let readyMessage = newMessage else {
+            return nil
+        }
+        return readyMessage
+    }
 
     func client(_ client: PubNub, didReceiveMessage message: PNMessageResult) {
         print("******didReceiveMessage*****")
@@ -137,29 +159,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             return
         }
     
-        let stringName    = stringData["username"] as? String ?? ""
-       
-        let stringTime    = stringData["time"] as? String ?? ""
-        let stringImg     = stringData["image"] as? String ?? ""
-        
-        
-        //JSQ Pic
-
-
-        var newMessage: JSQMessage?
-        
-        if  let stringSticker = stringData["stickers"] as? String ,
-            stringSticker.isEmpty == false {
-        
-            let imgForJSq = UIImage(named: stringSticker)
-            let phoForJSQ = JSQPhotoMediaItem(image: imgForJSq)
-        newMessage = JSQMessage(senderId: stringName, displayName: stringName, media: phoForJSQ)
-        } else if  let stringText  = stringData["text"] as? String {
-            newMessage = JSQMessage(senderId: stringName, displayName: stringName, text: stringText)
-        
-            
-        }
-        guard let readyMessage = newMessage else {
+        guard  let readyMessage = parseData(stringData) else{
             return
         }
         mesModelJSQ.append(readyMessage)
