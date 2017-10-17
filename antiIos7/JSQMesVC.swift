@@ -133,42 +133,38 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         print("from client!!!!!!!!!!!!!!!!!!!!!!!\(message.data)")
         print("*******UUID from message IS \(message.uuid)")
         
-        let stringData  = message.data.message as? NSDictionary
+        guard let stringData  = message.data.message as? NSDictionary else {
+            return
+        }
     
-        let stringName    = stringData?["username"] as? String ?? ""
-        let stringText    = stringData?["text"] as? String ?? ""
-        let stringTime    = stringData?["time"] as? String ?? ""
-        let stringImg     = stringData?["image"] as? String ?? ""
+        let stringName    = stringData["username"] as? String ?? ""
+       
+        let stringTime    = stringData["time"] as? String ?? ""
+        let stringImg     = stringData["image"] as? String ?? ""
         
         
         //JSQ Pic
 
-//        
 
-        
-        
-       // messageModel.append(MesJSQ(username: stringName, textMes: stringText, time: stringTime, image: stringImg, imgSticker: stringSticker))
-        
-//        for mesM in mesModelJSQ {
-//            if !mesM.isMediaMessage {
-//               newMtransform = newMes!
-//            } else {
-//                newMtransform = newM!
-//            }
-//        }
         var newMessage: JSQMessage?
         
-        if  let stringSticker = stringData?["stickers"] as? String {
+        if  let stringSticker = stringData["stickers"] as? String ,
+            stringSticker.isEmpty == false {
+        
             let imgForJSq = UIImage(named: stringSticker)
             let phoForJSQ = JSQPhotoMediaItem(image: imgForJSq)
         newMessage = JSQMessage(senderId: stringName, displayName: stringName, media: phoForJSQ)
+        } else if  let stringText  = stringData["text"] as? String {
+            newMessage = JSQMessage(senderId: stringName, displayName: stringName, text: stringText)
+        
+            
         }
         guard let readyMessage = newMessage else {
             return
         }
         mesModelJSQ.append(readyMessage)
         collectionView.reloadData()
-    //finishReceivingMessage()
+   // finishReceivingMessage()
     }
     func getTime() -> String{
         let currentDate = Date()  // -  get the current date
@@ -246,7 +242,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
 
         return mesModelJSQ[indexPath.item]
     }
-    
+
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
         let buble = JSQMessagesBubbleImageFactory()
         let message = mesModelJSQ[indexPath.item]
