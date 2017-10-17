@@ -19,6 +19,10 @@
 		363F1A541F87A79500B7792E /* messageViewIncoming.xib in Resources */ = {isa = PBXBuildFile; fileRef = 363F1A521F87A79500B7792E /* messageViewIncoming.xib */; };
 		363F1A5A1F89190800B7792E /* StickerCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363F1A581F89190800B7792E /* StickerCollectionViewController.swift */; };
 		363F1A5B1F89190800B7792E /* StickerCollectionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 363F1A591F89190800B7792E /* StickerCollectionViewController.xib */; };
+		3649218C1F8E4271007E4785 /* HotNewsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3649218B1F8E4271007E4785 /* HotNewsVC.swift */; };
+		3649218E1F8E45FD007E4785 /* HotCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3649218D1F8E45FD007E4785 /* HotCell.swift */; };
+		364921911F8E490A007E4785 /* HotModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 364921901F8E490A007E4785 /* HotModel.swift */; };
+		364921931F8E5020007E4785 /* TypesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 364921921F8E5020007E4785 /* TypesModel.swift */; };
 		3683F0131F82300100E08CF4 /* MainVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0121F82300100E08CF4 /* MainVc.swift */; };
 		3683F0161F82303F00E08CF4 /* WelcomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0151F82303F00E08CF4 /* WelcomeVC.swift */; };
 		3683F0181F82308D00E08CF4 /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0171F82308D00E08CF4 /* Global.swift */; };
@@ -45,6 +49,10 @@
 		363F1A521F87A79500B7792E /* messageViewIncoming.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = messageViewIncoming.xib; sourceTree = "<group>"; };
 		363F1A581F89190800B7792E /* StickerCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickerCollectionViewController.swift; sourceTree = "<group>"; };
 		363F1A591F89190800B7792E /* StickerCollectionViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StickerCollectionViewController.xib; sourceTree = "<group>"; };
+		3649218B1F8E4271007E4785 /* HotNewsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotNewsVC.swift; sourceTree = "<group>"; };
+		3649218D1F8E45FD007E4785 /* HotCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotCell.swift; sourceTree = "<group>"; };
+		364921901F8E490A007E4785 /* HotModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotModel.swift; sourceTree = "<group>"; };
+		364921921F8E5020007E4785 /* TypesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypesModel.swift; sourceTree = "<group>"; };
 		3683F0121F82300100E08CF4 /* MainVc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainVc.swift; sourceTree = "<group>"; };
 		3683F0151F82303F00E08CF4 /* WelcomeVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WelcomeVC.swift; sourceTree = "<group>"; };
 		3683F0171F82308D00E08CF4 /* Global.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
@@ -90,6 +98,7 @@
 		362DEB481F822CCF0085FBD1 /* antiIos7 */ = {
 			isa = PBXGroup;
 			children = (
+				364921881F8E4224007E4785 /* newTolls */,
 				363F1A571F8918D800B7792E /* newXib */,
 				3683F01C1F82353300E08CF4 /* View */,
 				3683F0191F82309500E08CF4 /* Model */,
@@ -117,6 +126,41 @@
 				363F1A591F89190800B7792E /* StickerCollectionViewController.xib */,
 			);
 			name = newXib;
+			sourceTree = "<group>";
+		};
+		364921881F8E4224007E4785 /* newTolls */ = {
+			isa = PBXGroup;
+			children = (
+				3649218F1F8E48EA007E4785 /* Files */,
+				3649218A1F8E4244007E4785 /* views */,
+				364921891F8E422E007E4785 /* controllers */,
+			);
+			name = newTolls;
+			sourceTree = "<group>";
+		};
+		364921891F8E422E007E4785 /* controllers */ = {
+			isa = PBXGroup;
+			children = (
+				3649218B1F8E4271007E4785 /* HotNewsVC.swift */,
+			);
+			name = controllers;
+			sourceTree = "<group>";
+		};
+		3649218A1F8E4244007E4785 /* views */ = {
+			isa = PBXGroup;
+			children = (
+				3649218D1F8E45FD007E4785 /* HotCell.swift */,
+			);
+			name = views;
+			sourceTree = "<group>";
+		};
+		3649218F1F8E48EA007E4785 /* Files */ = {
+			isa = PBXGroup;
+			children = (
+				364921901F8E490A007E4785 /* HotModel.swift */,
+				364921921F8E5020007E4785 /* TypesModel.swift */,
+			);
+			name = Files;
 			sourceTree = "<group>";
 		};
 		3683F0141F82300B00E08CF4 /* Controller */ = {
@@ -293,16 +337,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				363F1A531F87A79500B7792E /* messageViewIncoming.swift in Sources */,
+				364921931F8E5020007E4785 /* TypesModel.swift in Sources */,
 				3621E9C41F83C4CB0097EAB1 /* JSQMesVC.swift in Sources */,
 				363F1A4F1F87A70700B7792E /* messageViewOutgoingCell.swift in Sources */,
 				362DEB521F822CCF0085FBD1 /* antiIos7.xcdatamodeld in Sources */,
 				3683F0221F823E9C00E08CF4 /* StickerCell.swift in Sources */,
+				364921911F8E490A007E4785 /* HotModel.swift in Sources */,
 				3683F0201F823D8400E08CF4 /* ChatCell.swift in Sources */,
 				3683F0131F82300100E08CF4 /* MainVc.swift in Sources */,
 				362DEB4A1F822CCF0085FBD1 /* AppDelegate.swift in Sources */,
 				363F1A5A1F89190800B7792E /* StickerCollectionViewController.swift in Sources */,
 				3683F0181F82308D00E08CF4 /* Global.swift in Sources */,
 				3683F0161F82303F00E08CF4 /* WelcomeVC.swift in Sources */,
+				3649218C1F8E4271007E4785 /* HotNewsVC.swift in Sources */,
+				3649218E1F8E45FD007E4785 /* HotCell.swift in Sources */,
 				3683F01E1F82356D00E08CF4 /* ImgCell.swift in Sources */,
 				3683F01B1F8230A900E08CF4 /* ChatModel.swift in Sources */,
 			);
@@ -430,6 +478,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = CBVCE8QCE8;
 				INFOPLIST_FILE = antiIos7/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = polin911.antiIos7;
@@ -446,6 +495,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = CBVCE8QCE8;
 				INFOPLIST_FILE = antiIos7/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = polin911.antiIos7;

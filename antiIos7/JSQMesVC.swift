@@ -19,7 +19,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     let picker = UIImagePickerController()
     
     @IBOutlet var stickersCollection: UICollectionView!
-    
+    var newMtransform: JSQMessage!
     var messageModel = [MesJSQ]()
     var mesModelJSQ = [JSQMessage]()
     var appDel = UIApplication.shared.delegate as! AppDelegate
@@ -139,19 +139,36 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         let stringText    = stringData?["text"] as? String ?? ""
         let stringTime    = stringData?["time"] as? String ?? ""
         let stringImg     = stringData?["image"] as? String ?? ""
-        let stringSticker = stringData?["stickers"] as? String ?? ""
+        
         
         //JSQ Pic
-        let imgForJSq = UIImage(named: stringSticker)
-        let phoForJSQ = JSQPhotoMediaItem(image: imgForJSq)
+
 //        
-        let newMes = JSQMessage(senderId: stringName, displayName: stringName, text: stringText)
-        let newM = JSQMessage(senderId: stringName, displayName: stringName, media: phoForJSQ)
+
+        
         
        // messageModel.append(MesJSQ(username: stringName, textMes: stringText, time: stringTime, image: stringImg, imgSticker: stringSticker))
-        mesModelJSQ.append(newM!)
-       // collectionView.reloadData()
-        finishReceivingMessage()
+        
+//        for mesM in mesModelJSQ {
+//            if !mesM.isMediaMessage {
+//               newMtransform = newMes!
+//            } else {
+//                newMtransform = newM!
+//            }
+//        }
+        var newMessage: JSQMessage?
+        
+        if  let stringSticker = stringData?["stickers"] as? String {
+            let imgForJSq = UIImage(named: stringSticker)
+            let phoForJSQ = JSQPhotoMediaItem(image: imgForJSq)
+        newMessage = JSQMessage(senderId: stringName, displayName: stringName, media: phoForJSQ)
+        }
+        guard let readyMessage = newMessage else {
+            return
+        }
+        mesModelJSQ.append(readyMessage)
+        collectionView.reloadData()
+    //finishReceivingMessage()
     }
     func getTime() -> String{
         let currentDate = Date()  // -  get the current date
