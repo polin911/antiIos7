@@ -120,12 +120,23 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         appDel.client?.historyForChannel(chan, start: nil, end: nil, includeTimeToken: true, withCompletion: { (result, status) in
             print("!!!!!!!!!Status: \(result)")
          //   chatMesArray2 = self.parseJson(result!.data.messages as AnyObject)
-            self.mesModelJSQ = self.parseJsonforJSqMes(result?.data.messages as AnyObject)
+            self.mesModelJSQ = self.parseDataAny(result!.data.messages as [AnyObject])
            // self.mesModelJSQ = self.parseJsonforJSqMedia(result?.data.messages as AnyObject)
             self.collectionView.reloadData()
             self.finishReceivingMessage()
           
         })
+    }
+    func parseDataAny(_ any: [AnyObject] ) -> [JSQMessage] {
+        var list = [JSQMessage]()
+        for data in any {
+            if let data = data as? NSDictionary,
+                let messageData = data["message"] as? NSDictionary,
+                let message = parseData(messageData){
+                list.append(message)
+            }
+        }
+        return list
     }
     func parseData(_ data: NSDictionary) -> JSQMessage? {
         
