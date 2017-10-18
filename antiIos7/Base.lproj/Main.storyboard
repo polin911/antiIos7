@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="nzd-Rb-B1i">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -112,7 +112,7 @@
                                                 </constraints>
                                                 <state key="normal" title="JSQ"/>
                                                 <connections>
-                                                    <segue destination="XcH-3I-yeY" kind="show" id="SNk-mC-nhd"/>
+                                                    <segue destination="XcH-3I-yeY" kind="show" id="YVO-QQ-TqJ"/>
                                                 </connections>
                                             </button>
                                         </subviews>
@@ -266,6 +266,7 @@
                     </view>
                     <connections>
                         <outlet property="stickersCollection" destination="D6L-6G-b4A" id="7MK-Ig-FMK"/>
+                        <segue destination="nzd-Rb-B1i" kind="presentation" identifier="showStickersVC" id="Awo-QK-bQ8"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jqr-3t-NUL" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -305,6 +306,24 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="axg-aP-Idi" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="766" y="835"/>
+        </scene>
+        <!--VcJSQ-->
+        <scene sceneID="XyR-7t-riS">
+            <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="RZt-SM-WuC" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <viewController id="dm2-D1-yR2" customClass="VcJSQ" customModule="antiIos7" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Gbr-5g-uln"/>
+                        <viewControllerLayoutGuide type="bottom" id="mBs-V7-DIE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="cYX-dy-ZNu">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
+                    </view>
+                </viewController>
+            </objects>
+            <point key="canvasLocation" x="-25" y="1517"/>
         </scene>
         <!--MainVC-->
         <scene sceneID="5Qt-DW-FgK">

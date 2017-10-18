@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import JSQMessagesViewController
 
 private let reuseIdentifier = "StickCell"
 
@@ -14,6 +15,13 @@ class StickersController4JSQ: UICollectionViewController {
     
      var imgStrickersString = ["s1.png","s2.png","s3.png","s4.png","s5.png", "s6.png","s7.png","s8.png","s9.png","s10.png","s11.png","s12.png","s13.png","s14.png","s15.png","s16.png"]
 
+    var message4JSQ : JSQMesVC!
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let vc = segue.destination as? JSQMesVC {
+            vc.finishSendingMessage()
+        }
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -24,17 +32,7 @@ class StickersController4JSQ: UICollectionViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    /*
-    // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
-
-    // MARK: UICollectionViewDataSource
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
         // #warning Incomplete implementation, return the number of sections
@@ -57,6 +55,11 @@ class StickersController4JSQ: UICollectionViewController {
     }
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+     
+   imgSticker = imgStrickersString[indexPath.row]
+        
+        
+        dismiss(animated: true, completion: nil)
         
     }
 
