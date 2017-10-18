@@ -61,7 +61,6 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
 
     }
 
-    
     ////Collection
     func collectionUpload() {
         
@@ -119,9 +118,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         
         appDel.client?.historyForChannel(chan, start: nil, end: nil, includeTimeToken: true, withCompletion: { (result, status) in
             print("!!!!!!!!!Status: \(result)")
-         //   chatMesArray2 = self.parseJson(result!.data.messages as AnyObject)
             self.mesModelJSQ = self.parseDataAny(result!.data.messages as [AnyObject])
-           // self.mesModelJSQ = self.parseJsonforJSqMedia(result?.data.messages as AnyObject)
             self.collectionView.reloadData()
             self.finishReceivingMessage()
           
@@ -151,9 +148,8 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             let imgForJSq = UIImage(named: stringSticker)
             let phoForJSQ = JSQPhotoMediaItem(image: imgForJSq)
             newMessage = JSQMessage(senderId: stringName, displayName: stringName, media: phoForJSQ)
-        } else if  let stringText  = stringData["text"] as? String {
+        } else if let stringText = stringData["text"] as? String {
             newMessage = JSQMessage(senderId: stringName, displayName: stringName, text: stringText)
-            
         }
         guard let readyMessage = newMessage else {
             return nil
@@ -225,9 +221,6 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         let pubChat = MesJSQ(username: senderDisplayName, textMes: text, time: getTime(), image: "", imgSticker: "")
         let newDict = chatMessageToDictionary(pubChat)
         appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
-       // messageModel.append(pubChat)
-       // updateTableview()
-        
         //For JSq
         let mes = JSQMessage(senderId: senderId, displayName: senderDisplayName, text: text)
         mesModelJSQ.append(mes!)
@@ -280,73 +273,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
 }
-extension JSQMesVC {
-    func parseJsonforJSqMes(_ anyObj:AnyObject) -> [JSQMessage] {
-        var list : [JSQMessage] = []
-        if  anyObj is [AnyObject] {
-        for jsonMsg in anyObj as! [AnyObject] {
-            let json = jsonMsg["message"] as? NSDictionary
-            
-            let usernameJson = (json?["username"] as AnyObject? as? String) ?? "" // to get rid of null
-            let textJson     = (json?["text"]  as AnyObject? as? String) ?? ""
-            let timeJson     = (json?["time"]  as AnyObject? as? String) ?? ""
-            let imgJson      = (json?["image"] as AnyObject as? String) ?? ""
-            let sendIdJ      = (json?["uuid"] as AnyObject? as? String) ?? ""
-            let imgStickerJ  = (json?["stickers"] as AnyObject? as? String) ?? ""
-    
-            //JSQ Pic
-            let imgForJSq = UIImage(named: imgStickerJ)
-            let phoForJSQ = JSQPhotoMediaItem(image: imgForJSq)
-            
-           // imgSticker = imgStickerJ
-           // mesModelJSQ.append(JSQMessage(senderId: usernameJson, displayName: usernameJson, media: phoForJSQ))
-        list.append(JSQMessage(senderId: usernameJson, displayName: usernameJson, text: textJson))
-          // list.append(JSQMessage(senderId: usernameJson, displayName: usernameJson, media: phoForJSQ))
-           
-        }
-       // collectionView.reloadData()
-        
-    }
-    
-    return list
-    
-    }
-    
-    func parseJsonforJSqMedia(_ anyObj:AnyObject) -> [JSQMessage] {
-       var list : [JSQMessage] = []
-        if  anyObj is [AnyObject] {
-            for jsonMsg in anyObj as! [AnyObject] {
-                let json = jsonMsg["message"] as? NSDictionary
-                
-                let usernameJson = (json?["username"] as AnyObject? as? String) ?? "" // to get rid of null
-                let textJson     = (json?["text"]  as AnyObject? as? String) ?? ""
-                let timeJson     = (json?["time"]  as AnyObject? as? String) ?? ""
-                let imgJson      = (json?["image"] as AnyObject as? String) ?? ""
-                let sendIdJ      = (json?["uuid"] as AnyObject? as? String) ?? ""
-                let imgStickerJ  = (json?["stickers"] as AnyObject? as? String) ?? ""
-                
-                //JSQ Pic
-                let imgForJSq = UIImage(named: imgStickerJ)
-                let phoForJSQ = JSQPhotoMediaItem(image: imgForJSq)
-                
-               // imgSticker = imgStickerJ
-               // mesModelJSQ.append(JSQMessage(senderId: usernameJson, displayName: usernameJson, media: phoForJSQ))
-               // list.append(JSQMessage(senderId: usernameJson, displayName: usernameJson, text: textJson))
-                 list.append(JSQMessage(senderId: usernameJson , displayName: usernameJson, media: phoForJSQ))
-                
-            }
-          //  collectionView.reloadData()
-            
-        }
-        
-        return list
-        
-    }
-}
-extension JSQMesVC {
-    
-    
-}
+
 
     
 
