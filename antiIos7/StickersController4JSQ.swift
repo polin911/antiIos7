@@ -9,17 +9,32 @@
 import UIKit
 import JSQMessagesViewController
 
+protocol stickerName {
+    var nameStick : String { get }
+}
 private let reuseIdentifier = "StickCell"
 
-class StickersController4JSQ: UICollectionViewController {
-    
+class StickersController4JSQ: UICollectionViewController, stickerName {
+   
+    var nameStick: String {
+        return newNameStickers
+    }
+
      var imgStrickersString = ["s1.png","s2.png","s3.png","s4.png","s5.png", "s6.png","s7.png","s8.png","s9.png","s10.png","s11.png","s12.png","s13.png","s14.png","s15.png","s16.png"]
+    
+    var newNameStickers = ""
+    var mesJSQ : MesJSQ?
 
     var message4JSQ : JSQMesVC!
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let vc = segue.destination as? JSQMesVC {
-            vc.finishSendingMessage()
+           
+            
+            
+//            let pic = UIImage(named: imgSticker)
+//            let img = JSQPhotoMediaItem(image: pic)
+//            vc.mesModelJSQ.append(JSQMessage(senderId: vc.senderId, displayName: vc.senderDisplayName, media: img))
         }
     }
     override func viewDidLoad() {
@@ -56,8 +71,7 @@ class StickersController4JSQ: UICollectionViewController {
 
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
      
-   imgSticker = imgStrickersString[indexPath.row]
-        
+        imageSticker = imgStrickersString[indexPath.row]
         
         dismiss(animated: true, completion: nil)
         

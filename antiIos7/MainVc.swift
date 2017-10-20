@@ -47,7 +47,7 @@ class MainVC: UIViewController, PNObjectEventListener{
     
     
     
-    func extractedFunc() {
+    func updateView() {
         self.chatTableView.delegate   = self
         self.chatTableView.dataSource = self
         
@@ -56,11 +56,6 @@ class MainVC: UIViewController, PNObjectEventListener{
         initPubNub()
         updateTableview()
         userImg.image = UIImage(named: imgName)
-    }
-    
-    func updateView() {
-        extractedFunc()
-        
     }
     ///////////////////////////////MARK: PubNubConnection
     
@@ -256,8 +251,7 @@ class MainVC: UIViewController, PNObjectEventListener{
         }
         
         updateChat()
-        
-        
+ 
     }
     
     /////////
@@ -284,10 +278,10 @@ class MainVC: UIViewController, PNObjectEventListener{
     
     func updateStickers() {
         let appDel = UIApplication.shared.delegate! as! AppDelegate
-        let pubChat = ChatMessage(username: userName, text: messageTxtField.text!, time: getTime(), image: imgName, imgSticker: imgSticker)
+        let pubChat = ChatMessage(username: userName, text: messageTxtField.text!, time: getTime(), image: imgName, imgSticker: imageSticker)
         let newDict = chatMessageToDictionary(pubChat)
         appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
-        imgSticker = ""
+        imageSticker = ""
         updateTableview()
         
     }
@@ -295,11 +289,10 @@ class MainVC: UIViewController, PNObjectEventListener{
     @IBAction func senderBtnPressed(_ sender: AnyObject) {
         let appDel = UIApplication.shared.delegate! as! AppDelegate
         
-        
         let message = messageTxtField.text
         if(message == "") {return}
         else{
-            let pubChat = ChatMessage(username: userName, text: messageTxtField.text!, time: getTime(), image: imgName, imgSticker: imgSticker)
+            let pubChat = ChatMessage(username: userName, text: messageTxtField.text!, time: getTime(), image: imgName, imgSticker: imageSticker)
             
             let newDict = chatMessageToDictionary(pubChat)
             
@@ -340,7 +333,7 @@ extension MainVC: UITableViewDelegate {
     extension MainVC: UICollectionViewDelegate {
         func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
             let currentSticker = imgStrickersString[indexPath.row]
-            imgSticker = currentSticker
+            imageSticker = currentSticker
             stickerCollectionView.isHidden = true
             xBtn.isHidden = true
             updateStickers()

@@ -44,7 +44,7 @@ class newJSQVC: JSQMessagesViewController,  PNObjectEventListener, UIImagePicker
         
         print("!!!!!!!!!!!!!!!!!!SenderId!!!!!!!!!!!!!!!!!!:\(senderId)")
         print("!!!!!!!!!!!!!!!!!!SenderN!!!!!!!!!!!!!!!!!!:\(userName)")
-        
+       
         /////////////customCell
         self.collectionView.register(UINib(nibName: "messageViewIncoming", bundle: nil), forCellWithReuseIdentifier: "incomingCell")
         self.collectionView.register(UINib(nibName: "messageViewOutgoingCell", bundle: nil), forCellWithReuseIdentifier: "outgoingCell")
@@ -60,7 +60,6 @@ class newJSQVC: JSQMessagesViewController,  PNObjectEventListener, UIImagePicker
         
         super.viewDidAppear(animated)
         self.collectionView.collectionViewLayout.springinessEnabled = true
-        
     }
     
     override func didReceiveMemoryWarning() {

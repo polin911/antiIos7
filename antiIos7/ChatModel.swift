@@ -23,7 +23,7 @@ struct MesJSQ {
     var textMes : String
     var time    : String
     var image   : String
-    var imgSticker: String
+    var imgSticker :String
     
 //    init(userN: String, textMes: String, time: String, image: String ) {
 //        self.username = userN

@@ -18,7 +18,7 @@ var userName    = ""
 var nameChanged = false
 var chan        = "antichat_hackathon"
 var imgName     = "1.png"
-var imgSticker  = ""
+var imageSticker  = ""
 
 
 func chatMessageToDictionary(_ chatmessage: ChatMessage) -> [String: NSString]{

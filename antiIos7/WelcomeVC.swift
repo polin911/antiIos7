@@ -31,16 +31,16 @@ class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     /////////////////MARK: AlertFunction
     
     func changeNameModal() {
-        
+
         if #available(iOS 8.0, *) {
             let loginAlert:UIAlertController = UIAlertController(title: "Имя", message: "Введите свое имя или ник", preferredStyle: .alert)
-            
+
             loginAlert.addTextField(configurationHandler: {
                 textfield in
                 textfield.placeholder = "What is your name?"
             })
-            
-            
+
+
             loginAlert.addAction(UIAlertAction(title: "Go", style: .default, handler: {alertAction in
                                                 let textFields:NSArray = loginAlert.textFields! as NSArray
                                                 let usernameTextField:UITextField = textFields.object(at: 0) as! UITextField
@@ -54,49 +54,49 @@ class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
                                                     nameChanged = true
                                                 }
             }))
-            
+
             self.present(loginAlert, animated: true, completion: nil)
         } else {
             // Fallback on earlier versions
         }
-        
-        
+
+
     }
     
-    
-    func changeChatModal() {
-        let appDel = UIApplication.shared.delegate! as! AppDelegate
-        appDel.client?.unsubscribeFromChannels([chan], withPresence: true)
-        
-        
-        if #available(iOS 8.0, *) {
-            let loginAlert:UIAlertController = UIAlertController(title: "Телепортироваться в другой чат", message: "Введите название чатп", preferredStyle: UIAlertControllerStyle.alert)
-            loginAlert.addTextField(configurationHandler: {
-                textfield in
-                textfield.placeholder = "подписать меня на чат: _____"
-            })
-            
-            loginAlert.addAction(UIAlertAction(title: "Go", style: UIAlertActionStyle.default, handler: {alertAction in
-                let textFields:NSArray = loginAlert.textFields! as NSArray
-                let usernameTextField:UITextField = textFields.adding(0) as! UITextField
-                chan = usernameTextField.text!
-                if(chan == ""){
-                    self.changeChatModal()
-                }
-                else{
-                    chatMesArray = []
-                    usersArray = []
-                    appDel.client?.subscribeToChannels([chan], withPresence: true)
-                }
-            }))
-            
-            self.present(loginAlert, animated: true, completion: nil)
-        } else {
-            // Fallback on earlier versions
-        }
-        
-        
-    }
+//
+//    func changeChatModal() {
+//        let appDel = UIApplication.shared.delegate! as! AppDelegate
+//        appDel.client?.unsubscribeFromChannels([chan], withPresence: true)
+//
+//
+//        if #available(iOS 8.0, *) {
+//            let loginAlert:UIAlertController = UIAlertController(title: "Телепортироваться в другой чат", message: "Введите название чатп", preferredStyle: UIAlertControllerStyle.alert)
+//            loginAlert.addTextField(configurationHandler: {
+//                textfield in
+//                textfield.placeholder = "подписать меня на чат: _____"
+//            })
+//
+//            loginAlert.addAction(UIAlertAction(title: "Go", style: UIAlertActionStyle.default, handler: {alertAction in
+//                let textFields:NSArray = loginAlert.textFields! as NSArray
+//                let usernameTextField:UITextField = textFields.adding(0) as! UITextField
+//                chan = usernameTextField.text!
+//                if(chan == ""){
+//                    self.changeChatModal()
+//                }
+//                else{
+//                    chatMesArray = []
+//                    usersArray = []
+//                    appDel.client?.subscribeToChannels([chan], withPresence: true)
+//                }
+//            }))
+//
+//            self.present(loginAlert, animated: true, completion: nil)
+//        } else {
+//            // Fallback on earlier versions
+//        }
+//
+//
+//    }
     
     func showUserImg() {
         //let appDel = UIApplication.shared.delegate! as! AppDelegate
