@@ -29,12 +29,8 @@ class StickersController4JSQ: UICollectionViewController, stickerName {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let vc = segue.destination as? JSQMesVC {
-           
-            
-            
-//            let pic = UIImage(named: imgSticker)
-//            let img = JSQPhotoMediaItem(image: pic)
-//            vc.mesModelJSQ.append(JSQMessage(senderId: vc.senderId, displayName: vc.senderDisplayName, media: img))
+          
+
         }
     }
     override func viewDidLoad() {
