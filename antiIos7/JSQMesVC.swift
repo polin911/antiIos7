@@ -37,14 +37,16 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         //ButtonForSticker
        // self.inputToolbar.contentView.leftBarButtonItem = stickBtn
       //  buttonStickApperiance()
-        
+        self.collectionView.backgroundColor = UIColor.black
+       
+        //updateHistory()
         /////////
      
         picker.delegate = self
         self.title = chan
         self.senderId = userName
         self.senderDisplayName = userName
-       
+       automaticallyScrollsToMostRecentMessage = true
         
         print("!!!!!!!!!!!!!!!!!!SenderId!!!!!!!!!!!!!!!!!!:\(senderId)")
         print("!!!!!!!!!!!!!!!!!!SenderN!!!!!!!!!!!!!!!!!!:\(userName)")
@@ -65,12 +67,11 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     override func viewWillAppear(_ animated: Bool) {
+       checkStickers()
         initPubNub()
-        
-       // updateTableview()
-        updateHistory()
-        checkStickers()
-//collectionView.reloadData()
+       updateHistory()
+
+
     }
     override func viewDidAppear(_ animated: Bool) {
         
@@ -121,7 +122,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             }
             _ = result?.data.occupancy.stringValue
         })
-        updateHistory()
+        //updateHistory()
  
         guard let deviceToken   = UserDefaults.standard.object(forKey: "deviceToken") as? Data
             else {
@@ -139,9 +140,9 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             
             self.mesModelJSQ = self.parseDataAny(result!.data.messages as [AnyObject])
             self.messageModel = self.parseJsonDataAny(result!.data.messages as [AnyObject])
-          //  self.collectionView.reloadData()
+           // self.collectionView.reloadData()
             self.finishReceivingMessage()
-//            imageSticker = ""
+
             
             print("Stiiiiiiiiiiiiickkers \(imageSticker)")
           
@@ -163,8 +164,8 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
            
             messageModel.append(pubChat)
             mesModelJSQ.append(newMessage)
-            finishSendingMessage()
-            collectionView.reloadData()
+            finishReceivingMessage()
+           // collectionView.reloadData()
         }
         //imageSticker = ""
     }
@@ -186,10 +187,10 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         guard let readyJsonMes = parseJsonMessage(stringData) else {
             return
         }
-        mesModelJSQ.append(readyMessage)
+       // mesModelJSQ.append(readyMessage)
         messageModel.append(readyJsonMes)
         collectionView.reloadData()
-   // finishReceivingMessage()
+        finishReceivingMessage()
     }
     func getTime() -> String{
         let currentDate = Date()  // -  get the current date
@@ -237,7 +238,14 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             let message = self.mesModelJSQ[indexPath.item]
             let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
         
-            return cell
+//        if message.senderId == self.senderId {
+//            cell.textView!.textColor = UIColor.white
+//        }
+//        else {
+//            cell.textView!.textColor = UIColor.blue
+//        }
+        return cell
+        
         }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -255,9 +263,9 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         let message = mesModelJSQ[indexPath.item]
 
         if senderId == message.senderId {
-            return buble?.outgoingMessagesBubbleImage(with: .black)
+            return buble?.outgoingMessagesBubbleImage(with: .red)
         } else {
-            return buble?.incomingMessagesBubbleImage(with: .black)
+            return buble?.incomingMessagesBubbleImage(with: .red)
         }
     }
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
@@ -283,8 +291,8 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
         let message = mesModelJSQ[indexPath.item]
         let mesUseeName = message.senderDisplayName
-        
-        
+//        var nameUser = NSAttributedString(string: mesUseeName!)
+
         return NSAttributedString(string: mesUseeName!)
     }
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat {

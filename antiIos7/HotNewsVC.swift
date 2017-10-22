@@ -19,14 +19,14 @@ class HotNewsVC: UIViewController {
     //
     var hModel: [HotModel] = []
     var typeModel = TypesModel()
-    var med4J    : Meduza4Json!
+    var med4J   = [Meduza4Json]()
     var titleMed = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         parseJSonMeduza()
-        
+        tableViewHot.reloadData()
 
     }
 
@@ -66,15 +66,19 @@ extension HotNewsVC {
                 let meduzaNews = try JSONDecoder().decode(Med4JsonDoc.self, from: data)
                 print("!!!!!!!!!!!!!!!Documents: \(meduzaNews)")
                 
-                let stringData = meduzaNews.documents as? NSDictionary
+                let stringData = meduzaNews.documents as NSDictionary
+                    var title = stringData["title"] as? String ?? ""
+                    var url   = stringData["url"]   as? String ?? ""
+                    var newMes = Meduza4Json(title: title, url: url)
+                self.med4J.append(newMes)
                // let dataMed = stringData![self.med4J] as? NSDictionary
-                let stringTitle = Meduza4Json.CodingKeys.title.rawValue
-                let stringUrl   = stringData!["url"] as? String ?? ""
-            
-                let newMessage = HotModel(newsTytle: stringTitle, url: Meduza4Json.CodingKeys.url.rawValue )
-                
-                self.hModel.append(newMessage)
-                print("title@@@@@@@@@@@@@@@@@@@\(stringTitle)")
+//                let stringTitle = Meduza4Json.CodingKeys.title.rawValue
+//                let stringUrl   = stringData!["url"] as? String ?? ""
+//
+//                let newMessage = HotModel(newsTytle: stringTitle, url: Meduza4Json.CodingKeys.url.rawValue )
+//
+//                self.hModel.append(newMessage)
+               // print("title@@@@@@@@@@@@@@@@@@@\(stringTitle)")
                 
                 
             } catch let error {
@@ -90,7 +94,7 @@ extension HotNewsVC: UITableViewDelegate , UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableViewHot.dequeueReusableCell(withIdentifier: "HotCell", for: indexPath) as! HotCell
-        cell.TitleOfNews.text = hModel[indexPath.row].newsTytle
+        cell.TitleOfNews.text = med4J[indexPath.row].title
         
 //        if typeModel.typeResourse == typeModel.arrayTypeResourse[2] {
 //
@@ -99,7 +103,7 @@ extension HotNewsVC: UITableViewDelegate , UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return hModel.count
+        return med4J.count
     }
 }
 /////////////////////

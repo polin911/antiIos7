@@ -25,10 +25,10 @@ struct Meduza4Json: Codable {
     var title    : String
     var url      : String
     
-    enum CodingKeys: String, CodingKey {
-        case title = "title"
-        case url   = "url"
-    }
+//    enum CodingKeys: String, CodingKey {
+//        case title = "title"
+//        case url   = "url"
+//    }
 
 }
 
