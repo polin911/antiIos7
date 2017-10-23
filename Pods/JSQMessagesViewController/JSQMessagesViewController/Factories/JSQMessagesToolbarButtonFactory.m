@@ -25,28 +25,24 @@
 
 @implementation JSQMessagesToolbarButtonFactory
 
+
 + (UIButton *)defaultAccessoryButtonItem
 {
-    UIImage *accessoryImage = [UIImage jsq_defaultAccessoryImage];
-    UIImage *normalImage = [accessoryImage jsq_imageMaskedWithColor:[UIColor lightGrayColor]];
-    UIImage *highlightedImage = [accessoryImage jsq_imageMaskedWithColor:[UIColor darkGrayColor]];
-
-    UIButton *accessoryButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, accessoryImage.size.width, 32.0f)];
-    [accessoryButton setImage:normalImage forState:UIControlStateNormal];
-    [accessoryButton setImage:highlightedImage forState:UIControlStateHighlighted];
-
-    accessoryButton.contentMode = UIViewContentModeScaleAspectFit;
-    accessoryButton.backgroundColor = [UIColor clearColor];
-    accessoryButton.tintColor = [UIColor lightGrayColor];
-    
-    accessoryButton.accessibilityLabel = [NSBundle jsq_localizedStringForKey:@"accessory_button_accessibility_label"];
-
-    return accessoryButton;
+    UIImage *cameraImage = [UIImage imageNamed:@"smileStck"];
+    UIImage *cameraNormal = [cameraImage jsq_imageMaskedWithColor:[UIColor lightGrayColor]];
+    UIImage *cameraHighlighted = [cameraImage jsq_imageMaskedWithColor:[UIColor darkGrayColor]];
+    UIButton *cameraButton = [[UIButton alloc] initWithFrame:CGRectZero];
+    [cameraButton setImage:cameraNormal forState:UIControlStateNormal];
+    [cameraButton setImage:cameraHighlighted forState:UIControlStateHighlighted];
+    cameraButton.contentMode = UIViewContentModeScaleAspectFit;
+    cameraButton.backgroundColor = [UIColor clearColor];
+    cameraButton.tintColor = [UIColor lightGrayColor];
+    return cameraButton;
 }
 
 + (UIButton *)defaultSendButtonItem
 {
-    NSString *sendTitle = [NSBundle jsq_localizedStringForKey:@"send"];
+    NSString *sendTitle = [NSBundle jsq_localizedStringForKey:@"oK"];
 
     UIButton *sendButton = [[UIButton alloc] initWithFrame:CGRectZero];
     [sendButton setTitle:sendTitle forState:UIControlStateNormal];

@@ -12,20 +12,22 @@ import PubNub
 import UIKit
 import AVKit
 import MobileCoreServices
-//import
 
 class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     let picker = UIImagePickerController()
+    
+    var incomingJSQ = JSQMessagesCollectionViewCellIncoming()
+    var outcominJSQ = JSQMessagesCollectionViewCellOutgoing()
     
     @IBOutlet var stickersCollection: UICollectionView!
     var newMtransform: JSQMessage!
     var messageModel = [MesJSQ]()
     var mesModelJSQ = [JSQMessage]()
     var appDel = UIApplication.shared.delegate as! AppDelegate
+    var mediaAspect: JSQMessageMediaData!
     
-    
-    var stickBtn: UIButton!
+    var stickBtn: JSQMessagesToolbarButtonFactory!
     ///
     var bubble = JSQMessagesBubbleImageFactory()
     var avatars = Dictionary<String, UIImage>()
@@ -34,10 +36,8 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //ButtonForSticker
-       // self.inputToolbar.contentView.leftBarButtonItem = stickBtn
-      //  buttonStickApperiance()
         self.collectionView.backgroundColor = UIColor.black
+      
        
         //updateHistory()
         /////////
@@ -57,13 +57,14 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     /// ButtonSticker
 
-    
+
     func buttonStickerWork() {
         shouldPerformSegue(withIdentifier: "showStickersVC", sender: self)
     }
     func buttonStickApperiance() {
         let imageStick = UIImage(named:"smileStck" )
-        stickBtn.setImage(imageStick, for: .normal)
+        //stickBtn.setImage(imageStick, for: .normal)
+        //stickBtn
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -74,10 +75,8 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
 
     }
     override func viewDidAppear(_ animated: Bool) {
-        
         super.viewDidAppear(animated)
         self.collectionView.collectionViewLayout.springinessEnabled = true
-
     }
 
     ////Collection
@@ -96,9 +95,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         let config = PNConfiguration( publishKey: "pub-c-8ecaf827-b81c-4d89-abf0-d669cf6da672", subscribeKey: "sub-c-a11d1bc0-ce50-11e5-bcee-0619f8945a4f")
         config.uuid = userName
         appDel.client = PubNub.clientWithConfiguration(config)
-        
         appDel.client?.addListener(self)
-        
         self.joinChannel(chan)
     }
     
@@ -143,7 +140,6 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
            // self.collectionView.reloadData()
             self.finishReceivingMessage()
 
-            
             print("Stiiiiiiiiiiiiickkers \(imageSticker)")
           
         })
@@ -158,7 +154,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             let newDict = chatMessageToDictionary(pubChat)
             appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
             
-            var media = JSQPhotoMediaItem(image: UIImage(named: imageSticker))
+            var media = CustomJSQPhotoMediaItem(image: UIImage(named: imageSticker))
             let mes = JSQMessage(senderId: userName, displayName: userName, media: media)
             guard let newMessage = mes else {return}
            
@@ -203,8 +199,10 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     
     
   //////JSQ
-    
+  
+
     override func didPressAccessoryButton(_ sender: UIButton!) {
+
     performSegue(withIdentifier: "showStickersVC", sender: self)   
         
     }
@@ -215,36 +213,24 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         let newDict = chatMessageToDictionary(pubChat)
         appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
         //For JSq
-//        if imageSticker.isEmpty == true {
         let mes = JSQMessage(senderId: senderId, displayName: senderDisplayName, text: text)
             guard let newMessage = mes else {return}
             mesModelJSQ.append(newMessage)
-//        } else  {
-//            var media = JSQPhotoMediaItem(image: UIImage(named: imageSticker))
-//            let mes = JSQMessage(senderId: senderId, displayName: senderDisplayName, media: media)
-//            guard let newMessage = mes else {return}
-//            mesModelJSQ.append(newMessage)
-//        }
         messageModel.append(pubChat)
        //imageSticker = ""
         collectionView.reloadData()
         finishSendingMessage()
      
     }
-    
+
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
             let message = self.mesModelJSQ[indexPath.item]
-            let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
-        
-//        if message.senderId == self.senderId {
-//            cell.textView!.textColor = UIColor.white
-//        }
-//        else {
-//            cell.textView!.textColor = UIColor.blue
-//        }
+            var cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
+
         return cell
+        
         
         }
 
@@ -296,7 +282,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         return NSAttributedString(string: mesUseeName!)
     }
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat {
-        return 45
+        return 30
     }
 
     
@@ -365,7 +351,30 @@ extension JSQMesVC {
         
     }
 }
-
+//For Media
+class CustomJSQPhotoMediaItem: JSQPhotoMediaItem {
+    override init!(image: UIImage!) {
+        super.init(image: image)
+        
+    }
+   // imageView.contentMode = UIViewContentModeScaleAspectFill;
+   // imageView.frame = CGRectMake(0.0f, 0.0f, size.width, size.height);
+    override init!(maskAsOutgoing: Bool) {
+        super.init(maskAsOutgoing: maskAsOutgoing)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    override func mediaViewDisplaySize() -> CGSize {
+        let ratio = self.image.size.height / self.image.size.width
+        let w = min(UIScreen.main.bounds.width * 0.8, self.image.size.width)
+        let h = w * ratio
+        return CGSize(width: w, height: h)
+    }
+    
+    
+}
 
     
 

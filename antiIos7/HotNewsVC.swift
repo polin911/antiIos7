@@ -24,10 +24,14 @@ class HotNewsVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        updateView()
+      //  parseJSonMeduza()
+      //  tableViewHot.reloadData()
 
+    }
+    override func viewWillAppear(_ animated: Bool) {
         parseJSonMeduza()
         tableViewHot.reloadData()
-
     }
 
     func updateView() {
@@ -65,12 +69,20 @@ extension HotNewsVC {
                 var medData : Meduza4Json
                 let meduzaNews = try JSONDecoder().decode(Med4JsonDoc.self, from: data)
                 print("!!!!!!!!!!!!!!!Documents: \(meduzaNews)")
+                guard meduzaNews != nil else {
+                    return
+                }
+                self.med4J = meduzaNews.documents.values.map{$0}
                 
-                let stringData = meduzaNews.documents as NSDictionary
-                    var title = stringData["title"] as? String ?? ""
-                    var url   = stringData["url"]   as? String ?? ""
-                    var newMes = Meduza4Json(title: title, url: url)
-                self.med4J.append(newMes)
+                DispatchQueue.main.async {
+                    self.tableViewHot.reloadData()
+                }
+                
+//                let stringData = meduzaNews.documents as NSDictionary
+//                    var title = stringData["title"] as? String ?? ""
+//                    var url   = stringData["url"]   as? String ?? ""
+//                   var newMes = Meduza4Json(title: title, url: url)
+//                self.med4J.append(newMes)
                // let dataMed = stringData![self.med4J] as? NSDictionary
 //                let stringTitle = Meduza4Json.CodingKeys.title.rawValue
 //                let stringUrl   = stringData!["url"] as? String ?? ""
@@ -95,10 +107,7 @@ extension HotNewsVC: UITableViewDelegate , UITableViewDataSource {
         
         let cell = tableViewHot.dequeueReusableCell(withIdentifier: "HotCell", for: indexPath) as! HotCell
         cell.TitleOfNews.text = med4J[indexPath.row].title
-        
-//        if typeModel.typeResourse == typeModel.arrayTypeResourse[2] {
-//
-//        }
+
        return cell
     }
     
