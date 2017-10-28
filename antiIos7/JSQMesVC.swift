@@ -165,7 +165,11 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         }
         //imageSticker = ""
     }
-    
+    func gotoVCB(_ sender: UIButton) {
+        let vc = StickersController4JSQ()
+        vc.modalPresentationStyle = .custom
+        present(vc, animated: true, completion: nil)
+    }
 
 
     func client(_ client: PubNub, didReceiveMessage message: PNMessageResult) {
@@ -199,7 +203,23 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     
     
   //////JSQ
-  
+    
+    
+    override func didPressAccessoryButton2(_ sender: UIButton!) {
+        let alertAction = UIAlertController(title: "загрузить фотографию", message: "Твое фото", preferredStyle:.actionSheet)
+        let cancel = UIAlertAction(title: "отменить", style: .cancel, handler: nil)
+        let photos = UIAlertAction(title: "Фото", style: .default, handler: { (alert: UIAlertAction) in
+           // self.chooseMedia(type: kUTTypeImage)
+            
+        })
+        let videos = UIAlertAction(title: "Видео", style: .default, handler: { (alert: UIAlertAction) in
+           // self.chooseMedia(type: kUTTypeVideo)
+        })
+        alertAction.addAction(videos)
+        alertAction.addAction(photos)
+        alertAction.addAction(cancel)
+        present(alertAction, animated: true, completion: nil)
+    }
 
     override func didPressAccessoryButton(_ sender: UIButton!) {
 
@@ -375,6 +395,8 @@ class CustomJSQPhotoMediaItem: JSQPhotoMediaItem {
     
     
 }
+
+
 
     
 

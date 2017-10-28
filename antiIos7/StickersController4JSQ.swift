@@ -43,6 +43,8 @@ class StickersController4JSQ: UICollectionViewController, stickerName {
         // Dispose of any resources that can be recreated.
     }
 
+    
+    ////////////////
 
 
     override func numberOfSections(in collectionView: UICollectionView) -> Int {

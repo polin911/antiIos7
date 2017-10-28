@@ -196,7 +196,7 @@ JSQMessagesKeyboardControllerDelegate>
     // NOTE: let this behavior be opt-in for now
     // [JSQMessagesCollectionViewCell registerMenuAction:@selector(delete:)];
 
-    self.showTypingIndicator = NO;
+    self.showTypingIndicator = YES;
 
     self.showLoadEarlierMessagesHeader = NO;
 
@@ -378,6 +378,11 @@ JSQMessagesKeyboardControllerDelegate>
 }
 
 - (void)didPressAccessoryButton:(UIButton *)sender
+{
+    NSAssert(NO, @"Error! required method not implemented in subclass. Need to implement %s", __PRETTY_FUNCTION__);
+}
+
+- (void)didPressAccessoryButton2:(UIButton *)sender
 {
     NSAssert(NO, @"Error! required method not implemented in subclass. Need to implement %s", __PRETTY_FUNCTION__);
 }
@@ -773,6 +778,21 @@ JSQMessagesKeyboardControllerDelegate>
                             date:[NSDate date]];
     }
 }
+////////////
+- (void)messagesInputToolbar:(JSQMessagesInputToolbar *)toolbar didPressLeftBarButton2:(UIButton *)sender
+{
+    if (toolbar.sendButtonOnRight) {
+        [self didPressAccessoryButton2:sender];
+    }
+    else {
+        [self didPressSendButton:sender
+                 withMessageText:[self jsq_currentlyComposedMessageText]
+                        senderId:self.senderId
+               senderDisplayName:self.senderDisplayName
+                            date:[NSDate date]];
+    }
+}
+////////////
 
 - (void)messagesInputToolbar:(JSQMessagesInputToolbar *)toolbar didPressRightBarButton:(UIButton *)sender
 {
@@ -785,6 +805,7 @@ JSQMessagesKeyboardControllerDelegate>
     }
     else {
         [self didPressAccessoryButton:sender];
+        [self didPressAccessoryButton2:sender];
     }
 }
 

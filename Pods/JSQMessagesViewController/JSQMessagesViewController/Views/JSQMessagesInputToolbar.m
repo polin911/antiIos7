@@ -65,7 +65,7 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
 
     self.contentView.leftBarButtonItem = [JSQMessagesToolbarButtonFactory defaultAccessoryButtonItem];
     self.contentView.rightBarButtonItem = [JSQMessagesToolbarButtonFactory defaultSendButtonItem];
-
+    self.contentView.leftBarButtonItem2 = [JSQMessagesToolbarButtonFactory defaultAccessoryButtonItem2];
     [self toggleSendButtonEnabled];
 }
 
@@ -97,6 +97,11 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
     [self.delegate messagesInputToolbar:self didPressLeftBarButton:sender];
 }
 
+- (void)jsq_leftBarButtonPressed2:(UIButton *)sender
+{
+    [self.delegate messagesInputToolbar:self didPressLeftBarButton2:sender];
+}
+
 - (void)jsq_rightBarButtonPressed:(UIButton *)sender
 {
     [self.delegate messagesInputToolbar:self didPressRightBarButton:sender];
@@ -113,6 +118,7 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
     }
     else {
         self.contentView.leftBarButtonItem.enabled = hasText;
+        self.contentView.leftBarButtonItem2.enabled = hasText;
     }
 }
 
@@ -133,6 +139,18 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
                                                        action:@selector(jsq_leftBarButtonPressed:)
                                              forControlEvents:UIControlEventTouchUpInside];
             }
+            /////////
+            if ([keyPath isEqualToString:NSStringFromSelector(@selector(leftBarButtonItem2))]) {
+                
+                [self.contentView.leftBarButtonItem2 removeTarget:self
+                                                          action:NULL
+                                                forControlEvents:UIControlEventTouchUpInside];
+                
+                [self.contentView.leftBarButtonItem2 addTarget:self
+                                                       action:@selector(jsq_leftBarButtonPressed2:)
+                                             forControlEvents:UIControlEventTouchUpInside];
+            }
+            /////////
             else if ([keyPath isEqualToString:NSStringFromSelector(@selector(rightBarButtonItem))]) {
 
                 [self.contentView.rightBarButtonItem removeTarget:self
@@ -159,6 +177,11 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
                        forKeyPath:NSStringFromSelector(@selector(leftBarButtonItem))
                           options:0
                           context:kJSQMessagesInputToolbarKeyValueObservingContext];
+    
+    [self.contentView addObserver:self
+                       forKeyPath:NSStringFromSelector(@selector(leftBarButtonItem2))
+                          options:0
+                          context:kJSQMessagesInputToolbarKeyValueObservingContext];
 
     [self.contentView addObserver:self
                        forKeyPath:NSStringFromSelector(@selector(rightBarButtonItem))
@@ -177,6 +200,9 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
     @try {
         [_contentView removeObserver:self
                           forKeyPath:NSStringFromSelector(@selector(leftBarButtonItem))
+                             context:kJSQMessagesInputToolbarKeyValueObservingContext];
+        [_contentView removeObserver:self
+                          forKeyPath:NSStringFromSelector(@selector(leftBarButtonItem2))
                              context:kJSQMessagesInputToolbarKeyValueObservingContext];
 
         [_contentView removeObserver:self

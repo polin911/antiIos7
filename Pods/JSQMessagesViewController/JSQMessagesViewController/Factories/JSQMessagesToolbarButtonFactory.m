@@ -28,16 +28,30 @@
 
 + (UIButton *)defaultAccessoryButtonItem
 {
-    UIImage *cameraImage = [UIImage imageNamed:@"smileStck"];
-    UIImage *cameraNormal = [cameraImage jsq_imageMaskedWithColor:[UIColor lightGrayColor]];
+    UIImage *cameraImage = [UIImage imageNamed:@"smileStck.png"];
+   // UIImage *cameraNormal = [cameraImage jsq_imageMaskedWithColor:[UIColor lightGrayColor]];
     UIImage *cameraHighlighted = [cameraImage jsq_imageMaskedWithColor:[UIColor darkGrayColor]];
     UIButton *cameraButton = [[UIButton alloc] initWithFrame:CGRectZero];
-    [cameraButton setImage:cameraNormal forState:UIControlStateNormal];
+    [cameraButton setImage:cameraImage forState:UIControlStateNormal];
     [cameraButton setImage:cameraHighlighted forState:UIControlStateHighlighted];
     cameraButton.contentMode = UIViewContentModeScaleAspectFit;
     cameraButton.backgroundColor = [UIColor clearColor];
-    cameraButton.tintColor = [UIColor lightGrayColor];
+   // cameraButton.tintColor = [UIColor lightGrayColor];
     return cameraButton;
+}
+
++ (UIButton *)defaultAccessoryButtonItem2
+{
+    UIImage *cameraImage = [UIImage imageNamed:@"smileStck"];
+    UIImage *cameraNormal = [cameraImage jsq_imageMaskedWithColor:[UIColor lightGrayColor]];
+    UIImage *cameraHighlighted = [cameraImage jsq_imageMaskedWithColor:[UIColor darkGrayColor]];
+    UIButton *cameraButton2 = [[UIButton alloc] initWithFrame:CGRectZero];
+    [cameraButton2 setImage:cameraNormal forState:UIControlStateNormal];
+    [cameraButton2 setImage:cameraHighlighted forState:UIControlStateHighlighted];
+    cameraButton2.contentMode = UIViewContentModeScaleAspectFit;
+    cameraButton2.backgroundColor = [UIColor clearColor];
+    cameraButton2.tintColor = [UIColor lightGrayColor];
+    return cameraButton2;
 }
 
 + (UIButton *)defaultSendButtonItem

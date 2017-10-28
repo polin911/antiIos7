@@ -32,6 +32,7 @@
  *  @return A newly created button.
  */
 + (UIButton *)defaultAccessoryButtonItem;
++ (UIButton *)defaultAccessoryButtonItem2;
 
 /**
  *  Creates and returns a new button that is styled as the default send button. 

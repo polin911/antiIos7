@@ -219,6 +219,7 @@
  *  @param sender The accessory button that was pressed by the user.
  */
 - (void)didPressAccessoryButton:(UIButton *)sender;
+- (void)didPressAccessoryButton2:(UIButton *)sender;
 
 /**
  *  Animates the sending of a new message. See `finishSendingMessageAnimated:` for more details.

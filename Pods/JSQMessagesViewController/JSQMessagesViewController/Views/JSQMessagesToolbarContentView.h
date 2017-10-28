@@ -50,13 +50,14 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingD
  *  Set this value to `nil` to remove the button.
  */
 @property (weak, nonatomic) UIButton *leftBarButtonItem;
-
+@property (weak, nonatomic) UIButton *leftBarButtonItem2;
 /**
  *  Specifies the width of the leftBarButtonItem.
  *
  *  @discussion This property modifies the width of the leftBarButtonContainerView.
  */
 @property (assign, nonatomic) CGFloat leftBarButtonItemWidth;
+@property (assign, nonatomic) CGFloat leftBarButtonItemWidth2;
 
 /**
  *  Specifies the amount of spacing between the content view and the leading edge of leftBarButtonItem.
@@ -64,6 +65,7 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingD
  *  @discussion The default value is `8.0f`.
  */
 @property (assign, nonatomic) CGFloat leftContentPadding;
+@property (assign, nonatomic) CGFloat leftContentPadding2;
 
 /**
  *  The container view for the leftBarButtonItem.
@@ -74,6 +76,7 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingD
  *  in your `JSQMessagesViewController` subclass.
  */
 @property (weak, nonatomic, readonly) UIView *leftBarButtonContainerView;
+@property (weak, nonatomic, readonly) UIView *leftBarButtonContainerView2;
 
 /**
  *  A custom button item displayed on the right of the toolbar content view.

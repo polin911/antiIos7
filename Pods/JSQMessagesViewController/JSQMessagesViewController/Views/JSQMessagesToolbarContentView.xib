@@ -16,63 +16,72 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LEq-G7-jGt" userLabel="Left button container">
-                    <rect key="frame" x="8" y="6" width="34" height="32"/>
+                    <rect key="frame" x="240" y="6" width="34" height="32"/>
                     <subviews>
-                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="smileStck" translatesAutoresizingMaskIntoConstraints="NO" id="lna-Hn-zcQ">
-                            <rect key="frame" x="1" y="1" width="32" height="30"/>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="1" translatesAutoresizingMaskIntoConstraints="NO" id="lna-Hn-zcQ">
+                            <rect key="frame" x="0.0" y="0.0" width="32" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         </imageView>
                     </subviews>
                     <color key="backgroundColor" red="0.66666666666666663" green="0.66666666666666663" blue="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="32" id="0sE-GV-joM"/>
-                        <constraint firstAttribute="trailing" secondItem="lna-Hn-zcQ" secondAttribute="trailing" constant="1" id="CLs-6f-qST"/>
-                        <constraint firstItem="lna-Hn-zcQ" firstAttribute="top" secondItem="LEq-G7-jGt" secondAttribute="top" constant="1" id="Hmv-JQ-sbn"/>
-                        <constraint firstItem="lna-Hn-zcQ" firstAttribute="leading" secondItem="LEq-G7-jGt" secondAttribute="leading" constant="1" id="MRc-Gr-JDw"/>
-                        <constraint firstAttribute="bottom" secondItem="lna-Hn-zcQ" secondAttribute="bottom" constant="1" id="dkV-4p-FM2"/>
-                        <constraint firstAttribute="width" constant="34" id="eMy-Af-wwH"/>
+                        <constraint firstAttribute="width" constant="34" id="Vhk-cc-36c"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Myo-1S-Vg1" userLabel="Right button container">
-                    <rect key="frame" x="262" y="6" width="50" height="32"/>
+                    <rect key="frame" x="280" y="6" width="32" height="32"/>
                     <color key="backgroundColor" red="0.66666666666666663" green="0.66666666666666663" blue="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="32" id="NaR-re-dJ4"/>
-                        <constraint firstAttribute="width" constant="50" id="yde-S9-dHe"/>
+                        <constraint firstAttribute="width" constant="32" id="9wp-xJ-R83"/>
                     </constraints>
                 </view>
                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dm4-NT-mvr" customClass="JSQMessagesComposerTextView">
-                    <rect key="frame" x="50" y="7" width="204" height="30"/>
+                    <rect key="frame" x="44" y="6" width="190" height="32"/>
                     <color key="backgroundColor" red="0.66666666666666663" green="0.66666666666666663" blue="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                 </textView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ckg-lx-RA2" userLabel="Left button container2">
+                    <rect key="frame" x="6" y="6" width="32" height="32"/>
+                    <color key="backgroundColor" red="0.66666666669999997" green="0.66666666669999997" blue="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="32" id="YDS-9L-hS0"/>
+                        <constraint firstAttribute="height" constant="32" id="hIz-Oo-U2O"/>
+                        <constraint firstAttribute="width" constant="32" id="jpU-Rl-e3A"/>
+                    </constraints>
+                </view>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstItem="Myo-1S-Vg1" firstAttribute="leading" secondItem="dm4-NT-mvr" secondAttribute="trailing" constant="8" id="7Ld-5r-Hp3"/>
-                <constraint firstItem="dm4-NT-mvr" firstAttribute="top" secondItem="1" secondAttribute="top" constant="7" id="9Tz-Wq-xIf"/>
-                <constraint firstAttribute="bottom" secondItem="dm4-NT-mvr" secondAttribute="bottom" constant="7" id="CCb-V7-yek"/>
-                <constraint firstAttribute="bottom" secondItem="Myo-1S-Vg1" secondAttribute="bottom" constant="6" id="EaS-Oq-Qp5"/>
-                <constraint firstItem="LEq-G7-jGt" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="8" id="LAU-fo-GJJ"/>
-                <constraint firstAttribute="trailing" secondItem="Myo-1S-Vg1" secondAttribute="trailing" constant="8" id="ds6-61-GNv"/>
-                <constraint firstAttribute="bottom" secondItem="LEq-G7-jGt" secondAttribute="bottom" constant="6" id="oG2-YD-ZZI"/>
-                <constraint firstItem="dm4-NT-mvr" firstAttribute="leading" secondItem="LEq-G7-jGt" secondAttribute="trailing" constant="8" id="owo-gB-gyR"/>
+                <constraint firstItem="LEq-G7-jGt" firstAttribute="top" secondItem="1" secondAttribute="top" constant="6" id="6Hv-cN-XpX"/>
+                <constraint firstItem="ckg-lx-RA2" firstAttribute="top" secondItem="1" secondAttribute="top" constant="6" id="6Sl-iM-dC6"/>
+                <constraint firstAttribute="bottom" secondItem="dm4-NT-mvr" secondAttribute="bottom" constant="6" id="EKs-5t-uYC"/>
+                <constraint firstItem="Myo-1S-Vg1" firstAttribute="leading" secondItem="LEq-G7-jGt" secondAttribute="trailing" constant="6" id="Gck-Yc-LaV"/>
+                <constraint firstItem="dm4-NT-mvr" firstAttribute="leading" secondItem="ckg-lx-RA2" secondAttribute="trailing" constant="6" id="JMA-FS-KgI"/>
+                <constraint firstItem="LEq-G7-jGt" firstAttribute="leading" secondItem="dm4-NT-mvr" secondAttribute="trailing" constant="6" id="MKN-c1-XKa"/>
+                <constraint firstItem="Myo-1S-Vg1" firstAttribute="top" secondItem="1" secondAttribute="top" constant="6" id="NuS-eg-ckl"/>
+                <constraint firstAttribute="trailing" secondItem="Myo-1S-Vg1" secondAttribute="trailing" constant="8" id="P41-tK-t3V"/>
+                <constraint firstItem="ckg-lx-RA2" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="6" id="Rdw-Cj-any"/>
+                <constraint firstAttribute="bottom" secondItem="Myo-1S-Vg1" secondAttribute="bottom" constant="6" id="UUh-fK-bXk"/>
+                <constraint firstItem="dm4-NT-mvr" firstAttribute="top" secondItem="1" secondAttribute="top" constant="6" id="e0k-ug-clH"/>
+                <constraint firstItem="LEq-G7-jGt" firstAttribute="leading" secondItem="dm4-NT-mvr" secondAttribute="trailing" constant="6" id="fAo-ss-kyn"/>
+                <constraint firstAttribute="bottom" secondItem="dm4-NT-mvr" secondAttribute="bottom" constant="6" id="l3f-sW-0t0"/>
+                <constraint firstItem="dm4-NT-mvr" firstAttribute="top" secondItem="1" secondAttribute="top" constant="6" id="ugo-vX-0xV"/>
+                <constraint firstAttribute="bottom" secondItem="ckg-lx-RA2" secondAttribute="bottom" constant="6" id="woF-A1-hXJ"/>
+                <constraint firstAttribute="bottom" secondItem="LEq-G7-jGt" secondAttribute="bottom" constant="6" id="xhJ-cX-6XT"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="leftBarButtonContainerView" destination="LEq-G7-jGt" id="F0V-4N-1Mo"/>
-                <outlet property="leftBarButtonContainerViewWidthConstraint" destination="eMy-Af-wwH" id="FI9-F2-2bN"/>
-                <outlet property="leftHorizontalSpacingConstraint" destination="LAU-fo-GJJ" id="X2c-BI-0Q4"/>
+                <outlet property="leftBarButtonContainerView2" destination="ckg-lx-RA2" id="Dr2-AW-uFL"/>
                 <outlet property="rightBarButtonContainerView" destination="Myo-1S-Vg1" id="0SR-cw-EkD"/>
-                <outlet property="rightBarButtonContainerViewWidthConstraint" destination="yde-S9-dHe" id="WGu-df-M3L"/>
-                <outlet property="rightHorizontalSpacingConstraint" destination="ds6-61-GNv" id="ZQh-8M-QFs"/>
                 <outlet property="textView" destination="dm4-NT-mvr" id="PFw-HO-oT8"/>
             </connections>
             <point key="canvasLocation" x="268" y="548"/>
         </view>
     </objects>
     <resources>
-        <image name="smileStck" width="256" height="256"/>
+        <image name="1" width="120" height="120"/>
     </resources>
 </document>
