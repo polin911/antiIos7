@@ -27,7 +27,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             print("changed Pubnub \(messageModel.count + oldValue.count)")
         }
     }
-  
+    
     //
     var appDel = UIApplication.shared.delegate as! AppDelegate
     var mediaAspect: JSQMessageMediaData!
@@ -155,15 +155,15 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     func checkStickers() {
         if imageSticker.isEmpty == false {
             
-//            let pubChat = MesJSQMedia(username: userName, image: imgName, imgSticker: imageSticker)
-//            let newDict = chatMessageToDictionarMedia(pubChat)
-//            appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
+            //            let pubChat = MesJSQMedia(username: userName, image: imgName, imgSticker: imageSticker)
+            //            let newDict = chatMessageToDictionarMedia(pubChat)
+            //            appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
             
-//            var media = CustomJSQPhotoMediaItem(image: UIImage(named: imageSticker))
-//            let mes = JSQMessage(senderId: userName, displayName: userName, media: media)
-//            guard let newMessage = mes else {return}
-//
-//            mesModelJSQ.append(newMessage)
+            //            var media = CustomJSQPhotoMediaItem(image: UIImage(named: imageSticker))
+            //            let mes = JSQMessage(senderId: userName, displayName: userName, media: media)
+            //            guard let newMessage = mes else {return}
+            //
+            //            mesModelJSQ.append(newMessage)
             finishReceivingMessage()
             // collectionView.reloadData()
         }
@@ -181,39 +181,47 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         print("from client!!!!!!!!!!!!!!!!!!!!!!!\(message.data)")
         print("*******UUID from message IS \(message.uuid)")
         
-        guard let stringData  = message.data.message as? NSDictionary else {
+        guard let json  = message.data.message as? NSDictionary else {
             return
         }
         
-//        guard  let readyMessage = parseData(stringData) else{
-//            return
-//        }
-//        guard let readyJsonMes = parseJsonMessage(stringData) else {
-//            return
-//        }
-        //выдираем айдишку из сообщения
-        //если в твоем массиве из сообщений уже есть такое с такой айдишкой, то ты то сообщение удяляешь
-    //    messageModel.append(readyJsonMes)
-        collectionView.reloadData()
-        finishReceivingMessage()
-    }
-    func getTime() -> String{
-        let currentDate = Date()  // -  get the current date
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "hh:mm a" //format style to look like 00:00 am/pm
-        let dateString = dateFormatter.string(from: currentDate)
-        return dateString
-    }
+        //        guard  let readyMessage = parseData(stringData) else{
+        //            return
+        //        }
+        //        guard let readyJsonMes = parseJsonMessage(stringData) else {
+        //            return
+        //        }
+        
+        
+        guard let readyMessage = parseData(json) else {
+            return
+        }
+        
+        if let index = messageModel.index(where: { message -> Bool in readyMessage.idMes == message.idMes}) {
+            //выдираем айдишку из сообщения
+            messageModel.remove(at: index) }
     
-    ///AccessoryButton
-    
-    
-    private func chooseMedia(type: CFString) {
-        picker.mediaTypes = [type as String]
-        present(picker, animated: true, completion: nil)
-    }
-    
-    
+    messageModel.append(readyMessage)
+    collectionView.reloadData()
+    finishReceivingMessage()
+}
+func getTime() -> String{
+    let currentDate = Date()  // -  get the current date
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "hh:mm a" //format style to look like 00:00 am/pm
+    let dateString = dateFormatter.string(from: currentDate)
+    return dateString
+}
+
+///AccessoryButton
+
+
+private func chooseMedia(type: CFString) {
+    picker.mediaTypes = [type as String]
+    present(picker, animated: true, completion: nil)
+}
+
+
 //    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
 //        picker.dismiss(animated: true, completion: nil)
 //        let picture = info[UIImagePickerControllerEditedImage] as? UIImage
@@ -235,60 +243,60 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
 //        }
 //        
 //    }
-    
-    
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        picker.dismiss(animated: true, completion:nil)
+
+
+func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+    picker.dismiss(animated: true, completion:nil)
+}
+
+override func didPressAccessoryButton2(_ sender: UIButton!) {
+    let picker = UIImagePickerController()
+    picker.delegate = self
+    if (UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary)) {
+        picker.sourceType = UIImagePickerControllerSourceType.photoLibrary
     }
     
-    override func didPressAccessoryButton2(_ sender: UIButton!) {
-        let picker = UIImagePickerController()
-        picker.delegate = self
-        if (UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary)) {
-            picker.sourceType = UIImagePickerControllerSourceType.photoLibrary
-        }
-        
-        present(picker, animated: true, completion:nil)
-        
-    }
+    present(picker, animated: true, completion:nil)
+    
+}
+
+
+
+///////JSQ
+override func didPressAccessoryButton(_ sender: UIButton!) {
+    
+    performSegue(withIdentifier: "showStickersVC", sender: self)
+    
+}
+
+override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
     
     
+    //for PubNub
+    let newMes = MesJSQText(date: date, idMes: NSUUID().uuidString, username: senderDisplayName, textMes: text, avatar: imgName)
+    appDel.client?.publish(newMes.toDictionaryMessage(), toChannel: chan, withCompletion: nil)
+    messageModel.append(newMes)
+    // let pubChat = MesJSQText(username: senderDisplayName, textMes: text, image: imgName)
+    //        var newDict = chatMessageToDictionaryMessage(pubChat)
+    ////        newDict["id"] = id
+    //        appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
+    //For JSq
+    //        let mes = JSQMessage(senderId: senderId, displayName: senderDisplayName, text: text)
+    //            guard let newMessage = mes else {return}
+    //            mesModelJSQ.append(newMessage)
+    collectionView.reloadData()
+    finishSendingMessage()
     
-    ///////JSQ
-    override func didPressAccessoryButton(_ sender: UIButton!) {
-        
-        performSegue(withIdentifier: "showStickersVC", sender: self)
-        
-    }
-  
-    override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        
-        
-        //for PubNub
-        let newMes = MesJSQText(date: date, idMes: NSUUID().uuidString, username: senderDisplayName, textMes: text, avatar: imgName)
-        appDel.client?.publish(newMes.toDictionaryMessage(), toChannel: chan, withCompletion: nil)
-        messageModel.append(newMes)
-        // let pubChat = MesJSQText(username: senderDisplayName, textMes: text, image: imgName)
-        //        var newDict = chatMessageToDictionaryMessage(pubChat)
-        ////        newDict["id"] = id
-        //        appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
-        //For JSq
-        //        let mes = JSQMessage(senderId: senderId, displayName: senderDisplayName, text: text)
-        //            guard let newMessage = mes else {return}
-        //            mesModelJSQ.append(newMessage)
-        collectionView.reloadData()
-        finishSendingMessage()
-        
-    }
-    //0. когда мы создаем соообщение (json), мы указываем его тип (type = text, type = sticker, type = image)
-    //1. можно использовать наследников от jsqmessage и ты туда сможешь напихать все что угодно, в том числе аватар, каритнку и т.д.
-    //2. замутил бы там еще и тип сообщения
-    //3. добавил бы для сообщений айдишку - let id = NSUUID().uuidString
-    //4. когда сообщение пришло, проверить, есть ли сообщение с такой айдишкой в массиве и если есть уже, то удалить из массива и добавить то, которое от сервераъ
-    //5. теперь будет легко проверить, что
-    
-    
-    
+}
+//0. когда мы создаем соообщение (json), мы указываем его тип (type = text, type = sticker, type = image)
+//1. можно использовать наследников от jsqmessage и ты туда сможешь напихать все что угодно, в том числе аватар, каритнку и т.д.
+//2. замутил бы там еще и тип сообщения
+//3. добавил бы для сообщений айдишку - let id = NSUUID().uuidString
+//4. когда сообщение пришло, проверить, есть ли сообщение с такой айдишкой в массиве и если есть уже, то удалить из массива и добавить то, которое от сервераъ
+//5. теперь будет легко проверить, что
+
+
+
 //    func sendSomeTypeOfMessagePressed(){
 //        
 //        let text = MesJSQText(username: "dgdsgds", textMes: "text", avatar: "itweewuwieewote")
@@ -301,83 +309,83 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
 //        appDel.client?.publish(json, toChannel: chan, compressed: true, withCompletion: nil)
 //    }
 //    
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        let message = self.messageModel[indexPath.item]
-        var cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
-        
-        return cell
-        
-        
-    }
+override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForCellTopLabelAt indexPath: IndexPath!) -> CGFloat {
-        return 30
-    }
+    let message = self.messageModel[indexPath.item]
+    var cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
     
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
-        let message = messageModel[indexPath.item]
-        let mesTime = message.date
-        let currentDate = mesTime  // -  get the current date
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "hh:mm a" //format style to look like 00:00 am/pm
-        let dateString = dateFormatter.string(from: currentDate)
-        
-        return NSAttributedString(string: dateString)
-        
-    }
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return messageModel.count
-        
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
-        
-        return messageModel[indexPath.item].jsqMessage
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
-        let buble = JSQMessagesBubbleImageFactory()
-        let message = messageModel[indexPath.item]
-        
-        if senderId == message.jsqMessage.senderId {
-            return buble?.outgoingMessagesBubbleImage(with: .red)
-        } else {
-            return buble?.incomingMessagesBubbleImage(with: .red)
-        }
-    }
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
-        
-        //        var avatarMes = messageModel[indexPath.item]
-        //        var newAvatar = avatarMes.image
-        //        let message = mesModelJSQ[indexPath.item]
-        //        var imageName = UIImage(named: newAvatar)
-        //        if senderDisplayName == message.senderDisplayName {
-        //            return JSQMessagesAvatarImageFactory.avatarImage(with: imageName, diameter: 45)
-        //        } else {
-        //            if newAvatar.isEmpty == false {
-        //            return JSQMessagesAvatarImageFactory.avatarImage(with: imageName, diameter: 45)
-        //
-        //            } else {
-        //                return JSQMessagesAvatarImageFactory.avatarImage(with: #imageLiteral(resourceName: "s11"), diameter: 45)
-        //        }
-        //        }
-        // collectionView.reloadData()
-        return nil
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
-        let message = messageModel[indexPath.item]
-        let mesUseeName = message.jsqMessage.senderDisplayName
-        //        var nameUser = NSAttributedString(string: mesUseeName!)
-        
-        return NSAttributedString(string: mesUseeName!)
-    }
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat {
-        return 30
-    }
+    return cell
     
     
+}
+
+override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForCellTopLabelAt indexPath: IndexPath!) -> CGFloat {
+    return 30
+}
+
+override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
+    let message = messageModel[indexPath.item]
+    let mesTime = message.date
+    let currentDate = mesTime  // -  get the current date
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "hh:mm a" //format style to look like 00:00 am/pm
+    let dateString = dateFormatter.string(from: currentDate)
+    
+    return NSAttributedString(string: dateString)
+    
+}
+override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    return messageModel.count
+    
+}
+
+override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
+    
+    return messageModel[indexPath.item].jsqMessage
+}
+
+override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
+    let buble = JSQMessagesBubbleImageFactory()
+    let message = messageModel[indexPath.item]
+    
+    if senderId == message.jsqMessage.senderId {
+        return buble?.outgoingMessagesBubbleImage(with: .red)
+    } else {
+        return buble?.incomingMessagesBubbleImage(with: .red)
+    }
+}
+override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
+    
+    //        var avatarMes = messageModel[indexPath.item]
+    //        var newAvatar = avatarMes.image
+    //        let message = mesModelJSQ[indexPath.item]
+    //        var imageName = UIImage(named: newAvatar)
+    //        if senderDisplayName == message.senderDisplayName {
+    //            return JSQMessagesAvatarImageFactory.avatarImage(with: imageName, diameter: 45)
+    //        } else {
+    //            if newAvatar.isEmpty == false {
+    //            return JSQMessagesAvatarImageFactory.avatarImage(with: imageName, diameter: 45)
+    //
+    //            } else {
+    //                return JSQMessagesAvatarImageFactory.avatarImage(with: #imageLiteral(resourceName: "s11"), diameter: 45)
+    //        }
+    //        }
+    // collectionView.reloadData()
+    return nil
+}
+
+override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
+    let message = messageModel[indexPath.item]
+    let mesUseeName = message.jsqMessage.senderDisplayName
+    //        var nameUser = NSAttributedString(string: mesUseeName!)
+    
+    return NSAttributedString(string: mesUseeName!)
+}
+override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat {
+    return 30
+}
+
+
 }
 
 //Parse
@@ -389,21 +397,21 @@ extension JSQMesVC {
             if let data = parseData(data) {
                 list.append(data)
             }
-   
+            
         }
         return list
     }
     
     func parseData(_ data: NSDictionary) -> MessageToJSQ? {
         var newMes   : MessageToJSQ
-      
+        
         if let type = data["type"] as? String {
             switch type {
             case "text":
                 let usernameJson = data["username"] as? String ?? ""
                 let textJson     = data["text"]  as? String ?? ""
                 let imgJson      = data["avatar"] as? String ?? ""
-                let idJson       = data["id"] as? String ?? ""
+                let idJson       = data["idMes"] as? String ?? ""
                 var dataJs       = Date()
                 if let date = data["timetoken"] as? Double {
                     dataJs = Date(timeIntervalSince1970: date / 1000000 )
@@ -424,7 +432,7 @@ extension JSQMesVC {
                 return nil
                 
             default :
-               return nil
+                return nil
                 
                 
             }
