@@ -17,7 +17,7 @@ var usersArray   :[String]       = []
 var userName    = ""
 var nameChanged = false
 var chan        = "antichat_hackathon"
-var imgName     = "1.png"
+var imgName     = "1"
 var imageSticker  = ""
 
 
@@ -30,13 +30,13 @@ func chatMessageToDictionary(_ chatmessage: ChatMessage) -> [String: NSString]{
         "stickers": NSString(string: chatmessage.imgSticker)
     ]
 }
-func chatMesToDicJSQ(_ chatmessage: MesJSQ) -> [String: NSString]{
-    return [
-        "username": NSString(string: chatmessage.username),
-        "text"    : NSString(string: chatmessage.textMes),
-        "time"    : NSString(string: chatmessage.time),
-        "image"   : NSString(string: chatmessage.image),
-        "stickers": NSString(string: chatmessage.imgSticker)
-    ]
-    
-}
+//func chatMesToDicJSQ(_ chatmessage: MesJSQ) -> [String: NSString]{
+//    return [
+//        "username": NSString(string: chatmessage.username),
+//        "text"    : NSString(string: chatmessage.textMes),
+//        "time"    : NSString(string: chatmessage.time),
+//        "image"   : NSString(string: chatmessage.image),
+//        "stickers": NSString(string: chatmessage.imgSticker)
+//    ]
+
+//}
