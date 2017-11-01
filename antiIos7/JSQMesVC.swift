@@ -264,6 +264,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         performSegue(withIdentifier: "showStickersVC", sender: self)
         
     }
+  
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
         
         
@@ -386,39 +387,44 @@ extension JSQMesVC {
     func parseData (_ json: [NSDictionary]) -> [MessageToJSQ] {
         var list     = [MessageToJSQ]()
         for data in json {
-            if let type = data["type"] as? String {
-                switch type {
-                case "text":
-                    let usernameJson = data["username"] as? String ?? ""
-                    let textJson     = data["text"]  as? String ?? ""
-                    let imgJson      = data["avatar"] as? String ?? ""
-                    let idJson       = data["id"] as? String ?? ""
-                    
-                  //  let newM = MesJSQText(
-                    
-                    
-                case "sticker" :
-                    let usernameJson = data["username"] as? String ?? ""
-                    let textJson     = data["text"]  as? String ?? ""
-                    let imgJson      = data["avatar"] as? String ?? ""
-                    let stickJson    = data["stickers"] as? String ?? ""
-                    let idJson       = data["id"] as? String ?? ""
-                    
-                    
-                default :
-                    continue
-                    
-                    
-                }
+            if let data = parseData(data) {
+                list.append(data)
             }
+   
         }
         return list
     }
     
-    func parseData(_ json: NSDictionary) -> MessageToJSQ? {
+    func parseData(_ data: NSDictionary) -> MessageToJSQ? {
         var newMes   : MessageToJSQ
       
-        
+        if let type = data["type"] as? String {
+            switch type {
+            case "text":
+                let usernameJson = data["username"] as? String ?? ""
+                let textJson     = data["text"]  as? String ?? ""
+                let imgJson      = data["avatar"] as? String ?? ""
+                let idJson       = data["id"] as? String ?? ""
+                
+                 let newM = MesJSQText(idMes: idJson, username: usernameJson, textMes: textJson, avatar: imgJson )
+                return newM
+                
+                
+            case "sticker" :
+                let usernameJson = data["username"] as? String ?? ""
+                let textJson     = data["text"]  as? String ?? ""
+                let imgJson      = data["avatar"] as? String ?? ""
+                let stickJson    = data["stickers"] as? String ?? ""
+                let idJson       = data["id"] as? String ?? ""
+                let newM = MesJSQMedia(idMes: idJson, username: usernameJson, avatar: imgJson, imgSticker: stickJson)
+                return newM
+                
+            default :
+               return nil
+                
+                
+            }
+        }
         //    func parseDataAny(_ any: [AnyObject] ) -> [JSQMessage] {
         //        var list = [JSQMessage]()
         //        for data in any {

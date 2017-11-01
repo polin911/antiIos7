@@ -36,7 +36,11 @@ protocol MessageToJSQ {
 
 struct MesJSQMedia:MessageToJSQ {
     var idMes: String
-    var jsqMessage: JSQMessage
+    var jsqMessage: JSQMessage {
+    let media = JSQPhotoMediaItem(image: UIImage(named:avatar))
+    var message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes, avatar: avatar)
+    return message!
+    }
     func toDictionaryMessage() -> [String : Any] {
         return [
             "idMes"   : NSString(string:self.idMes),
@@ -51,19 +55,20 @@ struct MesJSQMedia:MessageToJSQ {
     var imgSticker :String
     let type: MessageType = .sticker
     
-    lazy var jsqMes:JSQMessage = {
-        let media = JSQPhotoMediaItem(image: UIImage(named:avatar))
-        var message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes, avatar: avatar)
-        return message!
-    }()
+ 
     
 }
 
 
 struct MesJSQText:MessageToJSQ {
-    var jsqMessage: JSQMessage
+
+  var jsqMessage: JSQMessage  {
+        let message = JSQMessage(senderId: userName, displayName: userName, text: textMes, idMes: idMes, avatar: avatar)
+        //guard
+        return message!
+    }
     
-    func toDictionaryMessage() -> [String : Any] {
+func toDictionaryMessage() -> [String : Any] {
         return [
             "idMes"   : NSString(string:self.idMes),
             "type"    : self.type,
@@ -77,11 +82,7 @@ struct MesJSQText:MessageToJSQ {
     var username: String
     var textMes : String
     var avatar  : String
-    lazy var jsqMes:JSQMessage = {
-        let message = JSQMessage(senderId: userName, displayName: userName, text: textMes, idMes: idMes, avatar: avatar)
-       //guard
-        return message!
-    }()
+
 }
 
 func chatMessageToDictionaryMessage(_ chatmessage: MesJSQText) -> [String: AnyObject]{
