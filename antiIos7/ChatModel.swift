@@ -21,10 +21,10 @@ struct ChatMessage {
 }
 
 //////////////////////////////////
-enum MessageType {
-    case sticker
-    case text
-    case image
+enum MessageType: String {
+    case sticker = "sticker"
+    case text    = "text"
+    case image   = "image"
 }
 
 protocol MessageToJSQ {
@@ -32,9 +32,11 @@ protocol MessageToJSQ {
     var idMes:String     {get}
     var jsqMessage:JSQMessage {get}
     func toDictionaryMessage()->[String:Any]
+    var date: Date{get}
 }
 
-struct MesJSQMedia:MessageToJSQ {
+struct MesJSQMedia {
+    //var date: String
     var idMes: String
     var jsqMessage: JSQMessage {
     let media = JSQPhotoMediaItem(image: UIImage(named:avatar))
@@ -61,6 +63,8 @@ struct MesJSQMedia:MessageToJSQ {
 
 
 struct MesJSQText:MessageToJSQ {
+    var date: Date
+    
 
   var jsqMessage: JSQMessage  {
         let message = JSQMessage(senderId: userName, displayName: userName, text: textMes, idMes: idMes, avatar: avatar)
@@ -71,7 +75,7 @@ struct MesJSQText:MessageToJSQ {
 func toDictionaryMessage() -> [String : Any] {
         return [
             "idMes"   : NSString(string:self.idMes),
-            "type"    : self.type,
+            "type"    : self.type.rawValue,
             "username": NSString(string: self.username),
             "text"    : NSString(string: self.textMes),
             "image"   : NSString(string: self.avatar)

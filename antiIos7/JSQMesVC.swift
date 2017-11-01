@@ -27,11 +27,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             print("changed Pubnub \(messageModel.count + oldValue.count)")
         }
     }
-    var mesModelJSQ = [JSQMessage](){
-        didSet {
-            print("changed JSQ \(mesModelJSQ.count + oldValue.count)")
-        }
-    }
+  
     //
     var appDel = UIApplication.shared.delegate as! AppDelegate
     var mediaAspect: JSQMessageMediaData!
@@ -269,6 +265,9 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         
         
         //for PubNub
+        let newMes = MesJSQText(date: date, idMes: NSUUID().uuidString, username: senderDisplayName, textMes: text, avatar: imgName)
+        appDel.client?.publish(newMes.toDictionaryMessage(), toChannel: chan, withCompletion: nil)
+        messageModel.append(newMes)
         // let pubChat = MesJSQText(username: senderDisplayName, textMes: text, image: imgName)
         //        var newDict = chatMessageToDictionaryMessage(pubChat)
         ////        newDict["id"] = id
@@ -304,7 +303,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
 //    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let message = self.mesModelJSQ[indexPath.item]
+        let message = self.messageModel[indexPath.item]
         var cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
         
         return cell
@@ -317,31 +316,31 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
-        let message = mesModelJSQ[indexPath.item]
+        let message = messageModel[indexPath.item]
         let mesTime = message.date
         let currentDate = mesTime  // -  get the current date
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "hh:mm a" //format style to look like 00:00 am/pm
-        let dateString = dateFormatter.string(from: currentDate!)
+        let dateString = dateFormatter.string(from: currentDate)
         
         return NSAttributedString(string: dateString)
         
     }
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return mesModelJSQ.count
+        return messageModel.count
         
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
         
-        return mesModelJSQ[indexPath.item]
+        return messageModel[indexPath.item].jsqMessage
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
         let buble = JSQMessagesBubbleImageFactory()
-        let message = mesModelJSQ[indexPath.item]
+        let message = messageModel[indexPath.item]
         
-        if senderId == message.senderId {
+        if senderId == message.jsqMessage.senderId {
             return buble?.outgoingMessagesBubbleImage(with: .red)
         } else {
             return buble?.incomingMessagesBubbleImage(with: .red)
@@ -368,8 +367,8 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
-        let message = mesModelJSQ[indexPath.item]
-        let mesUseeName = message.senderDisplayName
+        let message = messageModel[indexPath.item]
+        let mesUseeName = message.jsqMessage.senderDisplayName
         //        var nameUser = NSAttributedString(string: mesUseeName!)
         
         return NSAttributedString(string: mesUseeName!)
@@ -405,8 +404,13 @@ extension JSQMesVC {
                 let textJson     = data["text"]  as? String ?? ""
                 let imgJson      = data["avatar"] as? String ?? ""
                 let idJson       = data["id"] as? String ?? ""
+                var dataJs       = Date()
+                if let date = data["timetoken"] as? Double {
+                    dataJs = Date(timeIntervalSince1970: date / 1000000 )
+                    
+                }
                 
-                 let newM = MesJSQText(idMes: idJson, username: usernameJson, textMes: textJson, avatar: imgJson )
+                let newM = MesJSQText(date: dataJs, idMes: idJson, username: usernameJson, textMes: textJson, avatar: imgJson )
                 return newM
                 
                 
@@ -417,7 +421,7 @@ extension JSQMesVC {
                 let stickJson    = data["stickers"] as? String ?? ""
                 let idJson       = data["id"] as? String ?? ""
                 let newM = MesJSQMedia(idMes: idJson, username: usernameJson, avatar: imgJson, imgSticker: stickJson)
-                return newM
+                return nil
                 
             default :
                return nil
