@@ -38,16 +38,16 @@ protocol MessageToJSQ {
 
 struct MesJSQMedia: MessageToJSQ {
     var jsqMessage: JSQMessage {
-    let media = JSQPhotoMediaItem(image: UIImage(named:avatar))
+    let media = JSQPhotoMediaItem(image: UIImage(named:imgSticker))
     var message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes)
     return message!
     }
     func toDictionaryMessage() -> [String : Any] {
         return [
-            "idMes"   : NSString(string:self.idMes),
-            "type"    : self.type.rawValue,
-            "nick": NSString(string: self.username),
-            "image"   : NSString(string: self.imgSticker),
+            "idMes" : NSString(string:self.idMes),
+            "type"  : self.type.rawValue,
+            "nick"  : NSString(string: self.username),
+            "stickers" : NSString(string: self.imgSticker),
             "avatar": NSString(string: self.avatar)
         ]
     }

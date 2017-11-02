@@ -147,6 +147,13 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     func checkStickers() {
         if imageSticker.isEmpty == false {
             
+            let fakeDate = Date()
+            let newMes = MesJSQMedia(date: fakeDate, idMes: NSUUID().uuidString , username: senderDisplayName, avatar: imgName, imgSticker: imageSticker)
+                //MesJSQText(date: date, idMes: NSUUID().uuidString, username: userName, textMes: text, avatar: imgName)
+            appDel.client?.publish(newMes.toDictionaryMessage(), toChannel: chan, withCompletion: nil)
+            messageModel.append(newMes)
+      
+            
             //            let pubChat = MesJSQMedia(username: userName, image: imgName, imgSticker: imageSticker)
             //            let newDict = chatMessageToDictionarMedia(pubChat)
             //            appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
@@ -318,27 +325,7 @@ override func collectionView(_ collectionView: JSQMessagesCollectionView!, avata
     }
     } else {
         return JSQMessagesAvatarImageFactory.avatarImage(with: #imageLiteral(resourceName: "s11"), diameter: 45)
-    }
-        // return JSQMessagesAvatarImageFactory.avatarImage(with: avatarName, diameter: 45)
-//     else {
-//        return JSQMessagesAvatarImageFactory.avatarImage(with: #imageLiteral(resourceName: "s11"), diameter: 45) }
-    
-    //        var avatarMes = messageModel[indexPath.item]
-    //        var newAvatar = avatarMes.image
-    //        let message = mesModelJSQ[indexPath.item]
-    //        var imageName = UIImage(named: newAvatar)
-    //        if senderDisplayName == message.senderDisplayName {
-    //            return JSQMessagesAvatarImageFactory.avatarImage(with: imageName, diameter: 45)
-    //        } else {
-    //            if newAvatar.isEmpty == false {
-    //            return JSQMessagesAvatarImageFactory.avatarImage(with: imageName, diameter: 45)
-    //
-    //            } else {
-    //                return JSQMessagesAvatarImageFactory.avatarImage(with: #imageLiteral(resourceName: "s11"), diameter: 45)
-    //        }
-    //        }
-    // collectionView.reloadData()
-  
+    }  
 }
 
 override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
@@ -388,13 +375,18 @@ extension JSQMesVC {
                 
                 
             case "sticker" :
-//                let usernameJson = data["username"] as? String ?? ""
-//                let textJson     = data["text"]  as? String ?? ""
-//                let imgJson      = data["avatar"] as? String ?? ""
-//                let stickJson    = data["stickers"] as? String ?? ""
-//                let idJson       = data["id"] as? String ?? ""
-//                let newM = MesJSQMedia(idMes: idJson, username: usernameJson, avatar: imgJson, imgSticker: stickJson)
-                return nil
+                let usernameJson = message["nick"] as? String ?? ""
+                let textJson     = message["text"]  as? String ?? ""
+                let imgJson      = message["avatar"] as? String ?? ""
+                let stickJson    = message["stickers"] as? String ?? ""
+                let idJson       = message["idMes"] as? String ?? ""
+                var dataJs       = Date()
+                if let date = data["timetoken"] as? Double {
+                    dataJs = Date(timeIntervalSince1970: date / 1000000 )
+                    
+                }
+                let newM = MesJSQMedia(date: dataJs, idMes: idJson, username: usernameJson, avatar: imgJson, imgSticker: stickJson)
+                return newM
                 
             default :
                 return nil
