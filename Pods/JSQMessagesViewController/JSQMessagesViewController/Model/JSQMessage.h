@@ -34,7 +34,7 @@
  */
 @property (copy, nonatomic, readonly) NSString *senderId;
 @property (copy, nonatomic, readonly) NSString *idMes;
-@property (copy, nonatomic, readonly) NSString *avatar;
+
 
 /**
  *  Returns the display name for the user who sent the message. This value does not have to be unique.
@@ -83,8 +83,8 @@
 + (instancetype)messageWithSenderId:(NSString *)senderId
                         displayName:(NSString *)displayName
                                text:(NSString *)text
-                              idMes:(NSString *)idMes
-                             avatar:(NSString *)avatar;
+                              idMes:(NSString *)idMes;
+
 
 /**
  *  Initializes and returns a message object having the given senderId, senderDisplayName, date, and text.
@@ -102,8 +102,8 @@
                senderDisplayName:(NSString *)senderDisplayName
                             date:(NSDate *)date
                             text:(NSString *)text
-                           idMes:(NSString *)idMes
-                          avatar:(NSString *)avatar;
+                           idMes:(NSString *)idMes;
+
 /**
  *  Initializes and returns a message object having the given senderId, displayName, media,
  *  and current system date.
@@ -119,8 +119,8 @@
 + (instancetype)messageWithSenderId:(NSString *)senderId
                         displayName:(NSString *)displayName
                               media:(id<JSQMessageMediaData>)media
-                              idMes:(NSString *)idMes
-                             avatar:(NSString *)avatar;
+                              idMes:(NSString *)idMes;
+
 
 /**
  *  Initializes and returns a message object having the given senderId, displayName, date, and media.
@@ -138,8 +138,8 @@
                senderDisplayName:(NSString *)senderDisplayName
                             date:(NSDate *)date
                            media:(id<JSQMessageMediaData>)media
-                           idMes:(NSString *)idMes
-                          avatar:(NSString *)avatar;
+                           idMes:(NSString *)idMes;
+
 
 /**
  *  Not a valid initializer.

@@ -27,14 +27,13 @@
                         displayName:(NSString *)displayName
                                text:(NSString *)text
                                idMes:(NSString *)idMes
-                                avatar:(NSString *)avatar
+
 {
     return [[self alloc] initWithSenderId:senderId
                         senderDisplayName:displayName
                                      date:[NSDate date]
                                      text:text
-                                    idMes: idMes
-                                   avatar: avatar];
+                                    idMes: idMes];
 }
 
 - (instancetype)initWithSenderId:(NSString *)senderId
@@ -42,7 +41,7 @@
                             date:(NSDate *)date
                             text:(NSString *)text
                            idMes:(NSString *)idMes
-                          avatar:(NSString *)avatar
+
 {
     NSParameterAssert(text != nil);
 
@@ -57,14 +56,13 @@
                         displayName:(NSString *)displayName
                               media:(id<JSQMessageMediaData>)media
                               idMes:(NSString *)idMes
-                             avatar:(NSString *)avatar
+
 {
     return [[self alloc] initWithSenderId:senderId
                         senderDisplayName:displayName
                                      date:[NSDate date]
                                     media:media
-                                    idMes:idMes
-                                   avatar:avatar];
+                                    idMes:idMes];
 }
 
 - (instancetype)initWithSenderId:(NSString *)senderId
@@ -72,7 +70,7 @@
                             date:(NSDate *)date
                            media:(id<JSQMessageMediaData>)media
                            idMes:(NSString *)idMes
-                          avatar:(NSString *)avatar
+                     
 {
     NSParameterAssert(media != nil);
 
@@ -189,16 +187,14 @@
                                                  senderDisplayName:self.senderDisplayName
                                                               date:self.date
                                                              media:self.media
-                                                             idMes:self.idMes
-                                                            avatar:self.avatar];
+                                                             idMes:self.idMes];
     }
 
     return [[[self class] allocWithZone:zone] initWithSenderId:self.senderId
                                              senderDisplayName:self.senderDisplayName
                                                           date:self.date
                                                           text:self.text
-                                                         idMes:self.idMes
-                                                        avatar:self.avatar];
+                                                         idMes:self.idMes];
 }
 
 @end

@@ -31,15 +31,15 @@ protocol MessageToJSQ {
     var type:MessageType {get}
     var idMes:String     {get}
     var jsqMessage:JSQMessage {get}
-    func toDictionaryMessage()->[String:Any]
     var date: Date{get}
-    var avatar  : String {get}
+    var avatar : String {get}
+    func toDictionaryMessage()->[String:Any]
 }
 
 struct MesJSQMedia: MessageToJSQ {
     var jsqMessage: JSQMessage {
     let media = JSQPhotoMediaItem(image: UIImage(named:avatar))
-    var message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes, avatar: avatar)
+    var message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes)
     return message!
     }
     func toDictionaryMessage() -> [String : Any] {
@@ -64,7 +64,7 @@ struct MesJSQText:MessageToJSQ {
     var date: Date
     
     var jsqMessage: JSQMessage  {
-        let message = JSQMessage(senderId: username, displayName: username, text: textMes, idMes: idMes, avatar: avatar)
+        let message = JSQMessage(senderId: username, displayName: username, text: textMes, idMes: idMes)
         //guard
         return message!
     }
