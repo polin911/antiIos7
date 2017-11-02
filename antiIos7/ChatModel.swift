@@ -35,9 +35,7 @@ protocol MessageToJSQ {
     var date: Date{get}
 }
 
-struct MesJSQMedia {
-    //var date: String
-    var idMes: String
+struct MesJSQMedia: MessageToJSQ {
     var jsqMessage: JSQMessage {
     let media = JSQPhotoMediaItem(image: UIImage(named:avatar))
     var message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes, avatar: avatar)
@@ -46,28 +44,26 @@ struct MesJSQMedia {
     func toDictionaryMessage() -> [String : Any] {
         return [
             "idMes"   : NSString(string:self.idMes),
-            "type"    : self.type as AnyObject,
-            "username": NSString(string: self.username),
+            "type"    : self.type.rawValue,
+            "nick": NSString(string: self.username),
             "image"   : NSString(string: self.avatar),
-            "stickers": NSString(string: self.imgSticker)
+            "avatar": NSString(string: self.imgSticker)
         ]
     }
+    var date: Date
+    var idMes: String
     var username: String
     var avatar  : String
     var imgSticker :String
     let type: MessageType = .sticker
-    
- 
-    
 }
 
 
 struct MesJSQText:MessageToJSQ {
     var date: Date
     
-
-  var jsqMessage: JSQMessage  {
-        let message = JSQMessage(senderId: userName, displayName: userName, text: textMes, idMes: idMes, avatar: avatar)
+    var jsqMessage: JSQMessage  {
+        let message = JSQMessage(senderId: username, displayName: username, text: textMes, idMes: idMes, avatar: avatar)
         //guard
         return message!
     }
@@ -76,9 +72,9 @@ func toDictionaryMessage() -> [String : Any] {
         return [
             "idMes"   : NSString(string:self.idMes),
             "type"    : self.type.rawValue,
-            "username": NSString(string: self.username),
+            "nick"    : NSString(string: self.username),
             "text"    : NSString(string: self.textMes),
-            "image"   : NSString(string: self.avatar)
+            "avatar"  : NSString(string: self.avatar)
         ]
     }
     let type:MessageType = .text
@@ -88,42 +84,4 @@ func toDictionaryMessage() -> [String : Any] {
     var avatar  : String
 
 }
-
-func chatMessageToDictionaryMessage(_ chatmessage: MesJSQText) -> [String: AnyObject]{
-   return [
-        "id"      : NSString(string:chatmessage.idMes),
-        "type"    : chatmessage.type as AnyObject,
-        "username": NSString(string: chatmessage.username),
-        "text"    : NSString(string: chatmessage.textMes),
-        "image"   : NSString(string: chatmessage.avatar)
-        
-    ]
-}
-//func chatMessageToDictionary(_ chatmessage: MesJSQ) -> [String: AnyObject]{
-//    return [
-//        "username": NSString(string: chatmessage.username),
-//        "text"    : NSString(string: chatmessage.textMes),
-//        "image"   : NSString(string: chatmessage.image),
-//        "stickers": NSString(string: chatmessage.stick)
-//    ]
-//}
-func chatMessageToDictionarMedia(_ chatmessage: MesJSQMedia) -> [String: AnyObject]{
-    return [
-        "id"      : NSString(string:chatmessage.idMes),
-        "type"    : chatmessage.type as AnyObject,
-        "username": NSString(string: chatmessage.username),
-        "image"   : NSString(string: chatmessage.avatar),
-        "stickers": NSString(string: chatmessage.imgSticker)
-        
-    ]
-}
-
-//struct MesJSQ:MessageToJSQ {
-//    var username: String
-//    var textMes : String
-//    var image   : String
-//    var stick   : String
-//
-//}
-//var chatMesArray2 : [MesJSQ]  = []
 

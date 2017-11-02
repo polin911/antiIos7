@@ -22,11 +22,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     
     @IBOutlet var stickersCollection: UICollectionView!
     //Models:
-    var messageModel = [MessageToJSQ]() {
-        didSet {
-            print("changed Pubnub \(messageModel.count + oldValue.count)")
-        }
-    }
+    var messageModel = [MessageToJSQ]()
     
     //
     var appDel = UIApplication.shared.delegate as! AppDelegate
@@ -59,8 +55,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         self.collectionView.register(UINib(nibName: "messageViewOutgoingCell", bundle: nil), forCellWithReuseIdentifier: "outgoingCell")
     }
     /// ButtonSticker
-    
-    
+ 
     func buttonStickerWork() {
         shouldPerformSegue(withIdentifier: "showStickersVC", sender: self)
     }
@@ -74,7 +69,6 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         checkStickers()
         initPubNub()
         updateHistory()
-        
         
     }
     override func viewDidAppear(_ animated: Bool) {
@@ -140,9 +134,8 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             guard let result = result else {
                 return
             }
-            // self.mesModelJSQ = self.parseDataAny(result.data.messages as [AnyObject])
-            //            self.messageModel = self.parseJsonDataAny(result.data.messages as [AnyObject])
-            // self.collectionView.reloadData()
+            self.messageModel = self.parseData(result.data.messages as! [NSDictionary] )
+            self.collectionView.reloadData()
             self.finishReceivingMessage()
             
             print("Stiiiiiiiiiiiiickkers \(imageSticker)")
@@ -151,7 +144,6 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     ///////////Stickers
-    
     func checkStickers() {
         if imageSticker.isEmpty == false {
             
@@ -184,22 +176,14 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         guard let json  = message.data.message as? NSDictionary else {
             return
         }
-        
-        //        guard  let readyMessage = parseData(stringData) else{
-        //            return
-        //        }
-        //        guard let readyJsonMes = parseJsonMessage(stringData) else {
-        //            return
-        //        }
-        
-        
-        guard let readyMessage = parseData(json) else {
+        guard let readyMessage = parseData(["message" : json,
+                                           "timetoken" : message.data.timetoken]) else {
             return
         }
         
         if let index = messageModel.index(where: { message -> Bool in readyMessage.idMes == message.idMes}) {
-            //выдираем айдишку из сообщения
-            messageModel.remove(at: index) }
+            messageModel.remove(at: index)
+        }
     
     messageModel.append(readyMessage)
     collectionView.reloadData()
@@ -212,16 +196,12 @@ func getTime() -> String{
     let dateString = dateFormatter.string(from: currentDate)
     return dateString
 }
-
+    
 ///AccessoryButton
-
-
 private func chooseMedia(type: CFString) {
     picker.mediaTypes = [type as String]
     present(picker, animated: true, completion: nil)
 }
-
-
 //    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
 //        picker.dismiss(animated: true, completion: nil)
 //        let picture = info[UIImagePickerControllerEditedImage] as? UIImage
@@ -243,8 +223,6 @@ private func chooseMedia(type: CFString) {
 //        }
 //        
 //    }
-
-
 func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
     picker.dismiss(animated: true, completion:nil)
 }
@@ -257,10 +235,7 @@ override func didPressAccessoryButton2(_ sender: UIButton!) {
     }
     
     present(picker, animated: true, completion:nil)
-    
 }
-
-
 
 ///////JSQ
 override func didPressAccessoryButton(_ sender: UIButton!) {
@@ -270,20 +245,10 @@ override func didPressAccessoryButton(_ sender: UIButton!) {
 }
 
 override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-    
-    
     //for PubNub
-    let newMes = MesJSQText(date: date, idMes: NSUUID().uuidString, username: senderDisplayName, textMes: text, avatar: imgName)
+    let newMes = MesJSQText(date: date, idMes: NSUUID().uuidString, username: userName, textMes: text, avatar: imgName)
     appDel.client?.publish(newMes.toDictionaryMessage(), toChannel: chan, withCompletion: nil)
     messageModel.append(newMes)
-    // let pubChat = MesJSQText(username: senderDisplayName, textMes: text, image: imgName)
-    //        var newDict = chatMessageToDictionaryMessage(pubChat)
-    ////        newDict["id"] = id
-    //        appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
-    //For JSq
-    //        let mes = JSQMessage(senderId: senderId, displayName: senderDisplayName, text: text)
-    //            guard let newMessage = mes else {return}
-    //            mesModelJSQ.append(newMessage)
     collectionView.reloadData()
     finishSendingMessage()
     
@@ -294,29 +259,11 @@ override func didPressSend(_ button: UIButton!, withMessageText text: String!, s
 //3. добавил бы для сообщений айдишку - let id = NSUUID().uuidString
 //4. когда сообщение пришло, проверить, есть ли сообщение с такой айдишкой в массиве и если есть уже, то удалить из массива и добавить то, которое от сервераъ
 //5. теперь будет легко проверить, что
-
-
-
-//    func sendSomeTypeOfMessagePressed(){
-//        
-//        let text = MesJSQText(username: "dgdsgds", textMes: "text", avatar: "itweewuwieewote")
-//        //let stiker
-//        //let image
-//
-//
-//        let json = text.toDictionaryMessage()
-//        
-//        appDel.client?.publish(json, toChannel: chan, compressed: true, withCompletion: nil)
-//    }
-//    
+ 
 override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    
     let message = self.messageModel[indexPath.item]
     var cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
-    
     return cell
-    
-    
 }
 
 override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForCellTopLabelAt indexPath: IndexPath!) -> CGFloat {
@@ -326,9 +273,9 @@ override func collectionView(_ collectionView: JSQMessagesCollectionView!, layou
 override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
     let message = messageModel[indexPath.item]
     let mesTime = message.date
-    let currentDate = mesTime  // -  get the current date
+    let currentDate = mesTime
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "hh:mm a" //format style to look like 00:00 am/pm
+    dateFormatter.dateFormat = "hh:mm a"
     let dateString = dateFormatter.string(from: currentDate)
     
     return NSAttributedString(string: dateString)
@@ -384,8 +331,6 @@ override func collectionView(_ collectionView: JSQMessagesCollectionView!, attri
 override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat {
     return 30
 }
-
-
 }
 
 //Parse
@@ -404,14 +349,14 @@ extension JSQMesVC {
     
     func parseData(_ data: NSDictionary) -> MessageToJSQ? {
         var newMes   : MessageToJSQ
-        
-        if let type = data["type"] as? String {
+        if  let message = data["message"] as? NSDictionary,
+            let type = message["type"] as? String {
             switch type {
             case "text":
-                let usernameJson = data["username"] as? String ?? ""
-                let textJson     = data["text"]  as? String ?? ""
-                let imgJson      = data["avatar"] as? String ?? ""
-                let idJson       = data["idMes"] as? String ?? ""
+                let usernameJson = message["nick"] as? String ?? ""
+                let textJson     = message["text"]  as? String ?? ""
+                let imgJson      = message["avatar"] as? String ?? ""
+                let idJson       = message["idMes"] as? String ?? ""
                 var dataJs       = Date()
                 if let date = data["timetoken"] as? Double {
                     dataJs = Date(timeIntervalSince1970: date / 1000000 )
@@ -423,12 +368,12 @@ extension JSQMesVC {
                 
                 
             case "sticker" :
-                let usernameJson = data["username"] as? String ?? ""
-                let textJson     = data["text"]  as? String ?? ""
-                let imgJson      = data["avatar"] as? String ?? ""
-                let stickJson    = data["stickers"] as? String ?? ""
-                let idJson       = data["id"] as? String ?? ""
-                let newM = MesJSQMedia(idMes: idJson, username: usernameJson, avatar: imgJson, imgSticker: stickJson)
+//                let usernameJson = data["username"] as? String ?? ""
+//                let textJson     = data["text"]  as? String ?? ""
+//                let imgJson      = data["avatar"] as? String ?? ""
+//                let stickJson    = data["stickers"] as? String ?? ""
+//                let idJson       = data["id"] as? String ?? ""
+//                let newM = MesJSQMedia(idMes: idJson, username: usernameJson, avatar: imgJson, imgSticker: stickJson)
                 return nil
                 
             default :
@@ -437,65 +382,6 @@ extension JSQMesVC {
                 
             }
         }
-        //    func parseDataAny(_ any: [AnyObject] ) -> [JSQMessage] {
-        //        var list = [JSQMessage]()
-        //        for data in any {
-        //            if let data = data as? NSDictionary,
-        //                let messageData = data["message"] as? NSDictionary,
-        //                let message = parseData(messageData){
-        //                list.append(message)
-        //            }
-        //        }
-        //        return list
-        //    }
-        //
-        //    func parseData(_ data: NSDictionary) -> JSQMessage? {
-        //
-        //        let stringData    = data
-        //        let stringName    = stringData["username"] as? String ?? ""
-        //       // let stringTime    = stringData["time"] as? String ?? ""
-        //        let stringImg     = stringData["image"] as? String ?? ""
-        //        var newMessage: JSQMessage?
-        //
-        //        if  let stringSticker = stringData["stickers"] as? String ,
-        //            stringSticker.isEmpty == false {
-        //
-        //            let imgForJSq = UIImage(named: stringSticker)
-        //            let phoForJSQ = JSQPhotoMediaItem(image: imgForJSq)
-        //            newMessage = JSQMessage(senderId: stringName, displayName: stringName, media: phoForJSQ)
-        //        } else if let stringText = stringData["text"] as? String {
-        //            newMessage = JSQMessage(senderId: stringName, displayName: stringName, text: stringText)
-        //        }
-        //        guard let readyMessage = newMessage else {
-        //            return nil
-        //        }
-        //        return readyMessage
-        //    }
-        //    func parseJsonDataAny(_ any: [AnyObject] ) -> [MesJSQ] {
-        //        var list = [MesJSQ]()
-        //        for data in any {
-        //            if let data = data as? NSDictionary,
-        //                let messageData = data["message"] as? NSDictionary,
-        //                let message = parseJsonMessage(messageData){
-        //                list.append(message)
-        //            }
-        //        }
-        //        return list
-        //    }
-        //    func parseJsonMessage(_ data: NSDictionary) -> MesJSQ? {
-        //        var newMessage : MesJSQ?
-        //                let json = data
-        //
-        //                let usernameJson = json["username"] as? String ?? "" // to get rid of null
-        //                let textJson     = json["text"]  as? String ?? ""
-        //                let imgJson      = json["image"] as? String ?? ""
-        //                let imgStickerJ  = json["stickers"] as? String ?? ""
-        //        newMessage = MesJSQ(username: usernameJson, textMes: textJson,image: imgJson, stick: imgStickerJ)
-        //        guard let readyMes = newMessage else {return nil}
-        //        return readyMes
-        //
-        //
-        //    }
         return  nil
     }
 }
