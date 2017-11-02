@@ -33,6 +33,7 @@ protocol MessageToJSQ {
     var jsqMessage:JSQMessage {get}
     func toDictionaryMessage()->[String:Any]
     var date: Date{get}
+    var avatar  : String {get}
 }
 
 struct MesJSQMedia: MessageToJSQ {
@@ -46,8 +47,8 @@ struct MesJSQMedia: MessageToJSQ {
             "idMes"   : NSString(string:self.idMes),
             "type"    : self.type.rawValue,
             "nick": NSString(string: self.username),
-            "image"   : NSString(string: self.avatar),
-            "avatar": NSString(string: self.imgSticker)
+            "image"   : NSString(string: self.imgSticker),
+            "avatar": NSString(string: self.avatar)
         ]
     }
     var date: Date

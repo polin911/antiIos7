@@ -295,13 +295,33 @@ override func collectionView(_ collectionView: JSQMessagesCollectionView!, messa
     let buble = JSQMessagesBubbleImageFactory()
     let message = messageModel[indexPath.item]
     
-    if senderId == message.jsqMessage.senderId {
+    if senderDisplayName == message.jsqMessage.senderDisplayName {
         return buble?.outgoingMessagesBubbleImage(with: .red)
     } else {
         return buble?.incomingMessagesBubbleImage(with: .red)
     }
 }
 override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
+    
+    var avatarMes  = messageModel[indexPath.item]
+    var avatarImg  = avatarMes.avatar
+    if avatarImg.isEmpty == false {
+    var avatarName = UIImage(named: avatarImg)
+    
+    if senderDisplayName == avatarMes.jsqMessage.senderDisplayName {
+        return JSQMessagesAvatarImageFactory.avatarImage(with: avatarName, diameter: 45)
+    } else {
+        if avatarImg.isEmpty == false {
+            return JSQMessagesAvatarImageFactory.avatarImage(with: avatarName, diameter: 45)
+        } else {
+               return JSQMessagesAvatarImageFactory.avatarImage(with: #imageLiteral(resourceName: "s11"), diameter: 45) }
+    }
+    } else {
+        return JSQMessagesAvatarImageFactory.avatarImage(with: #imageLiteral(resourceName: "s11"), diameter: 45)
+    }
+        // return JSQMessagesAvatarImageFactory.avatarImage(with: avatarName, diameter: 45)
+//     else {
+//        return JSQMessagesAvatarImageFactory.avatarImage(with: #imageLiteral(resourceName: "s11"), diameter: 45) }
     
     //        var avatarMes = messageModel[indexPath.item]
     //        var newAvatar = avatarMes.image
@@ -318,7 +338,7 @@ override func collectionView(_ collectionView: JSQMessagesCollectionView!, avata
     //        }
     //        }
     // collectionView.reloadData()
-    return nil
+  
 }
 
 override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
@@ -362,7 +382,7 @@ extension JSQMesVC {
                     dataJs = Date(timeIntervalSince1970: date / 1000000 )
                     
                 }
-                
+            
                 let newM = MesJSQText(date: dataJs, idMes: idJson, username: usernameJson, textMes: textJson, avatar: imgJson )
                 return newM
                 
