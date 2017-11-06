@@ -36,11 +36,12 @@ protocol MessageToJSQ {
     func toDictionaryMessage()->[String:Any]
 }
 
+
 struct MesJSQMedia: MessageToJSQ {
     var jsqMessage: JSQMessage {
-    let media = JSQPhotoMediaItem(image: UIImage(named:imgSticker))
-    var message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes)
-    return message!
+        let media = JSQPhotoMediaItem(image: UIImage(named:imgSticker))
+        var message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes)
+        return message!
     }
     func toDictionaryMessage() -> [String : Any] {
         return [
@@ -69,7 +70,7 @@ struct MesJSQText:MessageToJSQ {
         return message!
     }
     
-func toDictionaryMessage() -> [String : Any] {
+    func toDictionaryMessage() -> [String : Any] {
         return [
             "idMes"   : NSString(string:self.idMes),
             "type"    : self.type.rawValue,
@@ -83,6 +84,6 @@ func toDictionaryMessage() -> [String : Any] {
     var username: String
     var textMes : String
     var avatar  : String
-
+    
 }
 

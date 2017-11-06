@@ -21,12 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, PNObjectEventListener {
     var dToken: Data?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        let notificationType:UIUserNotificationType = [UIUserNotificationType.alert,  UIUserNotificationType.badge, UIUserNotificationType.sound]
-        //        UIUserNotificationSettings(
-        let settings = UIUserNotificationSettings(types: notificationType, categories: nil)
-        application.registerUserNotificationSettings(settings)
-        application.registerForRemoteNotifications()
+
         return true
     }
     
