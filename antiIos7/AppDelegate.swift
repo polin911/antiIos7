@@ -21,6 +21,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, PNObjectEventListener {
     var dToken: Data?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        
+        
 
         return true
     }
