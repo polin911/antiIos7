@@ -13,6 +13,8 @@
 		362DEB521F822CCF0085FBD1 /* antiIos7.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 362DEB501F822CCF0085FBD1 /* antiIos7.xcdatamodeld */; };
 		362DEB541F822CCF0085FBD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 362DEB531F822CCF0085FBD1 /* Assets.xcassets */; };
 		362DEB571F822CCF0085FBD1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 362DEB551F822CCF0085FBD1 /* LaunchScreen.storyboard */; };
+		364929A91FB4410500AE8611 /* NewViewWithButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = 364929A81FB4410500AE8611 /* NewViewWithButton.xib */; };
+		364929AB1FB4469B00AE8611 /* NewViewWithButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 364929AA1FB4469B00AE8611 /* NewViewWithButton.swift */; };
 		3683F0131F82300100E08CF4 /* MainVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0121F82300100E08CF4 /* MainVc.swift */; };
 		3683F0161F82303F00E08CF4 /* WelcomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0151F82303F00E08CF4 /* WelcomeVC.swift */; };
 		3683F0181F82308D00E08CF4 /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0171F82308D00E08CF4 /* Global.swift */; };
@@ -37,6 +39,8 @@
 		362DEB531F822CCF0085FBD1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		362DEB561F822CCF0085FBD1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		362DEB581F822CCF0085FBD1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		364929A81FB4410500AE8611 /* NewViewWithButton.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewViewWithButton.xib; sourceTree = "<group>"; };
+		364929AA1FB4469B00AE8611 /* NewViewWithButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewViewWithButton.swift; sourceTree = "<group>"; };
 		3683F0121F82300100E08CF4 /* MainVc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainVc.swift; sourceTree = "<group>"; };
 		3683F0151F82303F00E08CF4 /* WelcomeVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WelcomeVC.swift; sourceTree = "<group>"; };
 		3683F0171F82308D00E08CF4 /* Global.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
@@ -102,6 +106,15 @@
 			path = antiIos7;
 			sourceTree = "<group>";
 		};
+		364929A71FB4407C00AE8611 /* Nib */ = {
+			isa = PBXGroup;
+			children = (
+				364929A81FB4410500AE8611 /* NewViewWithButton.xib */,
+				364929AA1FB4469B00AE8611 /* NewViewWithButton.swift */,
+			);
+			name = Nib;
+			sourceTree = "<group>";
+		};
 		3683F0141F82300B00E08CF4 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
@@ -133,6 +146,7 @@
 		36E8439A1F9770F600B9FE1A /* ForJSQ */ = {
 			isa = PBXGroup;
 			children = (
+				364929A71FB4407C00AE8611 /* Nib */,
 				36E8439C1F97711900B9FE1A /* View */,
 				36E8439B1F97710F00B9FE1A /* Controller */,
 				36E843A71F97915300B9FE1A /* newJSQVC.swift */,
@@ -241,6 +255,7 @@
 				362DEB571F822CCF0085FBD1 /* LaunchScreen.storyboard in Resources */,
 				362DEB541F822CCF0085FBD1 /* Assets.xcassets in Resources */,
 				362DEB4F1F822CCF0085FBD1 /* Main.storyboard in Resources */,
+				364929A91FB4410500AE8611 /* NewViewWithButton.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,6 +316,7 @@
 			files = (
 				3621E9C41F83C4CB0097EAB1 /* JSQMesVC.swift in Sources */,
 				36E8439E1F97714100B9FE1A /* StickersController4JSQ.swift in Sources */,
+				364929AB1FB4469B00AE8611 /* NewViewWithButton.swift in Sources */,
 				362DEB521F822CCF0085FBD1 /* antiIos7.xcdatamodeld in Sources */,
 				3683F0221F823E9C00E08CF4 /* StickerCell.swift in Sources */,
 				36E843A21F9771CA00B9FE1A /* StickCell.swift in Sources */,

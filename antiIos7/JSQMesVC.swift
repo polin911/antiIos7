@@ -38,7 +38,8 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         super.viewDidLoad()
         self.collectionView.backgroundColor = UIColor.black
         
-        
+        ////////
+      view.addSubview(customToolBar!)
         //updateHistory()
         /////////
         
@@ -217,7 +218,13 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     ///////JSQ
+
     
+    /////Nib
+    let customToolBar = Bundle.main.loadNibNamed("NewViewWithButton", owner: self, options: nil)?.first as? NewViewWithButton
+    
+
+    ///////////
     private func chooseMedia(type: CFString) {
         picker.mediaTypes = [type as String]
         present(picker, animated: true, completion: nil)
