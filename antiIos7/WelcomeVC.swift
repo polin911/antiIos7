@@ -40,7 +40,9 @@ class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
             lblName.text = userName
         }
         if imgName.isEmpty == false {
-            userWelcomeImg.image = UIImage(named: defaults.string(forKey: "imgName")!)
+            userWelcomeImg.image = UIImage(named: imgName)!
+        } else {
+            userWelcomeImg.image = UIImage(named: "1")
         }
     }
     /////////////////MARK: AlertFunction
