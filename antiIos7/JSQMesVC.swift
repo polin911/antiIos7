@@ -15,6 +15,7 @@ import MobileCoreServices
 
 class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
+    var customToolBarView = NewViewWithButton()
     let picker = UIImagePickerController()
     
     var incomingJSQ = JSQMessagesCollectionViewCellIncoming()
@@ -40,6 +41,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         
         ////////
       view.addSubview(customToolBar!)
+    
         //updateHistory()
         /////////
         
