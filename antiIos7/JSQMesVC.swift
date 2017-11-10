@@ -41,6 +41,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         
         ////////
       view.addSubview(customToolBar!)
+        
     
         //updateHistory()
         /////////

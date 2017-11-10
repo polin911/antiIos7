@@ -8,4 +8,5 @@ target 'antiIos7' do
   # Pods for antiIos7
 pod "PubNub", "~> 4"
 pod 'JSQMessagesViewController'
+pod 'Parse'
 end

@@ -1,20 +1,26 @@
 PODS:
+  - Bolts/Tasks (1.8.4)
   - JSQMessagesViewController (7.3.4):
     - JSQSystemSoundPlayer (~> 2.0.1)
   - JSQSystemSoundPlayer (2.0.1)
+  - Parse (1.14.2):
+    - Bolts/Tasks (~> 1.8)
   - PubNub (4.5.5):
     - PubNub/Core (= 4.5.5)
   - PubNub/Core (4.5.5)
 
 DEPENDENCIES:
   - JSQMessagesViewController
+  - Parse
   - PubNub (~> 4)
 
 SPEC CHECKSUMS:
+  Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
   JSQMessagesViewController: 39fed975e3c9f8eba7292071e29eeb541d105e66
   JSQSystemSoundPlayer: c5850e77a4363ffd374cd851154b9af93264ed8d
+  Parse: 4335d65f40cb3d43190d723144bbe1afb9c38230
   PubNub: 519594dfe84662686818591179470ff87a30a224
 
-PODFILE CHECKSUM: 15b81a0cd2a2b1add967fde505a78f880a5ef8e8
+PODFILE CHECKSUM: ab975ba74279fd79ac3e6bad04dc2ea7598a4dba
 
 COCOAPODS: 1.2.0
