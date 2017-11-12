@@ -12,6 +12,7 @@ import PubNub
 import UIKit
 import AVKit
 import MobileCoreServices
+import Parse
 
 class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
@@ -20,7 +21,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     
     var incomingJSQ = JSQMessagesCollectionViewCellIncoming()
     var outcominJSQ = JSQMessagesCollectionViewCellOutgoing()
-
+    
     
     @IBOutlet var stickersCollection: UICollectionView!
     //Models:
@@ -41,9 +42,9 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         self.collectionView.backgroundColor = UIColor.black
         
         ////////
-      view.addSubview(customToolBar!)
+        view.addSubview(customToolBar!)
         
-    
+        
         //updateHistory()
         /////////
         
@@ -222,12 +223,12 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     ///////JSQ
-
+    
     
     /////Nib
     let customToolBar = Bundle.main.loadNibNamed("NewViewWithButton", owner: self, options: nil)?.first as? NewViewWithButton
     
-
+    
     ///////////ImagePicker
     private func chooseMedia(type: CFString) {
         picker.mediaTypes = [type as String]
@@ -244,15 +245,24 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickerImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-          var imageFromImagePicker: UIImageView!
-           var newPic = pickerImage
+            var imageFromImagePicker: UIImageView!
+            var newPic = pickerImage
             guard newPic == pickerImage else { return }
-            
-            
             let currentDate = Date()
             let newMes = MesJSQMediaImage(date: currentDate, idMes: NSUUID().uuidString, username: senderDisplayName, avatar: imgName, img: newPic)
-                //MesJSQMedia(date: currentDate, idMes: NSUUID().uuidString , username: senderDisplayName, avatar: imgName, imgSticker: imageSticker)
-           // appDel.client?.publish(newMes.toDictionaryMessage(), toChannel: chan, withCompletion: nil)
+           
+            ////Parsing
+            guard let imageData = UIImagePNGRepresentation(newPic) else {return}
+            guard let imageFile : PFFile = PFFile(data: imageData) else {return}
+            
+            let testObject = PFObject(className: "img")
+            testObject["fileImg"] = imageFile
+            testObject.saveInBackground { (succes, error) in
+                print("Object has been saved.")
+            }
+            
+            
+            
             messageModel.append(newMes)
             finishReceivingMessage()
         }
