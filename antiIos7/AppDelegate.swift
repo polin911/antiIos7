@@ -10,6 +10,7 @@ import UIKit
 import CoreData
 import PubNub
 import JSQMessagesViewController
+import Parse
 
 
 @UIApplicationMain
@@ -21,7 +22,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, PNObjectEventListener {
     var dToken: Data?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        
+        // Initialize Parse.
+        let configuration = ParseClientConfiguration {
+            $0.applicationId = "Nxk1bWADJQ6HjMp18PAyAioj1s4SR79bOGD9wREQ"
+            $0.clientKey = "kVOvIOrbauVh0VnZHTbuURuS3CgPCMC5E4IPiGF9"
+            $0.server = "https://parseapi.back4app.com"
+        }
+        Parse.initialize(with: configuration)
         
 
         return true

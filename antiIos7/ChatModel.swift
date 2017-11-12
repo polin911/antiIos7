@@ -86,4 +86,27 @@ struct MesJSQText:MessageToJSQ {
     var avatar  : String
     
 }
+struct MesJSQMediaImage: MessageToJSQ {
+    var jsqMessage: JSQMessage {
+        let media = JSQPhotoMediaItem(image:img)
+        var message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes)
+        return message!
+    }
+    func toDictionaryMessage() -> [String : Any] {
+        return [
+            "idMes" : NSString(string:self.idMes),
+            "type"  : self.type.rawValue,
+            "nick"  : NSString(string: self.username),
+            "image" : img,
+            "avatar": NSString(string: self.avatar)
+        ]
+    }
+    var date: Date
+    var idMes: String
+    var username: String
+    var avatar  : String
+    var img : UIImage
+    let type: MessageType = .image
+   // var imgString : String
+}
 

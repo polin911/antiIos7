@@ -20,6 +20,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     
     var incomingJSQ = JSQMessagesCollectionViewCellIncoming()
     var outcominJSQ = JSQMessagesCollectionViewCellOutgoing()
+
     
     @IBOutlet var stickersCollection: UICollectionView!
     //Models:
@@ -227,7 +228,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     let customToolBar = Bundle.main.loadNibNamed("NewViewWithButton", owner: self, options: nil)?.first as? NewViewWithButton
     
 
-    ///////////
+    ///////////ImagePicker
     private func chooseMedia(type: CFString) {
         picker.mediaTypes = [type as String]
         present(picker, animated: true, completion: nil)
@@ -241,13 +242,30 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         picker.dismiss(animated: true, completion:nil)
     }
     
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        if let pickerImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+          var imageFromImagePicker: UIImageView!
+           var newPic = pickerImage
+            guard newPic == pickerImage else { return }
+            
+            
+            let currentDate = Date()
+            let newMes = MesJSQMediaImage(date: currentDate, idMes: NSUUID().uuidString, username: senderDisplayName, avatar: imgName, img: newPic)
+                //MesJSQMedia(date: currentDate, idMes: NSUUID().uuidString , username: senderDisplayName, avatar: imgName, imgSticker: imageSticker)
+           // appDel.client?.publish(newMes.toDictionaryMessage(), toChannel: chan, withCompletion: nil)
+            messageModel.append(newMes)
+            finishReceivingMessage()
+        }
+        dismiss(animated: true, completion: nil)
+    }
+    
+    
     override func didPressAccessoryButton2(_ sender: UIButton!) {
         let picker = UIImagePickerController()
         picker.delegate = self
         if (UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary)) {
             picker.sourceType = UIImagePickerControllerSourceType.photoLibrary
         }
-        
         present(picker, animated: true, completion:nil)
     }
     
@@ -387,6 +405,17 @@ extension JSQMesVC {
                 let newM = MesJSQMedia(date: dataJs, idMes: idJson, username: usernameJson, avatar: imgJson, imgSticker: stickJson)
                 return newM
                 
+            case "image" :
+                let usernameJson = message["nick"] as? String ?? ""
+                let imgJson      = message["avatar"] as? String ?? ""
+                let imageJson    = message["image"] as? String ?? ""
+                let idJson       = message["idMes"] as? String ?? ""
+                var dataJs       = Date()
+                if let date = data["timetoken"] as? Double {
+                    dataJs = Date(timeIntervalSince1970: date / 10000000 )
+                }
+                let newM = MesJSQMediaImage(date: dataJs, idMes: idJson, username: usernameJson, avatar: imgJson, img: UIImage(named: imageJson)!)
+                return newM
             default :
                 return nil
                 

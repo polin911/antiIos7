@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Parse
 
 class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
     
@@ -25,11 +26,22 @@ class WelcomeVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         
         uploadView()
         checkUser()
+        checkingParse()
         // Do any additional setup after loading the view.
     }
     func uploadView() {
         viewCollectionImg.dataSource = self
         viewCollectionImg.delegate   = self
+    }
+    //CheckingParse
+    func checkingParse() {
+        let testObject = PFObject(className: "TestObject")
+        testObject["foo"] = "bar"
+        testObject.saveInBackground { (succes, error) in
+            print("Object has been saved.")
+        }
+
+    
     }
     
     ///DefaultsUser
