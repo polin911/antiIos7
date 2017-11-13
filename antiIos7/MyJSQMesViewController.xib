@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="1tq-3X-f1U">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="GUM-cc-nQZ" customClass="JSQMessagesCollectionView">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <collectionViewLayout key="collectionViewLayout" id="vzJ-2y-3H6" customClass="JSQMessagesCollectionViewFlowLayout"/>
+                    <cells/>
+                </collectionView>
+                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ta5-aL-h0J" customClass="JSQMessagesInputToolbar">
+                    <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="JkW-GU-dGJ"/>
+                    </constraints>
+                    <items/>
+                </toolbar>
+                <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2y4-0F-aIj" customClass="MyJSQToolBarCont" customModule="antiIos7" customModuleProvider="target">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="55"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" red="0.50196081400000003" green="0.0" blue="0.50196081400000003" alpha="0.3181185788" colorSpace="calibratedRGB"/>
+                </view>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="Ta5-aL-h0J" secondAttribute="bottom" id="2wA-A8-oFc"/>
+                <constraint firstItem="GUM-cc-nQZ" firstAttribute="leading" secondItem="1tq-3X-f1U" secondAttribute="leading" id="I9s-rt-Dg3"/>
+                <constraint firstAttribute="trailing" secondItem="GUM-cc-nQZ" secondAttribute="trailing" id="J0N-pd-VnG"/>
+                <constraint firstItem="Ta5-aL-h0J" firstAttribute="leading" secondItem="1tq-3X-f1U" secondAttribute="leading" id="Q0h-57-gt7"/>
+                <constraint firstAttribute="trailing" secondItem="Ta5-aL-h0J" secondAttribute="trailing" id="ktK-27-rgD"/>
+                <constraint firstItem="GUM-cc-nQZ" firstAttribute="top" secondItem="1tq-3X-f1U" secondAttribute="top" id="s7B-uB-qmk"/>
+                <constraint firstAttribute="bottom" secondItem="GUM-cc-nQZ" secondAttribute="bottom" id="sBw-aK-NvQ"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <point key="canvasLocation" x="41.5" y="54.5"/>
+        </view>
+    </objects>
+</document>

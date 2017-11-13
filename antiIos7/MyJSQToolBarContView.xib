@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="pWH-bo-DA4" customClass="MyJSQToolBarCont" customModule="antiIos7" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="401" height="60"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="T2E-l8-dq7">
+                    <rect key="frame" x="0.0" y="0.0" width="401" height="60"/>
+                    <color key="backgroundColor" red="0.50196081400000003" green="0.0" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CHn-Qu-61b">
+                    <rect key="frame" x="344" y="10" width="57" height="40"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="57" id="B5Z-aq-Jwq"/>
+                    </constraints>
+                    <state key="normal" title="Button" image="s6"/>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="0.50196081400000003" green="0.0" blue="0.50196081400000003" alpha="0.31811857876712329" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="T2E-l8-dq7" secondAttribute="trailing" id="7iP-Nt-Zb1"/>
+                <constraint firstItem="T2E-l8-dq7" firstAttribute="top" secondItem="pWH-bo-DA4" secondAttribute="top" id="G2O-yH-hh2"/>
+                <constraint firstAttribute="bottom" secondItem="T2E-l8-dq7" secondAttribute="bottom" id="Ye9-gI-0Nt"/>
+                <constraint firstAttribute="trailing" secondItem="CHn-Qu-61b" secondAttribute="trailing" id="nsd-2S-bvL"/>
+                <constraint firstItem="CHn-Qu-61b" firstAttribute="top" secondItem="pWH-bo-DA4" secondAttribute="top" constant="10" id="spJ-XT-6VP"/>
+                <constraint firstItem="T2E-l8-dq7" firstAttribute="leading" secondItem="pWH-bo-DA4" secondAttribute="leading" id="wjS-1Q-QE8"/>
+                <constraint firstAttribute="bottom" secondItem="CHn-Qu-61b" secondAttribute="bottom" constant="10" id="yN1-VV-OAM"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="buttonPizza" destination="CHn-Qu-61b" id="Ifg-OC-hkK"/>
+                <outlet property="myMessageToolbar" destination="T2E-l8-dq7" id="cxs-Xe-Sob"/>
+            </connections>
+            <point key="canvasLocation" x="262.5" y="78"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="s6" width="361" height="397"/>
+    </resources>
+</document>
