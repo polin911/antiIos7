@@ -251,11 +251,12 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             let newMes = MesJSQMediaImage(date: currentDate, idMes: NSUUID().uuidString, username: senderDisplayName, avatar: imgName, img: newPic)
            
             ////Parsing
-            guard let imageData = UIImagePNGRepresentation(newPic) else {return}
+            guard let imageData = UIImageJPEGRepresentation(newPic, 0.5) else {return}
             guard let imageFile : PFFile = PFFile(data: imageData) else {return}
             
             let testObject = PFObject(className: "img")
-            testObject["fileImg"] = imageFile
+            testObject["fileImg"]  = imageFile
+            testObject["userName"] = self.senderDisplayName
             testObject.saveInBackground { (succes, error) in
                 print("Object has been saved.")
             }
