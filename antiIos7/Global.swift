@@ -14,11 +14,12 @@ var usersArray   :[String]       = []
 
 
 
-var userName    = ""
-var nameChanged = false
-var chan        = "antichat_hackathon"
-var imgName     = "1"
-var imageSticker  = ""
+var userName       = ""
+var nameChanged    = false
+var chan           = "antichat_hackathon"
+var imgName        = "1"
+var imageSticker   = ""
+var imageFromParse = UIImage()
 
 
 func chatMessageToDictionary(_ chatmessage: ChatMessage) -> [String: NSString]{

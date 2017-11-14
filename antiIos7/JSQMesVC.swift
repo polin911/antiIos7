@@ -75,6 +75,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     
     override func viewWillAppear(_ animated: Bool) {
         checkStickers()
+        //fetchParse()
         initPubNub()
         updateHistory()
         
@@ -246,6 +247,17 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
    
+    func fetchParse() {
+        if imageFromParse != nil {
+        let nickName    = parseAntiIos["nick"] as! String
+        let mesId       = parseAntiIos.objectId as! String
+        let currentDate = Date()
+        
+        var newMes = MesJSQMediaImage(date: currentDate, idMes: mesId, username: nickName, avatar: imgName, img: imageFromParse)
+        messageModel.append(newMes)
+        finishReceivingMessage()
+        }
+    }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickerImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
@@ -271,6 +283,17 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
                 if error == nil {
                     print("good stuf")
                 }
+                
+                let nickName    = self.parseAntiIos["nick"] as! String
+                let mesId       = self.parseAntiIos.objectId as! String
+                let currentDate = Date()
+                
+                var newMes = MesJSQMediaImage(date: currentDate, idMes: mesId, username: nickName, avatar: imgName, img: imageFromParse)
+                self.messageModel.append(newMes)
+                self.finishReceivingMessage()
+                
+              
+                
             })
             
 //            let parseImgObject = PFObject(className: "img")
