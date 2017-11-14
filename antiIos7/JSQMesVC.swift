@@ -242,6 +242,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         picker.dismiss(animated: true, completion:nil)
     }
     
+    let testObject = PFObject(className: "img")
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickerImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             var imageFromImagePicker: UIImageView!
@@ -254,11 +255,16 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             guard let imageData = UIImageJPEGRepresentation(newPic, 0.5) else {return}
             guard let imageFile : PFFile = PFFile(data: imageData) else {return}
             
-            let testObject = PFObject(className: "img")
-            testObject["fileImg"]  = imageFile
-            testObject["userName"] = self.senderDisplayName
-            testObject.saveInBackground { (succes, error) in
+            let parseImgObject = PFObject(className: "img")
+            parseImgObject["fileImg"]  = imageFile
+            parseImgObject["userName"] = self.senderDisplayName
+            
+            
+            
+            parseImgObject.saveInBackground { (succes, error) in
                 print("Object has been saved.")
+                let objectId = parseImgObject.objectId
+                print("!!!!!!!!!!!\(objectId as! String)")
             }
             
             
