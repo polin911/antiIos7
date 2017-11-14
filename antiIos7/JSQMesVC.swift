@@ -16,6 +16,9 @@ import Parse
 
 class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
+    var parseAntiIos = PFObject(className: "AntiIOS")
+    var parseQuery   = PFQuery(className: "AntiIOS")
+    
     var customToolBarView = NewViewWithButton()
     let picker = UIImagePickerController()
     
@@ -242,7 +245,8 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         picker.dismiss(animated: true, completion:nil)
     }
     
-    let testObject = PFObject(className: "img")
+   
+    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickerImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             var imageFromImagePicker: UIImageView!
@@ -254,18 +258,32 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             ////Parsing
             guard let imageData = UIImageJPEGRepresentation(newPic, 0.5) else {return}
             guard let imageFile : PFFile = PFFile(data: imageData) else {return}
-            
-            let parseImgObject = PFObject(className: "img")
-            parseImgObject["fileImg"]  = imageFile
-            parseImgObject["userName"] = self.senderDisplayName
-            
+            let imageAvatar = UIImage(named: imgName) ?? #imageLiteral(resourceName: "s11")
+            guard let avatarData = UIImageJPEGRepresentation(imageAvatar, 0.5) else {return}
+            guard let avatarFile : PFFile = PFFile(data: avatarData) else {return}
             
             
-            parseImgObject.saveInBackground { (succes, error) in
-                print("Object has been saved.")
-                let objectId = parseImgObject.objectId
-                print("!!!!!!!!!!!\(objectId as! String)")
-            }
+            parseAntiIos["avatar"] = avatarFile
+            parseAntiIos["image"]  = imageFile
+            parseAntiIos["nick"]   = self.senderDisplayName
+            
+            parseAntiIos.saveInBackground(block: { (success, error) in
+                if error == nil {
+                    print("good stuf")
+                }
+            })
+            
+//            let parseImgObject = PFObject(className: "img")
+//            parseImgObject["fileImg"]  = imageFile
+//            parseImgObject["userName"] = self.senderDisplayName
+//
+//
+//
+//            parseImgObject.saveInBackground { (succes, error) in
+//                print("Object has been saved.")
+//                let objectId = parseImgObject.objectId
+//                print("!!!!!!!!!!!\(objectId as! String)")
+//            }
             
             
             
