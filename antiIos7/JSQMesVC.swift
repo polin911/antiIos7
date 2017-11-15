@@ -16,6 +16,7 @@ import Parse
 
 class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
+    var parse        = Parse()
     var parseAntiIos = PFObject(className: "AntiIOS")
     var parseQuery   = PFQuery(className: "AntiIOS")
     
@@ -75,7 +76,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     
     override func viewWillAppear(_ animated: Bool) {
         checkStickers()
-        fetchParse()
+        //fetchParse()
         initPubNub()
         updateHistory()
         
@@ -145,7 +146,9 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             }
             self.messageModel = self.parseData(result.data.messages as! [NSDictionary] )
             self.collectionView.reloadData()
+            self.fetchParse()
             self.finishReceivingMessage()
+            
             
             print("Stiiiiiiiiiiiiickkers \(imageSticker)")
             
@@ -249,8 +252,9 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
    
+    
     func fetchParse() {
-        
+
         parseQuery.findObjectsInBackground { (objects, error) in
             if error == nil {
                 print("!!!!!!!!Successfully retrive \(objects?.count)")
