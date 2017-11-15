@@ -75,7 +75,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     
     override func viewWillAppear(_ animated: Bool) {
         checkStickers()
-        //fetchParse()
+        fetchParse()
         initPubNub()
         updateHistory()
         
@@ -222,7 +222,9 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             appDel.client?.publish(newMes.toDictionaryMessage(), toChannel: chan, withCompletion: nil)
             messageModel.append(newMes)
             finishReceivingMessage()
+            imageSticker = ""
         }
+        
     }
     
     ///////JSQ
@@ -248,15 +250,34 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     
    
     func fetchParse() {
-        if imageFromParse != nil {
-        let nickName    = parseAntiIos["nick"] as! String
-        let mesId       = parseAntiIos.objectId as! String
-        let currentDate = Date()
         
-        var newMes = MesJSQMediaImage(date: currentDate, idMes: mesId, username: nickName, avatar: imgName, img: imageFromParse)
-        messageModel.append(newMes)
-        finishReceivingMessage()
+        parseQuery.findObjectsInBackground { (objects, error) in
+            if error == nil {
+                print("!!!!!!!!Successfully retrive \(objects?.count)")
+                if let objects = objects {
+                    for object in objects {
+                        let nickName = object["nick"] as? String ?? ""
+                        let mesID    = object.objectId as? String ?? ""
+                        let currentD = Date()
+                       // let avatar   = object["avatar"] as? UIImage ?? #imageLiteral(resourceName: "s11")
+                        print("!!!!!!!!nick \(nickName)")
+                        let image    = object["image"]
+                        var newMes = MesJSQMediaImage(date: currentD, idMes: mesID, username: nickName, avatar: imgName, img: #imageLiteral(resourceName: "s12"))
+                        self.messageModel.append(newMes)
+                        self.finishReceivingMessage()
+                    }
+                }
+            }
         }
+//        if imageFromParse != nil {
+//        let nickName    = parseAntiIos["nick"] as! String
+//        let mesId       = parseAntiIos.objectId as! String
+//        let currentDate = Date()
+//
+//        var newMes = MesJSQMediaImage(date: currentDate, idMes: mesId, username: nickName, avatar: imgName, img: imageFromParse)
+//        messageModel.append(newMes)
+//        finishReceivingMessage()
+//        }
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
@@ -265,13 +286,13 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             var newPic = pickerImage
             guard newPic == pickerImage else { return }
             let currentDate = Date()
-            let newMes = MesJSQMediaImage(date: currentDate, idMes: NSUUID().uuidString, username: senderDisplayName, avatar: imgName, img: newPic)
-           
+//            let newMes = MesJSQMediaImage(date: currentDate, idMes: NSUUID().uuidString, username: senderDisplayName, avatar: imgName, img: newPic)
+//
             ////Parsing
-            guard let imageData = UIImageJPEGRepresentation(newPic, 0.5) else {return}
-            guard let imageFile : PFFile = PFFile(data: imageData) else {return}
+            guard let imageData = UIImagePNGRepresentation(newPic) else {return}
+            guard let imageFile = PFFile(data: imageData) else {return}
             let imageAvatar = UIImage(named: imgName) ?? #imageLiteral(resourceName: "s11")
-            guard let avatarData = UIImageJPEGRepresentation(imageAvatar, 0.5) else {return}
+            guard let avatarData = UIImagePNGRepresentation(imageAvatar) else {return}
             guard let avatarFile : PFFile = PFFile(data: avatarData) else {return}
             
             
@@ -283,6 +304,9 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
                 if error == nil {
                     print("good stuf")
                 }
+                else {
+                    print("Errorr!!!! \(error.debugDescription)")
+                }
                 
                 let nickName    = self.parseAntiIos["nick"] as! String
                 let mesId       = self.parseAntiIos.objectId as! String
@@ -290,6 +314,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
                 
                 var newMes = MesJSQMediaImage(date: currentDate, idMes: mesId, username: nickName, avatar: imgName, img: imageFromParse)
                 self.messageModel.append(newMes)
+                
                 self.finishReceivingMessage()
                 
               
@@ -310,8 +335,8 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             
             
             
-            messageModel.append(newMes)
-            finishReceivingMessage()
+//            messageModel.append(newMes)
+//            finishReceivingMessage()
         }
         dismiss(animated: true, completion: nil)
     }
