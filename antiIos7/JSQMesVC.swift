@@ -75,10 +75,11 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        checkStickers()
         //fetchParse()
+        checkStickers()
         initPubNub()
         updateHistory()
+        //fetchParse()
         
     }
     override func viewDidAppear(_ animated: Bool) {
@@ -146,7 +147,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             }
             self.messageModel = self.parseData(result.data.messages as! [NSDictionary] )
             self.collectionView.reloadData()
-            self.fetchParse()
+            //self.fetchParse()
             self.finishReceivingMessage()
             
             
@@ -252,22 +253,30 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
    
-    
+    //Parse
     func fetchParse() {
-
         parseQuery.findObjectsInBackground { (objects, error) in
             if error == nil {
                 print("!!!!!!!!Successfully retrive \(objects?.count)")
                 if let objects = objects {
                     for object in objects {
+                        
+                        //Date
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "dd-MM-yyyy HH:mm:ss.SSS"
+                        let dateStr = dateFormatter.string(from: (object.createdAt as NSDate?)! as Date)
+                        let currentD = dateFormatter.date(from: dateStr)
+                        
+        
                         let nickName = object["nick"] as? String ?? ""
                         let mesID    = object.objectId as? String ?? ""
-                        let currentD = Date()
+                        print("date!!!!!\(dateStr)")
                        // let avatar   = object["avatar"] as? UIImage ?? #imageLiteral(resourceName: "s11")
                         print("!!!!!!!!nick \(nickName)")
                         let image    = object["image"]
-                        var newMes = MesJSQMediaImage(date: currentD, idMes: mesID, username: nickName, avatar: imgName, img: #imageLiteral(resourceName: "s12"))
+                        var newMes = MesJSQMediaImage(date: currentD!, idMes: mesID, username: nickName, avatar: imgName, img: #imageLiteral(resourceName: "s15"))
                         self.messageModel.append(newMes)
+                        self.collectionView.reloadData()
                         self.finishReceivingMessage()
                     }
                 }
