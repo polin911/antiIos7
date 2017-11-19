@@ -8,6 +8,7 @@
 
 import Foundation
 import JSQMessagesViewController
+import Parse
 
 
 struct ChatMessage {
@@ -88,8 +89,14 @@ struct MesJSQText:MessageToJSQ {
 }
 struct MesJSQMediaImage: MessageToJSQ {
     var jsqMessage: JSQMessage {
-        let media = JSQPhotoMediaItem(image:img)
-        var message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes)
+        
+        let url = URL(string: img)
+        let dataImg = try? Data(contentsOf: url!) 
+        
+        
+        let media = JSQPhotoMediaItem(image: #imageLiteral(resourceName: "s3"))
+            //(data: dataImg!))
+        let message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes)
         return message!
     }
     func toDictionaryMessage() -> [String : Any] {
@@ -97,7 +104,7 @@ struct MesJSQMediaImage: MessageToJSQ {
             "idMes" : NSString(string:self.idMes),
             "type"  : self.type.rawValue,
             "nick"  : NSString(string: self.username),
-            "image" : img,
+            "photo" : NSString(string: self.img),
             "avatar": NSString(string: self.avatar)
         ]
     }
@@ -105,7 +112,7 @@ struct MesJSQMediaImage: MessageToJSQ {
     var idMes: String
     var username: String
     var avatar  : String
-    var img : UIImage
+    var img : String
     let type: MessageType = .image
    // var imgString : String
 }
