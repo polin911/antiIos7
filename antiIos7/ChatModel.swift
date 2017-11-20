@@ -6,6 +6,8 @@
 //  Copyright © 2017 Polina. All rights reserved.
 //
 
+var parseObject  = PFObject(className: "AntiIOS")
+var parseQuery   = PFQuery(className: "AntiIOS")
 import Foundation
 import JSQMessagesViewController
 import Parse
@@ -89,14 +91,66 @@ struct MesJSQText:MessageToJSQ {
 }
 struct MesJSQMediaImage: MessageToJSQ {
     var jsqMessage: JSQMessage {
+        var media : JSQPhotoMediaItem!
+
         
-//        let url = URL(string: img)
-//        let dataImg = try? Data(contentsOf: url!)
+//        let imageFile = parseAntiIos["image"]  as? PFFile
+//        imageFile?.getDataInBackground(block: { (imageData, error) in
+//            if error == nil {
+//                if let imageData = imageData {
+//                    let image = UIImage(data: imageData)
+//                    imageJson = "6"
+//
+//                }
+//            }
+//        })
         
-        
-        
-        let media = JSQPhotoMediaItem(image: #imageLiteral(resourceName: "s3"))
+//        print("ID Mes^^^^^^^^^^\(idMes)")
+//       // if parseObject.objectId == idMes {
+//            parseObject.objectId = idMes
+//        let imageFile = parseObject["image"] as! PFFile
+//        imageFile.getDataInBackground { (imageData, error) in
+//            if error == nil {
+//                let image = UIImage(data: imageData!)
+//                 media = JSQPhotoMediaItem(image: image)
+//            }
+//        }
+//        } else {
+//
+//         media = JSQPhotoMediaItem(image: #imageLiteral(resourceName: "s3"))
+//        }
             //(data: dataImg!))
+        print("\(img)")
+        if img == "photo0" {
+        
+        parseQuery.findObjectsInBackground { (objects, error) in
+            if error ==  nil {
+                print("!!!!!!!!Successfully retrive \(objects?.count)")
+                if let objects = objects {
+                    for object in objects {
+                        if object.objectId == self.idMes {
+                        let imageFile = object["image"] as! PFFile
+                        imageFile.getDataInBackground(block: { (imageData, error) in
+                            if error == nil {
+                                let image = UIImage(data: imageData!)
+                                media = JSQPhotoMediaItem(image: image)
+                            }
+                        })
+                    }
+                        else {
+                            media = JSQPhotoMediaItem(image: #imageLiteral(resourceName: "s5"))
+                        }
+                    }
+                  
+                }
+            }
+            else {
+                print("Errrrrrror \(error.debugDescription)")
+            }
+        }
+        } else {
+            media = JSQPhotoMediaItem(image: #imageLiteral(resourceName: "s6"))
+        }
         let message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes)
         return message!
     }
