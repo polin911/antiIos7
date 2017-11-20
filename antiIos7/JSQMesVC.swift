@@ -326,7 +326,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
                 let mesId       = self.parseAntiIos.objectId as! String
                 let currentDate = Date()
                 
-                var newMes = MesJSQMediaImage(date: currentDate, idMes: mesId, username: nickName, avatar: imgName, img: "photo")
+                var newMes = MesJSQMediaImage(date: currentDate, idMes: mesId, username: nickName, avatar: imgName, img: "photos")
            
                 self.appDel.client?.publish(newMes.toDictionaryMessage(), toChannel: chan, withCompletion: nil)
                 self.messageModel.append(newMes)
@@ -504,7 +504,6 @@ extension JSQMesVC {
                 return newM
                 
             case "image" :
-
                 let usernameJson = message["nick"] as? String ?? ""
                 let imgJson      = message["avatar"] as? String ?? ""
                 let idJson       = message["idMes"] as? String ?? ""
@@ -514,14 +513,23 @@ extension JSQMesVC {
                 }
                 
                 var imageJson = message["photo"] as? String ?? ""
-                if imageJson == "photo" {
-                 parseAntiIos.objectId = idJson
+                if imageJson == "photos" {
+                    imageJson = parseAntiIos.objectId!
                         print("Photttttooooosss!!!!!!!!!!")
                     print("!!!!!!!!id \(parseAntiIos.objectId)")
-                  // imageJson = parseAntiIos["image"]  as? String ?? "6"
+                    print("photos:::::::::::::::\(parseAntiIos["image"])")
                     
-                    
-                    
+//                    let imageFile = parseAntiIos["image"]  as? PFFile
+//                    imageFile?.getDataInBackground(block: { (imageData, error) in
+//                        if error == nil {
+//                            if let imageData = imageData {
+//                                let image = UIImage(data: imageData)
+//                                imageJson = "6"
+//
+//                            }
+//                        }
+//                    })
+  
                 }
                 let newM = MesJSQMediaImage(date: dataJs, idMes: idJson, username: usernameJson, avatar: imgJson, img: imgJson)
                 return newM

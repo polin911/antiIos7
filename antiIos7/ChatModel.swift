@@ -90,8 +90,9 @@ struct MesJSQText:MessageToJSQ {
 struct MesJSQMediaImage: MessageToJSQ {
     var jsqMessage: JSQMessage {
         
-        let url = URL(string: img)
-        let dataImg = try? Data(contentsOf: url!) 
+//        let url = URL(string: img)
+//        let dataImg = try? Data(contentsOf: url!)
+        
         
         
         let media = JSQPhotoMediaItem(image: #imageLiteral(resourceName: "s3"))
