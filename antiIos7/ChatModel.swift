@@ -48,7 +48,7 @@ struct MesJSQMedia: MessageToJSQ {
     }
     func toDictionaryMessage() -> [String : Any] {
         return [
-            "idMes" : NSString(string:self.idMes),
+            "idMesPubNub" : NSString(string:self.idMes),
             "type"  : self.type.rawValue,
             "nick"  : NSString(string: self.username),
             "stickers" : NSString(string: self.imgSticker),
@@ -75,7 +75,7 @@ struct MesJSQText:MessageToJSQ {
     
     func toDictionaryMessage() -> [String : Any] {
         return [
-            "idMes"   : NSString(string:self.idMes),
+            "idMesPubNub"   : NSString(string:self.idMes),
             "type"    : self.type.rawValue,
             "nick"    : NSString(string: self.username),
             "text"    : NSString(string: self.textMes),
@@ -90,76 +90,45 @@ struct MesJSQText:MessageToJSQ {
     
 }
 struct MesJSQMediaImage: MessageToJSQ {
-    var jsqMessage: JSQMessage {
-        var media : JSQPhotoMediaItem!
-
-        
-//        let imageFile = parseAntiIos["image"]  as? PFFile
-//        imageFile?.getDataInBackground(block: { (imageData, error) in
-//            if error == nil {
-//                if let imageData = imageData {
-//                    let image = UIImage(data: imageData)
-//                    imageJson = "6"
-//
-//                }
-//            }
-//        })
-        
-//        print("ID Mes^^^^^^^^^^\(idMes)")
-//       // if parseObject.objectId == idMes {
-//            parseObject.objectId = idMes
-//        let imageFile = parseObject["image"] as! PFFile
-//        imageFile.getDataInBackground { (imageData, error) in
-//            if error == nil {
-//                let image = UIImage(data: imageData!)
-//                 media = JSQPhotoMediaItem(image: image)
-//            }
-//        }
-//        } else {
-//
-//         media = JSQPhotoMediaItem(image: #imageLiteral(resourceName: "s3"))
-//        }
-            //(data: dataImg!))
-        print("\(img)")
-        if img == "photo0" {
-        
-        parseQuery.findObjectsInBackground { (objects, error) in
-            if error ==  nil {
-                print("!!!!!!!!Successfully retrive \(objects?.count)")
-                if let objects = objects {
-                    for object in objects {
-                        if object.objectId == self.idMes {
-                        let imageFile = object["image"] as! PFFile
-                        imageFile.getDataInBackground(block: { (imageData, error) in
-                            if error == nil {
-                                let image = UIImage(data: imageData!)
-                                media = JSQPhotoMediaItem(image: image)
-                            }
-                        })
-                    }
-                        else {
-                            media = JSQPhotoMediaItem(image: #imageLiteral(resourceName: "s5"))
-                        }
-                    }
-                  
+    
+    private var loadImage = false
+    
+    init(date: Date, idMes: String,username: String, avatar: String, photoId : String) {
+        self.date     = date
+        self.idMes    = idMes
+        self.username = username
+        self.avatar   = avatar
+        self.photoId  = photoId
+    }
+    
+    func getImageWith(completion: @escaping(UIImage) -> Void) {
+        if photoId.isEmpty == false {
+            let query = PFQuery(className: "AntiIOS")
+            query.whereKey("objectId", equalTo: photoId)
+            query.getFirstObjectInBackground(block: { (object, error) in
+                if error == nil {
+                    guard let fileObject = object?["image"] as? PFFile else {return}
+                    fileObject.getDataInBackground(block: { (data, error) in
+                        guard error == nil else {return}
+                        guard let data = data else {return}
+                        guard let image = UIImage(data: data) else {return}
+                        completion(image)
+                    })
                 }
-            }
-            else {
-                print("Errrrrrror \(error.debugDescription)")
-            }
+            })
         }
-        } else {
-            media = JSQPhotoMediaItem(image: #imageLiteral(resourceName: "s6"))
-        }
+    }
+    var jsqMessage: JSQMessage {
+        let media = JSQPhotoMediaItem(image: #imageLiteral(resourceName: "s6"))
         let message = JSQMessage(senderId: username, displayName: username, media: media, idMes: idMes)
         return message!
     }
     func toDictionaryMessage() -> [String : Any] {
         return [
-            "idMes" : NSString(string:self.idMes),
+            "idMesPubNub" : NSString(string:self.idMes),
             "type"  : self.type.rawValue,
             "nick"  : NSString(string: self.username),
-            "photo" : NSString(string: self.img),
+            "photo" : NSString(string: self.photoId),
             "avatar": NSString(string: self.avatar)
         ]
     }
@@ -167,8 +136,8 @@ struct MesJSQMediaImage: MessageToJSQ {
     var idMes: String
     var username: String
     var avatar  : String
-    var img : String
+    var photoId : String
     let type: MessageType = .image
-   // var imgString : String
+    
 }
 

@@ -252,63 +252,21 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         picker.dismiss(animated: true, completion:nil)
     }
     
-   
-    //Parse
-    func fetchParse() {
-
-        parseQuery.findObjectsInBackground { (objects, error) in
-            if error == nil {
-                print("!!!!!!!!Successfully retrive \(objects?.count)")
-                if let objects = objects {
-                    for object in objects {
-                        
-                        //Date
-                        let dateFormatter = DateFormatter()
-                        dateFormatter.dateFormat = "dd-MM-yyyy HH:mm:ss.SSS"
-                        let dateStr = dateFormatter.string(from: (object.createdAt as NSDate?)! as Date)
-                        let currentD = dateFormatter.date(from: dateStr)
-                        
-        
-                        let nickName = object["nick"] as? String ?? ""
-                        let mesID    = object.objectId as? String ?? ""
-                        print("date!!!!!\(dateStr)")
-                       // let avatar   = object["avatar"] as? UIImage ?? #imageLiteral(resourceName: "s11")
-                        print("!!!!!!!!nick \(nickName)")
-                        let image    = object["image"]
-//                        var newMes = MesJSQMediaImage(date: currentD!, idMes: mesID, username: nickName, avatar: imgName, img: "#imageLiteral(resourceName: "s15")")
-                        //self.messageModel.append(newMes)
-                        self.collectionView.reloadData()
-                        self.finishReceivingMessage()
-                    }
-                }
-            }
-        }
-//        if imageFromParse != nil {
-//        let nickName    = parseAntiIos["nick"] as! String
-//        let mesId       = parseAntiIos.objectId as! String
-//        let currentDate = Date()
-//
-//        var newMes = MesJSQMediaImage(date: currentDate, idMes: mesId, username: nickName, avatar: imgName, img: imageFromParse)
-//        messageModel.append(newMes)
-//        finishReceivingMessage()
-//        }
-    }
     
+    //MARk : ImagePicker
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickerImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             var imageFromImagePicker: UIImageView!
             var newPic = pickerImage
             guard newPic == pickerImage else { return }
             let currentDate = Date()
-//            let newMes = MesJSQMediaImage(date: currentDate, idMes: NSUUID().uuidString, username: senderDisplayName, avatar: imgName, img: newPic)
-//
+
             ////Parsing
-            guard let imageData = UIImagePNGRepresentation(newPic) else {return}
-            guard let imageFile = PFFile(data: imageData) else {return}
-            let imageAvatar = UIImage(named: imgName) ?? #imageLiteral(resourceName: "s11")
-            guard let avatarData = UIImagePNGRepresentation(imageAvatar) else {return}
-            guard let avatarFile : PFFile = PFFile(data: avatarData) else {return}
-            
+            guard let imageData   = UIImagePNGRepresentation(newPic) else {return}
+            guard let imageFile   = PFFile(data: imageData) else {return}
+            guard let imageAvatar = UIImage(named: imgName) else {return}
+            guard let avatarData  = UIImagePNGRepresentation(imageAvatar) else {return}
+            guard let avatarFile  : PFFile = PFFile(data: avatarData) else {return}
             
             parseAntiIos["avatar"] = avatarFile
             parseAntiIos["image"]  = imageFile
@@ -316,7 +274,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             
             parseAntiIos.saveInBackground(block: { (success, error) in
                 if error == nil {
-                    print("good stuf")
+                    print("save")
                 }
                 else {
                     print("Errorr!!!! \(error.debugDescription)")
@@ -326,33 +284,13 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
                 let mesId       = self.parseAntiIos.objectId as! String
                 let currentDate = Date()
                 
-                var newMes = MesJSQMediaImage(date: currentDate, idMes: mesId, username: nickName, avatar: imgName, img: "photo0")
+                var newMes = MesJSQMediaImage(date: currentDate, idMes: NSUUID().uuidString, username: nickName, avatar: imgName, photoId: mesId)
            
                 self.appDel.client?.publish(newMes.toDictionaryMessage(), toChannel: chan, withCompletion: nil)
                 self.messageModel.append(newMes)
-                
                 self.finishReceivingMessage()
-                
-              
-                
+
             })
-            
-//            let parseImgObject = PFObject(className: "img")
-//            parseImgObject["fileImg"]  = imageFile
-//            parseImgObject["userName"] = self.senderDisplayName
-//
-//
-//
-//            parseImgObject.saveInBackground { (succes, error) in
-//                print("Object has been saved.")
-//                let objectId = parseImgObject.objectId
-//                print("!!!!!!!!!!!\(objectId as! String)")
-//            }
-            
-            
-            
-//            messageModel.append(newMes)
-//            finishReceivingMessage()
         }
         dismiss(animated: true, completion: nil)
     }
@@ -376,12 +314,6 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         finishSendingMessage()
         
     }
-    //0. когда мы создаем соообщение (json), мы указываем его тип (type = text, type = sticker, type = image)
-    //1. можно использовать наследников от jsqmessage и ты туда сможешь напихать все что угодно, в том числе аватар, каритнку и т.д.
-    //2. замутил бы там еще и тип сообщения
-    //3. добавил бы для сообщений айдишку - let id = NSUUID().uuidString
-    //4. когда сообщение пришло, проверить, есть ли сообщение с такой айдишкой в массиве и если есть уже, то удалить из массива и добавить то, которое от сервераъ
-    //5. теперь будет легко проверить, что
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let message = self.messageModel[indexPath.item]
@@ -410,8 +342,14 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
+        var message = messageModel[indexPath.item].jsqMessage
         
-        return messageModel[indexPath.item].jsqMessage
+        if let imageMessage = messageModel[indexPath.item] as? MesJSQMediaImage {
+            
+        }
+        
+        
+        return message
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
@@ -479,7 +417,7 @@ extension JSQMesVC {
                 let usernameJson = message["nick"] as? String ?? ""
                 let textJson     = message["text"]  as? String ?? ""
                 let imgJson      = message["avatar"] as? String ?? ""
-                let idJson       = message["idMes"] as? String ?? ""
+                let idJson       = message["idMesPubNub"] as? String ?? ""
                 var dataJs       = Date()
                 if let date = data["timetoken"] as? Double {
                     dataJs = Date(timeIntervalSince1970: date / 10000000 )
@@ -494,7 +432,7 @@ extension JSQMesVC {
                 let usernameJson = message["nick"] as? String ?? ""
                 let imgJson      = message["avatar"] as? String ?? ""
                 let stickJson    = message["stickers"] as? String ?? ""
-                let idJson       = message["idMes"] as? String ?? ""
+                let idJson       = message["idMesPubNub"] as? String ?? ""
                 var dataJs       = Date()
                 if let date = data["timetoken"] as? Double {
                     dataJs = Date(timeIntervalSince1970: date / 10000000 )
@@ -506,22 +444,17 @@ extension JSQMesVC {
             case "image" :
                 let usernameJson = message["nick"] as? String ?? ""
                 let imgJson      = message["avatar"] as? String ?? ""
-                let idJson       = message["idMes"] as? String ?? ""
+                
+                guard let idJson = message["idMesPubNub"] as? String else {return nil}
                 var dataJs       = Date()
-                if let date = data["timetoken"] as? Double {
+                if let date      = data["timetoken"] as? Double {
                     dataJs = Date(timeIntervalSince1970: date / 10000000 )
                 }
                 
-                var photoJson = message["photo"] as? String ?? ""
-//                if imageJson == "photo1" {
-//              imageJson = "ok"
-//                        print("Photttttooooosss!!!!!!!!!!")
-//                    print("!!!!!!!!id \(imageJson)")
-//                    print("photos:::::::::::::::\(parseAntiIos["image"])")
-//                    
-//  
-//                }
-                let newM = MesJSQMediaImage(date: dataJs, idMes: idJson, username: usernameJson, avatar: imgJson, img: photoJson)
+                guard let photoJson = message["photo"] as? String else {return nil}
+                
+                let newM = MesJSQMediaImage(date: dataJs, idMes: idJson, username: usernameJson, avatar: imgJson, photoId: photoJson)
+                
                 return newM
             default :
                 return nil

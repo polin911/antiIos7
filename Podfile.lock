@@ -8,11 +8,15 @@ PODS:
   - PubNub (4.5.5):
     - PubNub/Core (= 4.5.5)
   - PubNub/Core (4.5.5)
+  - SDWebImage (3.8.2):
+    - SDWebImage/Core (= 3.8.2)
+  - SDWebImage/Core (3.8.2)
 
 DEPENDENCIES:
   - JSQMessagesViewController
   - Parse
   - PubNub (~> 4)
+  - SDWebImage
 
 SPEC CHECKSUMS:
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
@@ -20,7 +24,8 @@ SPEC CHECKSUMS:
   JSQSystemSoundPlayer: c5850e77a4363ffd374cd851154b9af93264ed8d
   Parse: 4335d65f40cb3d43190d723144bbe1afb9c38230
   PubNub: 519594dfe84662686818591179470ff87a30a224
+  SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
 
-PODFILE CHECKSUM: 026dbcb98a2711b8c7405dc7f4b2278f59267bad
+PODFILE CHECKSUM: 35fbda1326e06fe9e04e77da862e9992a9d8b09b
 
 COCOAPODS: 1.2.0
