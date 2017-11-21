@@ -6,7 +6,7 @@ target 'antiIos7' do
   use_frameworks!
 
   # Pods for antiIos7
-pod "PubNub", "~> 4"
+pod 'PubNub', '~> 4'
 pod 'JSQMessagesViewController'
 pod 'Parse'
 pod 'SDWebImage'

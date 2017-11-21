@@ -102,11 +102,10 @@ struct MesJSQMediaImage: MessageToJSQ {
     }
     
     func getImageWith(completion: @escaping(UIImage) -> Void) {
-        if photoId.isEmpty == false {
+        if self.photoId.isEmpty == false {
             let query = PFQuery(className: "AntiIOS")
-            query.whereKey("objectId", equalTo: photoId)
+            query.whereKey("objectId", equalTo: self.photoId)
             query.getFirstObjectInBackground(block: { (object, error) in
-                if error == nil {
                     guard let fileObject = object?["image"] as? PFFile else {return}
                     fileObject.getDataInBackground(block: { (data, error) in
                         guard error == nil else {return}
@@ -114,7 +113,7 @@ struct MesJSQMediaImage: MessageToJSQ {
                         guard let image = UIImage(data: data) else {return}
                         completion(image)
                     })
-                }
+                
             })
         }
     }

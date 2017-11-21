@@ -13,6 +13,7 @@ import UIKit
 import AVKit
 import MobileCoreServices
 import Parse
+import SDWebImage
 
 class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
@@ -193,30 +194,6 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         return dateString
     }
     
-    ///AccessoryButton
-    
-    //    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-    //        picker.dismiss(animated: true, completion: nil)
-    //        let picture = info[UIImagePickerControllerEditedImage] as? UIImage
-    //
-    //        if (info[UIImagePickerControllerEditedImage] as? UIImage) != nil
-    //        {
-    //
-    //
-    //            var media = CustomJSQPhotoMediaItem(image: picture)
-    //            let mes = JSQMessage(senderId: userName, displayName: userName, media: media)
-    //            guard let newMessage = mes else {return}
-    //            ///
-    //            let pubChat = MesJSQMedia(username: userName, image: imgName, imgSticker: imageSticker)
-    //            let newDict = chatMessageToDictionarMedia(pubChat)
-    //            appDel.client?.publish(newDict, toChannel: chan, compressed: true, withCompletion: nil)
-    //
-    //            mesModelJSQ.append(newMessage)
-    //            finishReceivingMessage()
-    //        }
-    //
-    //    }
-    
     ///////////Stickers
     func checkStickers() {
         if imageSticker.isEmpty == false {
@@ -257,15 +234,16 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickerImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             var imageFromImagePicker: UIImageView!
-            var newPic = pickerImage
-            guard newPic == pickerImage else { return }
+            var newPic      = pickerImage
+            guard newPic    == pickerImage else { return }
             let currentDate = Date()
 
             ////Parsing
             guard let imageData   = UIImagePNGRepresentation(newPic) else {return}
             guard let imageFile   = PFFile(data: imageData) else {return}
             guard let imageAvatar = UIImage(named: imgName) else {return}
-            guard let avatarData  = UIImagePNGRepresentation(imageAvatar) else {return}
+            guard let avatarData  = UIImageJPEGRepresentation(imageAvatar, 0.6) else {return}
+                //UIImagePNGRepresentation(imageAvatar) else {return}
             guard let avatarFile  : PFFile = PFFile(data: avatarData) else {return}
             
             parseAntiIos["avatar"] = avatarFile
@@ -318,6 +296,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let message = self.messageModel[indexPath.item]
         var cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
+        //cell.messageBubbleImageView.image = nil
         return cell
     }
     
@@ -345,10 +324,18 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         var message = messageModel[indexPath.item].jsqMessage
         
         if let imageMessage = messageModel[indexPath.item] as? MesJSQMediaImage {
-            
+            guard let image = SDImageCache.shared().imageFromDiskCache(forKey: imageMessage.photoId) else {
+                imageMessage.getImageWith(completion: { image in
+                    SDImageCache.shared().storeImageData(toDisk: UIImageJPEGRepresentation(image, 0.6),
+                                                         forKey: imageMessage.photoId)
+                    collectionView.reloadData()
+                })
+                return message
+            }
+            let photo = JSQPhotoMediaItem(image: image)
+            message   = JSQMessage(senderId: message.senderId, displayName: message.senderDisplayName, media: photo, idMes: message.idMes)
         }
-        
-        
+
         return message
     }
     
@@ -417,7 +404,7 @@ extension JSQMesVC {
                 let usernameJson = message["nick"] as? String ?? ""
                 let textJson     = message["text"]  as? String ?? ""
                 let imgJson      = message["avatar"] as? String ?? ""
-                let idJson       = message["idMesPubNub"] as? String ?? ""
+               guard let idJson       = message["idMesPubNub"] as? String else {return nil}
                 var dataJs       = Date()
                 if let date = data["timetoken"] as? Double {
                     dataJs = Date(timeIntervalSince1970: date / 10000000 )
@@ -432,7 +419,7 @@ extension JSQMesVC {
                 let usernameJson = message["nick"] as? String ?? ""
                 let imgJson      = message["avatar"] as? String ?? ""
                 let stickJson    = message["stickers"] as? String ?? ""
-                let idJson       = message["idMesPubNub"] as? String ?? ""
+                guard let idJson       = message["idMesPubNub"] as? String else {return nil}
                 var dataJs       = Date()
                 if let date = data["timetoken"] as? Double {
                     dataJs = Date(timeIntervalSince1970: date / 10000000 )
@@ -443,7 +430,7 @@ extension JSQMesVC {
                 
             case "image" :
                 let usernameJson = message["nick"] as? String ?? ""
-                let imgJson      = message["avatar"] as? String ?? ""
+                let avatarJson   = message["avatar"] as? String ?? ""
                 
                 guard let idJson = message["idMesPubNub"] as? String else {return nil}
                 var dataJs       = Date()
@@ -453,7 +440,7 @@ extension JSQMesVC {
                 
                 guard let photoJson = message["photo"] as? String else {return nil}
                 
-                let newM = MesJSQMediaImage(date: dataJs, idMes: idJson, username: usernameJson, avatar: imgJson, photoId: photoJson)
+                let newM = MesJSQMediaImage(date: dataJs, idMes: idJson, username: usernameJson, avatar: avatarJson, photoId: photoJson)
                 
                 return newM
             default :
