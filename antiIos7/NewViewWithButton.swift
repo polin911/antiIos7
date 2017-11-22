@@ -17,7 +17,10 @@ class NewViewWithButton : UIView {
      print("Hello!!!!!!!!!!!!!!!!!")
     }
 
-        
+    @IBAction func recBtnPressed(_ sender: Any) {
+        goToVideoVC()
+    }
+    
         var vc2: UIViewController!
         var welcomeVC =  WelcomeVC()
         
@@ -34,6 +37,13 @@ class NewViewWithButton : UIView {
             
             
         }
+    
+    func goToVideoVC() {
+        let storyboard: UIStoryboard = UIStoryboard (name: "Main", bundle: nil)
+        let vc: UIViewController = storyboard.instantiateViewController(withIdentifier: "VideoViewController")
+        let currentController = self.getCurrentViewController()
+        currentController?.present(vc, animated: true, completion: nil)
+    }
         
         func getCurrentViewController() -> UIViewController? {
             if let rootController = UIApplication.shared.keyWindow?.rootViewController {
@@ -47,7 +57,7 @@ class NewViewWithButton : UIView {
             
         }
         
-
+   //"VideoViewController"
     
 
 }

@@ -29,13 +29,27 @@
                                 <action selector="LogOutBtn:" destination="iN0-l3-epB" eventType="touchUpInside" id="ecX-eZ-anv"/>
                             </connections>
                         </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ifl-Dy-Teu">
+                            <rect key="frame" x="16" y="9" width="30" height="30"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="30" id="GZE-Lg-rbi"/>
+                                <constraint firstAttribute="height" constant="30" id="aog-5u-RAx"/>
+                            </constraints>
+                            <state key="normal" title="REC"/>
+                            <connections>
+                                <action selector="recBtnPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="idc-nZ-CV6"/>
+                            </connections>
+                        </button>
                     </subviews>
                     <color key="backgroundColor" red="0.50196081400000003" green="0.0" blue="0.50196081400000003" alpha="0.1443707191780822" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstItem="oU2-YY-Q65" firstAttribute="top" secondItem="087-OA-ttV" secondAttribute="top" id="6d3-Wf-Js6"/>
                         <constraint firstAttribute="bottom" secondItem="oU2-YY-Q65" secondAttribute="bottom" id="AL0-fP-Efb"/>
+                        <constraint firstItem="ifl-Dy-Teu" firstAttribute="leading" secondItem="087-OA-ttV" secondAttribute="leading" constant="16" id="CHy-aY-Y8n"/>
+                        <constraint firstItem="ifl-Dy-Teu" firstAttribute="top" secondItem="087-OA-ttV" secondAttribute="top" constant="9" id="HwF-V1-b2f"/>
                         <constraint firstItem="oU2-YY-Q65" firstAttribute="top" secondItem="087-OA-ttV" secondAttribute="top" id="q4S-Ae-Ej8"/>
                         <constraint firstAttribute="bottom" secondItem="oU2-YY-Q65" secondAttribute="bottom" id="ttd-8s-Bsv"/>
+                        <constraint firstAttribute="bottom" secondItem="ifl-Dy-Teu" secondAttribute="bottom" constant="10" id="ush-J1-A8T"/>
                         <constraint firstAttribute="trailing" secondItem="oU2-YY-Q65" secondAttribute="trailing" constant="43" id="vsq-ab-Che"/>
                         <constraint firstAttribute="trailing" secondItem="oU2-YY-Q65" secondAttribute="trailing" constant="43" id="x9s-7P-YU7"/>
                     </constraints>

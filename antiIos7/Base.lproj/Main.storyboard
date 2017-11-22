@@ -318,6 +318,59 @@
             </objects>
             <point key="canvasLocation" x="766" y="835"/>
         </scene>
+        <!--Video View Controller-->
+        <scene sceneID="9ft-kO-wJ8">
+            <objects>
+                <viewController storyboardIdentifier="VideoViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="hx9-bl-S8i" customClass="VideoViewController" customModule="antiIos7" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="5cq-vu-ast"/>
+                        <viewControllerLayoutGuide type="bottom" id="ICC-hg-gv4"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="uDq-Pd-P48">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Ubc-rg-nzB">
+                                <rect key="frame" x="16" y="509" width="343" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="Euq-Rf-Oin"/>
+                                </constraints>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="74X-mm-EKf">
+                                <rect key="frame" x="164" y="566" width="46" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="46" id="EQp-PB-uSu"/>
+                                    <constraint firstAttribute="height" constant="30" id="dTX-83-PaH"/>
+                                </constraints>
+                                <state key="normal" title="Send">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="SendBtnPressed:" destination="hx9-bl-S8i" eventType="touchUpInside" id="joR-33-7Dv"/>
+                                    <segue destination="XcH-3I-yeY" kind="show" id="bF6-JU-rcD"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="0.50196081400000003" green="0.0" blue="0.50196081400000003" alpha="0.3181185788" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="74X-mm-EKf" firstAttribute="centerX" secondItem="uDq-Pd-P48" secondAttribute="centerX" id="HM9-va-csd"/>
+                            <constraint firstItem="Ubc-rg-nzB" firstAttribute="leading" secondItem="uDq-Pd-P48" secondAttribute="leadingMargin" id="TvK-74-jC9"/>
+                            <constraint firstItem="ICC-hg-gv4" firstAttribute="top" secondItem="74X-mm-EKf" secondAttribute="bottom" constant="71" id="gyV-i1-jaR"/>
+                            <constraint firstItem="Ubc-rg-nzB" firstAttribute="trailing" secondItem="uDq-Pd-P48" secondAttribute="trailingMargin" id="nGm-1l-hpM"/>
+                            <constraint firstItem="74X-mm-EKf" firstAttribute="top" secondItem="Ubc-rg-nzB" secondAttribute="bottom" constant="27" id="s40-4j-zEC"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="textF" destination="Ubc-rg-nzB" id="6hD-SA-XZK"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ksb-K0-dsJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1146.4000000000001" y="1435.2323838080961"/>
+        </scene>
         <!--VcJSQ-->
         <scene sceneID="XyR-7t-riS">
             <objects>
@@ -645,4 +698,7 @@
         <image name="s2" width="600" height="600"/>
         <image name="smileStck" width="256" height="256"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="YVO-QQ-TqJ"/>
+    </inferredMetricsTieBreakers>
 </document>

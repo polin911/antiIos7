@@ -13,6 +13,7 @@
 		362DEB521F822CCF0085FBD1 /* antiIos7.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 362DEB501F822CCF0085FBD1 /* antiIos7.xcdatamodeld */; };
 		362DEB541F822CCF0085FBD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 362DEB531F822CCF0085FBD1 /* Assets.xcassets */; };
 		362DEB571F822CCF0085FBD1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 362DEB551F822CCF0085FBD1 /* LaunchScreen.storyboard */; };
+		3634BC661FC56A5C0057431E /* VideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3634BC651FC56A5C0057431E /* VideoViewController.swift */; };
 		364929A91FB4410500AE8611 /* NewViewWithButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = 364929A81FB4410500AE8611 /* NewViewWithButton.xib */; };
 		364929AB1FB4469B00AE8611 /* NewViewWithButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 364929AA1FB4469B00AE8611 /* NewViewWithButton.swift */; };
 		365839A81FBEDE6B00A5010A /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 365839A91FBEDE6B00A5010A /* Parse.framework */; };
@@ -40,6 +41,7 @@
 		362DEB531F822CCF0085FBD1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		362DEB561F822CCF0085FBD1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		362DEB581F822CCF0085FBD1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3634BC651FC56A5C0057431E /* VideoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoViewController.swift; sourceTree = "<group>"; };
 		364929A81FB4410500AE8611 /* NewViewWithButton.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewViewWithButton.xib; sourceTree = "<group>"; };
 		364929AA1FB4469B00AE8611 /* NewViewWithButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewViewWithButton.swift; sourceTree = "<group>"; };
 		365839A91FBEDE6B00A5010A /* Parse.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Parse.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -162,6 +164,7 @@
 			children = (
 				36E8439D1F97714100B9FE1A /* StickersController4JSQ.swift */,
 				36E843A31F97877100B9FE1A /* VcJSQ.swift */,
+				3634BC651FC56A5C0057431E /* VideoViewController.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -328,6 +331,7 @@
 				3683F0201F823D8400E08CF4 /* ChatCell.swift in Sources */,
 				3683F0131F82300100E08CF4 /* MainVc.swift in Sources */,
 				362DEB4A1F822CCF0085FBD1 /* AppDelegate.swift in Sources */,
+				3634BC661FC56A5C0057431E /* VideoViewController.swift in Sources */,
 				3683F0181F82308D00E08CF4 /* Global.swift in Sources */,
 				3683F0161F82303F00E08CF4 /* WelcomeVC.swift in Sources */,
 				36E843A41F97877100B9FE1A /* VcJSQ.swift in Sources */,
