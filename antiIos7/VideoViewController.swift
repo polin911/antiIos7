@@ -15,6 +15,14 @@ class VideoViewController: UIViewController {
     @IBAction func SendBtnPressed(_ sender: UIButton) {
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let vc = segue.destination as! JSQMesVC
+        var currentDate = Date()
+        var idM         = NSUUID().uuidString
+        let newMes = MesJSQText(date: currentDate, idMes: idM , username: userName, textMes: textF.text!, avatar: imgName)
+        vc.appDel.client?.publish(newMes.toDictionaryMessage(), toChannel: chan, withCompletion: nil)
+        vc.messageModel.append(newMes)
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
 
