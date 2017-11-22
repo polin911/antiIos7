@@ -76,13 +76,11 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        //fetchParse()
         checkStickers()
         initPubNub()
         updateHistory()
-        //fetchParse()
-        
     }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.collectionView.collectionViewLayout.springinessEnabled = true
@@ -124,12 +122,9 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
                 if !usersArray.contains(user){
                     usersArray.append(user)
                 }
-                
             }
             _ = result?.data.occupancy.stringValue
         })
-        //updateHistory()
-        
         guard let deviceToken   = UserDefaults.standard.object(forKey: "deviceToken") as? Data
             else {
                 return
@@ -138,9 +133,7 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     func updateHistory(){
-        
         let appDel = UIApplication.shared.delegate! as! AppDelegate
-        
         appDel.client?.historyForChannel(chan, start: nil, end: nil, includeTimeToken: true, withCompletion: { (result, status) in
             print("!!!!!!!!!Status: \(result)")
             guard let result = result else {
@@ -148,23 +141,10 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             }
             self.messageModel = self.parseData(result.data.messages as! [NSDictionary] )
             self.collectionView.reloadData()
-            //self.fetchParse()
             self.finishReceivingMessage()
-            
-            
             print("Stiiiiiiiiiiiiickkers \(imageSticker)")
-            
         })
     }
-    
-    
-    func gotoVCB(_ sender: UIButton) {
-        let vc = StickersController4JSQ()
-        vc.modalPresentationStyle = .custom
-        present(vc, animated: true, completion: nil)
-    }
-    
-    
     func client(_ client: PubNub, didReceiveMessage message: PNMessageResult) {
         print("******didReceiveMessage*****")
         print("from client!!!!!!!!!!!!!!!!!!!!!!!\(message.data)")
@@ -195,6 +175,13 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     ///////////Stickers
+    
+    func gotoVCB(_ sender: UIButton) {
+        let vc = StickersController4JSQ()
+        vc.modalPresentationStyle = .custom
+        present(vc, animated: true, completion: nil)
+    }
+    
     func checkStickers() {
         if imageSticker.isEmpty == false {
             
@@ -205,32 +192,27 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
             finishReceivingMessage()
             imageSticker = ""
         }
-        
-    }
-    
-    ///////JSQ
-    
-    
-    /////Nib
-    let customToolBar = Bundle.main.loadNibNamed("NewViewWithButton", owner: self, options: nil)?.first as? NewViewWithButton
-    
-    
-    ///////////ImagePicker
-    private func chooseMedia(type: CFString) {
-        picker.mediaTypes = [type as String]
-        present(picker, animated: true, completion: nil)
     }
     override func didPressAccessoryButton(_ sender: UIButton!) {
         
         performSegue(withIdentifier: "showStickersVC", sender: self)
         
     }
+    
+    /////MARK: Nib
+    let customToolBar = Bundle.main.loadNibNamed("NewViewWithButton", owner: self, options: nil)?.first as? NewViewWithButton
+    
+    
+    ///////////MARK: ImagePicker
+    private func chooseMedia(type: CFString) {
+        picker.mediaTypes = [type as String]
+        present(picker, animated: true, completion: nil)
+    }
+  
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion:nil)
     }
-    
-    
-    //MARk : ImagePicker
+
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickerImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             var imageFromImagePicker: UIImageView!
@@ -257,7 +239,6 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
                 else {
                     print("Errorr!!!! \(error.debugDescription)")
                 }
-                
                 let nickName    = self.parseAntiIos["nick"] as! String
                 let mesId       = self.parseAntiIos.objectId as! String
                 let currentDate = Date()
@@ -272,8 +253,6 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         }
         dismiss(animated: true, completion: nil)
     }
-    
-    
     override func didPressAccessoryButton2(_ sender: UIButton!) {
         let picker = UIImagePickerController()
         picker.delegate = self
@@ -282,6 +261,8 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
         }
         present(picker, animated: true, completion:nil)
     }
+    
+    //MARK: JSQ
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
         var currentDate = Date()

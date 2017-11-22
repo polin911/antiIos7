@@ -87,12 +87,10 @@ struct MesJSQText:MessageToJSQ {
     var username: String
     var textMes : String
     var avatar  : String
-    
 }
+
 struct MesJSQMediaImage: MessageToJSQ {
-    
     private var loadImage = false
-    
     init(date: Date, idMes: String,username: String, avatar: String, photoId : String) {
         self.date     = date
         self.idMes    = idMes
@@ -113,7 +111,6 @@ struct MesJSQMediaImage: MessageToJSQ {
                         guard let image = UIImage(data: data) else {return}
                         completion(image)
                     })
-                
             })
         }
     }
