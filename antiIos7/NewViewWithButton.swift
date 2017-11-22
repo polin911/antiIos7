@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import JSQMessagesViewController
 
-class NewViewWithButton : UIToolbar {
+class NewViewWithButton : UIView {
     
     @IBAction func LogOutBtn(_ sender: Any) {
         infoClick()
@@ -21,7 +21,7 @@ class NewViewWithButton : UIToolbar {
         var vc2: UIViewController!
         var welcomeVC =  WelcomeVC()
         
-        @IBOutlet var btnLogOutOutlet: UIButton!
+//        @IBOutlet var btnLogOutOutlet: UIButton!
     
         
         
@@ -31,6 +31,7 @@ class NewViewWithButton : UIToolbar {
             let vc: UIViewController = storyboard.instantiateViewController(withIdentifier: "WelcomeVC")
             let currentController = self.getCurrentViewController()
             currentController?.present(vc, animated: true, completion: nil)
+            
             
         }
         

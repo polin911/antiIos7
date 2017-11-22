@@ -26,7 +26,7 @@
                             </constraints>
                             <state key="normal" image="s12"/>
                             <connections>
-                                <action selector="LogOutBtn:" destination="iN0-l3-epB" eventType="touchUpInside" id="c8o-Vf-O2w"/>
+                                <action selector="LogOutBtn:" destination="iN0-l3-epB" eventType="touchUpInside" id="ecX-eZ-anv"/>
                             </connections>
                         </button>
                     </subviews>
@@ -49,9 +49,6 @@
                 <constraint firstAttribute="trailing" secondItem="087-OA-ttV" secondAttribute="trailing" id="eG3-77-ffm"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-            <connections>
-                <outlet property="btnLogOutOutlet" destination="oU2-YY-Q65" id="vIE-9s-I8V"/>
-            </connections>
             <point key="canvasLocation" x="31" y="-254.5"/>
         </view>
     </objects>
