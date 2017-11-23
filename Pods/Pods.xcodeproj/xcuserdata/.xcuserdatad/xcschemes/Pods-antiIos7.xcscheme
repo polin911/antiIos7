@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '5480AFB7E62D45068840FAC42DB2F0D3'
+               BlueprintIdentifier = 'E7969B7680167F685BEB867083C103B7'
                BlueprintName = 'Pods-antiIos7'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'Pods-antiIos7.framework'>

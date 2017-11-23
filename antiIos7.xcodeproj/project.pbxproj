@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3602074E1FC725C400C10571 /* PubNub.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3602074F1FC725C400C10571 /* PubNub.framework */; };
 		3621E9C41F83C4CB0097EAB1 /* JSQMesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3621E9C31F83C4CB0097EAB1 /* JSQMesVC.swift */; };
 		362DEB4A1F822CCF0085FBD1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362DEB491F822CCF0085FBD1 /* AppDelegate.swift */; };
 		362DEB4F1F822CCF0085FBD1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 362DEB4D1F822CCF0085FBD1 /* Main.storyboard */; };
@@ -32,6 +33,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3602074F1FC725C400C10571 /* PubNub.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PubNub.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3621E9C31F83C4CB0097EAB1 /* JSQMesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSQMesVC.swift; sourceTree = "<group>"; };
 		3621E9C51F83C5950097EAB1 /* J.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = J.h; sourceTree = "<group>"; };
 		362DEB461F822CCF0085FBD1 /* antiIos7.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = antiIos7.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -66,6 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3602074E1FC725C400C10571 /* PubNub.framework in Frameworks */,
 				365839A81FBEDE6B00A5010A /* Parse.framework in Frameworks */,
 				A1B71FD9F64C3DB7C827F151 /* Pods_antiIos7.framework in Frameworks */,
 			);
@@ -180,6 +183,7 @@
 		D7A228B72FD6D4067BC58362 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3602074F1FC725C400C10571 /* PubNub.framework */,
 				365839A91FBEDE6B00A5010A /* Parse.framework */,
 				898D0B6B6891F4575A8A6914 /* Pods_antiIos7.framework */,
 			);
