@@ -175,7 +175,6 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
     }
     
     ///////////Stickers
-    
     func gotoVCB(_ sender: UIButton) {
         let vc = StickersController4JSQ()
         vc.modalPresentationStyle = .custom
@@ -215,20 +214,13 @@ class JSQMesVC: JSQMessagesViewController, PNObjectEventListener, UIImagePickerC
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickerImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            var imageFromImagePicker: UIImageView!
-            var newPic      = pickerImage
-            guard newPic    == pickerImage else { return }
-            let currentDate = Date()
+            let newPic   = pickerImage
+            guard newPic == pickerImage else { return }
 
             ////Parsing
             guard let imageData   = UIImagePNGRepresentation(newPic) else {return}
             guard let imageFile   = PFFile(data: imageData) else {return}
-            guard let imageAvatar = UIImage(named: imgName) else {return}
-            guard let avatarData  = UIImageJPEGRepresentation(imageAvatar, 0.6) else {return}
-                //UIImagePNGRepresentation(imageAvatar) else {return}
-            guard let avatarFile  : PFFile = PFFile(data: avatarData) else {return}
-            
-            parseAntiIos["avatar"] = avatarFile
+           
             parseAntiIos["image"]  = imageFile
             parseAntiIos["nick"]   = self.senderDisplayName
             

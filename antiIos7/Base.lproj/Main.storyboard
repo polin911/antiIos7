@@ -353,11 +353,27 @@
                                     <segue destination="XcH-3I-yeY" kind="show" id="bF6-JU-rcD"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="a4C-jB-IrU">
+                                <rect key="frame" x="150" y="441" width="75" height="52"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="52" id="OWX-93-cHY"/>
+                                    <constraint firstAttribute="width" constant="75" id="THf-fH-Qpa"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="21"/>
+                                <state key="normal" title="REC">
+                                    <color key="titleColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="rec_Btn_Pressed:" destination="hx9-bl-S8i" eventType="touchUpInside" id="iIx-d7-krM"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.50196081400000003" green="0.0" blue="0.50196081400000003" alpha="0.3181185788" colorSpace="calibratedRGB"/>
                         <constraints>
+                            <constraint firstItem="a4C-jB-IrU" firstAttribute="centerX" secondItem="uDq-Pd-P48" secondAttribute="centerX" id="CAu-1Y-hd3"/>
                             <constraint firstItem="74X-mm-EKf" firstAttribute="centerX" secondItem="uDq-Pd-P48" secondAttribute="centerX" id="HM9-va-csd"/>
                             <constraint firstItem="Ubc-rg-nzB" firstAttribute="leading" secondItem="uDq-Pd-P48" secondAttribute="leadingMargin" id="TvK-74-jC9"/>
+                            <constraint firstItem="Ubc-rg-nzB" firstAttribute="top" secondItem="a4C-jB-IrU" secondAttribute="bottom" constant="16" id="bwp-Ds-R4T"/>
                             <constraint firstItem="ICC-hg-gv4" firstAttribute="top" secondItem="74X-mm-EKf" secondAttribute="bottom" constant="71" id="gyV-i1-jaR"/>
                             <constraint firstItem="Ubc-rg-nzB" firstAttribute="trailing" secondItem="uDq-Pd-P48" secondAttribute="trailingMargin" id="nGm-1l-hpM"/>
                             <constraint firstItem="74X-mm-EKf" firstAttribute="top" secondItem="Ubc-rg-nzB" secondAttribute="bottom" constant="27" id="s40-4j-zEC"/>
@@ -699,6 +715,6 @@
         <image name="smileStck" width="256" height="256"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="YVO-QQ-TqJ"/>
+        <segue reference="bF6-JU-rcD"/>
     </inferredMetricsTieBreakers>
 </document>
