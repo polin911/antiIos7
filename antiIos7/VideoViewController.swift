@@ -13,6 +13,8 @@ import Parse
 
 class VideoViewController: UIViewController {
 
+    let pickerVideo = UIImagePickerController()
+    
     @IBOutlet var textF: UITextField!
     
     @IBAction func SendBtnPressed(_ sender: UIButton) {
@@ -27,7 +29,7 @@ class VideoViewController: UIViewController {
             return false
         }
         
-        var cameraController = UIImagePickerController()
+        let cameraController = UIImagePickerController()
         cameraController.sourceType = .camera
         cameraController.mediaTypes = [kUTTypeMovie as NSString as String]
         cameraController.allowsEditing = false
@@ -56,7 +58,7 @@ class VideoViewController: UIViewController {
         return true
     }
     
-    @objc func video(videoPath: NSString, didFinishSavingWithError error: NSError?, contextInfo info: AnyObject) {
+     func video(videoPath: NSString, didFinishSavingWithError error: NSError?, contextInfo info: AnyObject) {
         var title = "Success"
         var message = "Video was saved"
         if let _ = error {
@@ -85,7 +87,8 @@ class VideoViewController: UIViewController {
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        pickerVideo.delegate = self
         // Do any additional setup after loading the view.
     }
 
@@ -94,10 +97,11 @@ class VideoViewController: UIViewController {
 }
 
 extension VideoViewController: UIImagePickerControllerDelegate {
-    private func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        dismiss(animated: true, completion: nil)
         var parseAntiIos = PFObject(className: "AntiIOS")
         
-       // let mediaType = info[UIImagePickerControllerMediaType] as! NSString
+        let mediaType = info[UIImagePickerControllerMediaType] as! NSString
         guard let videoURL = info[UIImagePickerControllerMediaURL] as? NSURL else {return}
         guard let dataVideo = NSData(contentsOf: videoURL as URL) else {return}
         let videoFile = PFFile(data: dataVideo as Data, contentType: "video/mp4")
@@ -109,17 +113,26 @@ extension VideoViewController: UIImagePickerControllerDelegate {
             guard error == nil else {return}
             print("video has been saved")
         }
-        
-        dismiss(animated: true, completion: nil)
-       
         //
             
             
-//            if UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(path) {
-//                UISaveVideoAtPathToSavedPhotosAlbum(path, self, #selector(VideoViewController.video(videoPath:didFinishSavingWithError:contextInfo:)), nil)
-//            }
-        
-       // }
+        if mediaType == kUTTypeMovie {
+            guard let path = (info[UIImagePickerControllerMediaURL] as! NSURL).path else { return }
+            if UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(path) {
+               
+                parseAntiIos.saveInBackground { (success, error) in
+                    guard error == nil else {return}
+                    print("video has been saved")
+                }
+               UISaveVideoAtPathToSavedPhotosAlbum(path, self, #selector(VideoViewController.video(videoPath:didFinishSavingWithError:contextInfo:)), nil )
+    
+            }
+          
+        }
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
     }
 }
 
