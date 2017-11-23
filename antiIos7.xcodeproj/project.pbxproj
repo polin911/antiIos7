@@ -17,7 +17,6 @@
 		3634BC661FC56A5C0057431E /* VideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3634BC651FC56A5C0057431E /* VideoViewController.swift */; };
 		364929A91FB4410500AE8611 /* NewViewWithButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = 364929A81FB4410500AE8611 /* NewViewWithButton.xib */; };
 		364929AB1FB4469B00AE8611 /* NewViewWithButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 364929AA1FB4469B00AE8611 /* NewViewWithButton.swift */; };
-		365839A81FBEDE6B00A5010A /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 365839A91FBEDE6B00A5010A /* Parse.framework */; };
 		3683F0131F82300100E08CF4 /* MainVc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0121F82300100E08CF4 /* MainVc.swift */; };
 		3683F0161F82303F00E08CF4 /* WelcomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0151F82303F00E08CF4 /* WelcomeVC.swift */; };
 		3683F0181F82308D00E08CF4 /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683F0171F82308D00E08CF4 /* Global.swift */; };
@@ -29,6 +28,7 @@
 		36E843A21F9771CA00B9FE1A /* StickCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E843A11F9771CA00B9FE1A /* StickCell.swift */; };
 		36E843A41F97877100B9FE1A /* VcJSQ.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E843A31F97877100B9FE1A /* VcJSQ.swift */; };
 		36E843A91F97915400B9FE1A /* newJSQVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E843A71F97915300B9FE1A /* newJSQVC.swift */; };
+		36F421DF1FC72EE500C6AA41 /* SwiftyCam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F421E01FC72EE500C6AA41 /* SwiftyCam.framework */; };
 		A1B71FD9F64C3DB7C827F151 /* Pods_antiIos7.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 898D0B6B6891F4575A8A6914 /* Pods_antiIos7.framework */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +58,7 @@
 		36E843A11F9771CA00B9FE1A /* StickCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickCell.swift; sourceTree = "<group>"; };
 		36E843A31F97877100B9FE1A /* VcJSQ.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VcJSQ.swift; sourceTree = "<group>"; };
 		36E843A71F97915300B9FE1A /* newJSQVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = newJSQVC.swift; sourceTree = "<group>"; };
+		36F421E01FC72EE500C6AA41 /* SwiftyCam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwiftyCam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		705DA02BB5B6F068B6CC1C13 /* Pods-antiIos7.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-antiIos7.debug.xcconfig"; path = "Pods/Target Support Files/Pods-antiIos7/Pods-antiIos7.debug.xcconfig"; sourceTree = "<group>"; };
 		898D0B6B6891F4575A8A6914 /* Pods_antiIos7.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_antiIos7.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A62C76A617A808FC1B759687 /* Pods-antiIos7.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-antiIos7.release.xcconfig"; path = "Pods/Target Support Files/Pods-antiIos7/Pods-antiIos7.release.xcconfig"; sourceTree = "<group>"; };
@@ -68,8 +69,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36F421DF1FC72EE500C6AA41 /* SwiftyCam.framework in Frameworks */,
 				3602074E1FC725C400C10571 /* PubNub.framework in Frameworks */,
-				365839A81FBEDE6B00A5010A /* Parse.framework in Frameworks */,
 				A1B71FD9F64C3DB7C827F151 /* Pods_antiIos7.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -183,6 +184,7 @@
 		D7A228B72FD6D4067BC58362 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				36F421E01FC72EE500C6AA41 /* SwiftyCam.framework */,
 				3602074F1FC725C400C10571 /* PubNub.framework */,
 				365839A91FBEDE6B00A5010A /* Parse.framework */,
 				898D0B6B6891F4575A8A6914 /* Pods_antiIos7.framework */,
