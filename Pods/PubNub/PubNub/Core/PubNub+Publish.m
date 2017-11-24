@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PubNub+Publish.h"
 #import "PNAPICallBuilder+Private.h"
@@ -153,8 +153,8 @@ NS_ASSUME_NONNULL_BEGIN
  
  @since 4.0
  */
-- (NSString *)encryptedMessage:(NSString *)message withCipherKey:(NSString *)key
-                         error:(NSError **)error;
+- (nullable NSString *)encryptedMessage:(NSString *)message withCipherKey:(NSString *)key
+                                  error:(NSError **)error;
 
 #pragma mark -
 
@@ -399,9 +399,10 @@ NS_ASSUME_NONNULL_END
             NSData *messageData = [messageForPublish dataUsingEncoding:NSUTF8StringEncoding];
             NSData *compressedBody = [PNGZIP GZIPDeflatedData:messageData];
             publishData = (compressedBody?: [@"" dataUsingEncoding:NSUTF8StringEncoding]);
+            parameters.HTTPMethod = @"POST";
         }
         
-        DDLogAPICall(strongSelf.logger, @"<PubNub::API> Publish%@ message to '%@' channel%@%@%@", 
+        PNLogAPICall(strongSelf.logger, @"<PubNub::API> Publish%@ message to '%@' channel%@%@%@",
                      (compressed ? @" compressed" : @""), (channel?: @"<error>"),
                      (metadata ? [NSString stringWithFormat:@" with metadata (%@)", 
                                   metadataForPublish] : @""),
@@ -411,13 +412,6 @@ NS_ASSUME_NONNULL_END
 
         [strongSelf processOperation:PNPublishOperation withParameters:parameters data:publishData
                      completionBlock:^(PNStatus *status) {
-                   
-           // Silence static analyzer warnings.
-           // Code is aware about this case and at the end will simply call on 'nil' object method.
-           // In most cases if referenced object become 'nil' it mean what there is no more need in
-           // it and probably whole client instance has been deallocated.
-           #pragma clang diagnostic push
-           #pragma clang diagnostic ignored "-Wreceiver-is-weak"
            if (status.isError) {
                 
                status.retryBlock = ^{
@@ -428,7 +422,6 @@ NS_ASSUME_NONNULL_END
                };
            }
            [weakSelf callBlock:block status:YES withResult:nil andStatus:status];
-           #pragma clang diagnostic pop
        }];
     });
 }
@@ -518,7 +511,6 @@ NS_ASSUME_NONNULL_END
             // In most cases if referenced object become 'nil' it mean what there is no more need in
             // it and probably whole client instance has been deallocated.
             #pragma clang diagnostic push
-            #pragma clang diagnostic ignored "-Wreceiver-is-weak"
             #pragma clang diagnostic ignored "-Warc-repeated-use-of-weak"
             // Encrypt message in case if serialization to JSON was successful.
             if (!publishError) {
@@ -594,7 +586,7 @@ NS_ASSUME_NONNULL_END
         [parameters addPathComponent:[PNString percentEscapedString:channel] forPlaceholder:@"{channel}"];
     }
     if (!shouldStore) { [parameters addQueryParameter:@"0" forFieldName:@"store"]; }
-    if (ttl) { [parameters addQueryParameter:ttl forFieldName:@"ttl"]; }
+    if (ttl) { [parameters addQueryParameter:ttl.stringValue forFieldName:@"ttl"]; }
     if (!replicate) { [parameters addQueryParameter:@"true" forFieldName:@"norep"]; }
     if (([message isKindOfClass:[NSString class]] && message.length) || message) {
         

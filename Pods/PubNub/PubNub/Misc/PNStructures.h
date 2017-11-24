@@ -3,9 +3,10 @@
  
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import <Foundation/Foundation.h>
+#import "PNDefines.h"
 
 
 #pragma mark Class forward
@@ -152,6 +153,15 @@ typedef void(^PNChannelGroupChangeCompletionBlock)(PNAcknowledgmentStatus *statu
  @since 4.0
  */
 typedef void(^PNHistoryCompletionBlock)(PNHistoryResult * _Nullable result, PNErrorStatus * _Nullable status);
+
+/**
+ @brief  Messages removal completion block.
+ 
+ @param status Reference on status instance which hold information about processing results.
+ 
+ @since 4.7.0
+ */
+typedef void(^PNMessageDeleteCompletionBlock)(PNAcknowledgmentStatus *status);
 
 
 #pragma mark - Completion blocks :: Presence
@@ -340,12 +350,23 @@ typedef NS_OPTIONS(NSUInteger, PNLogLevel){
      */
     PNRequestLogLevel = (1 << 3),
     
+#if PN_URLSESSION_TRANSACTION_METRICS_AVAILABLE
+    /**
+     @brief      \b PNLog level which allow to print out all API call requests' metrics.
+     @discussion Starting from macosx(10.12), ios(10.0), watchos(3.0), tvos(10.0) it is possible to gather 
+                 metrics information about each request processed.
+     
+     @since 4.5.13
+     */
+    PNRequestMetricsLogLevel = (1 << 4),
+#endif
+    
     /**
      @brief  \b PNLog level which allow to print out API execution results.
      
      @since 4.0
      */
-    PNResultLogLevel = (1 << 4),
+    PNResultLogLevel = (1 << 5),
     
     /**
      @brief  \b PNLog level which allow to print out client state change status information and 
@@ -353,7 +374,7 @@ typedef NS_OPTIONS(NSUInteger, PNLogLevel){
      
      @since 4.0
      */
-    PNStatusLogLevel = (1 << 5),
+    PNStatusLogLevel = (1 << 6),
     
     /**
      @brief      \b PNLog level which allow to print out every failure status information.
@@ -362,7 +383,7 @@ typedef NS_OPTIONS(NSUInteger, PNLogLevel){
      
      @since 4.0
      */
-    PNFailureStatusLogLevel = (1 << 6),
+    PNFailureStatusLogLevel = (1 << 7),
     
     /**
      @brief      \b PNLog level which allow to print out all API calls with passed parameters.
@@ -371,22 +392,25 @@ typedef NS_OPTIONS(NSUInteger, PNLogLevel){
      
      @since 4.0
      */
-    PNAPICallLogLevel = (1 << 7),
+    PNAPICallLogLevel = (1 << 8),
     
     /**
      @brief  \b PNLog level which allow to print out all AES errors.
      
      @since 4.0
      */
-    PNAESErrorLogLevel = (1 << 8),
+    PNAESErrorLogLevel = (1 << 9),
     
     /**
      @brief  Log every message from \b PubNub client.
      
      @since 4.0
      */
-    PNVerboseLogLevel = (PNInfoLogLevel|PNReachabilityLogLevel|PNRequestLogLevel|PNResultLogLevel|
-                         PNStatusLogLevel|PNFailureStatusLogLevel|PNAPICallLogLevel|
+    PNVerboseLogLevel = (PNInfoLogLevel|PNReachabilityLogLevel|PNRequestLogLevel|
+#if PN_URLSESSION_TRANSACTION_METRICS_AVAILABLE
+                         PNRequestMetricsLogLevel|
+#endif
+                         PNResultLogLevel|PNStatusLogLevel|PNFailureStatusLogLevel|PNAPICallLogLevel|
                          PNAESErrorLogLevel)
 };
 
@@ -401,6 +425,8 @@ typedef NS_ENUM(NSInteger, PNOperationType){
     PNUnsubscribeOperation,
     PNPublishOperation,
     PNHistoryOperation,
+    PNHistoryForChannelsOperation,
+    PNDeleteMessageOperation,
     PNWhereNowOperation,
     PNHereNowGlobalOperation,
     PNHereNowForChannelOperation,
@@ -524,15 +550,25 @@ typedef NS_ENUM(NSInteger, PNStatusCategory) {
      @since 4.0
      */
     PNCancelledCategory,
-
+    
     /**
      @brief      Status is used to notify what API request from client is malformed.
      @discussion In case if this status arrive, it is better to print out status object debug
                  description and contact support@pubnub.com
-
+     
      @since 4.0
      */
     PNBadRequestCategory,
+    
+    /**
+     @brief      Status is used to notify what composed API request has too many data in it.
+     @discussion In case if this status arrive, depending from used API it mean what too many data has been 
+                 passed to it. For example for publish it may mean what too big message has been sent. For
+                 subscription/unsubscription API it may mean what too many channels has been passed to API.
+     
+     @since 4.6.2
+     */
+    PNRequestURITooLongCategory,
 
     /**
      @brief      Status is used to notify what client has been configured with malformed filtering expression.

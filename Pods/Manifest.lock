@@ -5,9 +5,9 @@ PODS:
   - JSQSystemSoundPlayer (2.0.1)
   - Parse (1.15.3):
     - Bolts/Tasks (~> 1.8)
-  - PubNub (4.5.5):
-    - PubNub/Core (= 4.5.5)
-  - PubNub/Core (4.5.5)
+  - PubNub (4.7.4):
+    - PubNub/Core (= 4.7.4)
+  - PubNub/Core (4.7.4)
   - SDWebImage (4.2.2):
     - SDWebImage/Core (= 4.2.2)
   - SDWebImage/Core (4.2.2)
@@ -16,7 +16,7 @@ PODS:
 DEPENDENCIES:
   - JSQMessagesViewController
   - Parse
-  - PubNub
+  - PubNub (~> 4)
   - SDWebImage (~> 4.0)
   - SwiftyCam
 
@@ -25,10 +25,10 @@ SPEC CHECKSUMS:
   JSQMessagesViewController: 39fed975e3c9f8eba7292071e29eeb541d105e66
   JSQSystemSoundPlayer: c5850e77a4363ffd374cd851154b9af93264ed8d
   Parse: cdc0f1f975ee8be0409e66f21b05df4ae067047c
-  PubNub: 519594dfe84662686818591179470ff87a30a224
+  PubNub: de3a84200472d2fadfc7cf79622444a837a24b42
   SDWebImage: 89a9d32cd520bbb46eb14e541d5109b3564af198
   SwiftyCam: 86c114177a1b1f5dc2c82384577d0c20b922a31b
 
-PODFILE CHECKSUM: 37894107038e79a140d4cef49e6000b40c3268ff
+PODFILE CHECKSUM: 130e8175be5359111cbefd594cc1e212e2a4c92e
 
 COCOAPODS: 1.2.0

@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PNStatus+Private.h"
 #import "PNNetworkResponseSerializer.h"
@@ -224,6 +224,7 @@
     
     PNStatusCategory category = PNUnknownCategory;
     if (statusCode == 403) { category = PNAccessDeniedCategory; }
+    else if (statusCode == 414) { category = PNRequestURITooLongCategory; }
     else if (statusCode == 481) { category = PNMalformedFilterExpressionCategory; }
     
     return category;

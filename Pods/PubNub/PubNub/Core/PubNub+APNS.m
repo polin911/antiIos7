@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PubNub+APNS.h"
 #import "PNAPICallBuilder+Private.h"
@@ -159,26 +159,19 @@ NS_ASSUME_NONNULL_END
             [parameters removePathComponentForPlaceholder:@"{token}"];
         }
 
-        DDLogAPICall(self.logger, @"<PubNub::API> %@ push notifications for device '%@': %@.",
+        PNLogAPICall(self.logger, @"<PubNub::API> %@ push notifications for device '%@': %@.",
                      (shouldEnabled ? @"Enable" : @"Disable"), 
                      [PNData HEXFromDevicePushToken:pushToken].lowercaseString, 
                      [PNChannel namesForRequest:channels]);
     }
     else {
 
-        DDLogAPICall(self.logger, @"<PubNub::API> Disable push notifications for device '%@'.",
+        PNLogAPICall(self.logger, @"<PubNub::API> Disable push notifications for device '%@'.",
                      [[PNData HEXFromDevicePushToken:pushToken] lowercaseString]);
     }
 
     __weak __typeof(self) weakSelf = self;
     [self processOperation:operationType withParameters:parameters completionBlock:^(PNStatus *status){
-
-        // Silence static analyzer warnings.
-        // Code is aware about this case and at the end will simply call on 'nil' object method.
-        // In most cases if referenced object become 'nil' it mean what there is no more need in
-        // it and probably whole client instance has been deallocated.
-        #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wreceiver-is-weak"
         if (status.isError) {
             
             status.retryBlock = ^{
@@ -193,7 +186,6 @@ NS_ASSUME_NONNULL_END
                withCompletionBlock:NULL];
         }
         [weakSelf callBlock:block status:YES withResult:nil andStatus:status];
-        #pragma clang diagnostic pop
     }];
 }
 
@@ -210,19 +202,12 @@ NS_ASSUME_NONNULL_END
                       forPlaceholder:@"{token}"];
     }
 
-    DDLogAPICall(self.logger, @"<PubNub::API> Push notification enabled channels for device '%@'.",
+    PNLogAPICall(self.logger, @"<PubNub::API> Push notification enabled channels for device '%@'.",
                  [PNData HEXFromDevicePushToken:pushToken].lowercaseString);
 
     __weak __typeof(self) weakSelf = self;
     [self processOperation:PNPushNotificationEnabledChannelsOperation withParameters:parameters
            completionBlock:^(PNResult *result, PNStatus *status){
-
-               // Silence static analyzer warnings.
-               // Code is aware about this case and at the end will simply call on 'nil' object
-               // method. In most cases if referenced object become 'nil' it mean what there is no
-               // more need in it and probably whole client instance has been deallocated.
-               #pragma clang diagnostic push
-               #pragma clang diagnostic ignored "-Wreceiver-is-weak"
                if (status.isError) {
                     
                    status.retryBlock = ^{
@@ -232,7 +217,6 @@ NS_ASSUME_NONNULL_END
                    };
                }
                [weakSelf callBlock:block status:NO withResult:result andStatus:status];
-               #pragma clang diagnostic pop
            }];
 }
 

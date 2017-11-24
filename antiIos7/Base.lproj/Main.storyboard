@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Ohs-Cw-Cfw">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13527"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -387,6 +387,24 @@
             </objects>
             <point key="canvasLocation" x="-1146.4000000000001" y="1435.2323838080961"/>
         </scene>
+        <!--Camera View Controller-->
+        <scene sceneID="EPb-VO-7y8">
+            <objects>
+                <viewController id="Ohs-Cw-Cfw" customClass="CameraViewController" customModule="antiIos7" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="GcK-gw-ghX"/>
+                        <viewControllerLayoutGuide type="bottom" id="Rfs-hP-9gn"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="clm-MP-prI">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cWi-Mh-78b" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1113" y="2113"/>
+        </scene>
         <!--VcJSQ-->
         <scene sceneID="XyR-7t-riS">
             <objects>
@@ -463,14 +481,14 @@
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
                                                         <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="s2" translatesAutoresizingMaskIntoConstraints="NO" id="inT-fH-Z0u">
-                                                            <rect key="frame" x="278" y="55" width="70" height="70"/>
+                                                            <rect key="frame" x="271" y="55" width="70" height="70"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" constant="70" id="4QH-Ir-90F"/>
                                                                 <constraint firstAttribute="height" constant="70" id="GsI-dK-lfY"/>
                                                             </constraints>
                                                         </imageView>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jvn-VD-Odx">
-                                                            <rect key="frame" x="44" y="10" width="31" height="20"/>
+                                                            <rect key="frame" x="44" y="13" width="31" height="20"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" constant="31" id="0EM-ZG-g7W"/>
                                                                 <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="20" id="4P7-fO-ehG"/>
@@ -481,7 +499,7 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FFz-0v-2O2">
-                                                            <rect key="frame" x="8" y="115" width="343" height="63"/>
+                                                            <rect key="frame" x="15" y="112.5" width="329" height="63"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="63" id="ctB-ZA-Ar0"/>
                                                             </constraints>

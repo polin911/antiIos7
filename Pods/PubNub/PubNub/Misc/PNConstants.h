@@ -3,7 +3,7 @@
 
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import <Foundation/Foundation.h>
 #import "PNStructures.h"
@@ -15,10 +15,10 @@
 #pragma mark General information constants
 
 // Stores client library version number
-static NSString * const kPNLibraryVersion = @"4.5.5";
+static NSString * const kPNLibraryVersion = @"4.7.4";
 
 // Stores information about SDK codebase
-static NSString * const kPNCommit = @"fddb1f138e51e44f9a5ad7ddbea7b8466292d51a";
+static NSString * const kPNCommit = @"114804a76be108e8bd9ff97f2577ce1a1bcd68a8";
 
 /**
  @brief  Stores reference on unique identifier which is used to identify \b PubNub client among other 
@@ -41,17 +41,18 @@ static NSString * const kPNClientIdentifier = @"com.pubnub.pubnub-objc";
 
 #pragma mark - Default client configuration
 
-static NSString * const kPNDefaultOrigin = @"pubsub.pubnub.com";
+static NSString * const kPNDefaultOrigin = @"ps.pndsn.com";
 
 static NSTimeInterval const kPNDefaultSubscribeMaximumIdleTime = 310.0f;
 static NSTimeInterval const kPNDefaultNonSubscribeRequestTimeout = 10.0f;
 
 static BOOL const kPNDefaultIsTLSEnabled = YES;
 static PNHeartbeatNotificationOptions const kPNDefaultHeartbeatNotificationOptions = PNHeartbeatNotifyFailure;
+static BOOL const kPNDefaultShouldSuppressLeaveEvents = NO;
 static BOOL const kPNDefaultShouldKeepTimeTokenOnListChange = YES;
-static BOOL const kPNDefaultShouldRestoreSubscription = YES;
 static BOOL const kPNDefaultShouldTryCatchUpOnSubscriptionRestore = YES;
 static BOOL const kPNDefaultRequestMessageCountThreshold = 0;
+static NSUInteger const kPNDefaultMaximumMessagesCacheSize = 100;
 #if TARGET_OS_IOS
 static BOOL const kPNDefaultShouldCompleteRequestsBeforeSuspension = YES;
 #endif // TARGET_OS_IOS

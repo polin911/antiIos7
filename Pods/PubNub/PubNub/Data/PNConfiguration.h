@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 @interface PNConfiguration : NSObject
 
@@ -153,6 +153,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) PNHeartbeatNotificationOptions heartbeatNotificationOptions;
 
 /**
+ * @brief      Stores whether client shouldn't send presence \c leave events during unsubscription process.
+ * @discussion If this option is set to \c YES client will simply remove unsubscribed channels/groups from subscription
+ *             loop w/o notifying remote subscribers about leave.
+ *
+ * @since 4.7.3
+ */
+@property (nonatomic, assign, getter = shouldSuppressLeaveEvents) BOOL suppressLeaveEvents NS_SWIFT_NAME(suppressLeaveEvents);
+
+/**
  @brief   Stores whether client should communicate with \b PubNub services using secured connection or not.
  
  @default By default client use \b YES to secure communication with \b PubNub services.
@@ -182,7 +191,9 @@ NS_ASSUME_NONNULL_BEGIN
  
  @since 4.0
  */
-@property (nonatomic, assign, getter = shouldRestoreSubscription) BOOL restoreSubscription NS_SWIFT_NAME(restoreSubscription);
+@property (nonatomic, assign, getter = shouldRestoreSubscription) BOOL restoreSubscription NS_SWIFT_NAME(restoreSubscription) 
+          DEPRECATED_MSG_ATTRIBUTE("This option will be deprecated in upcoming releases. Client will restore "
+                                   "it's subscription after network issues automatically.");
 
 /**
  @brief      Stores whether client should try to catch up for events which occurred on previously subscribed 
@@ -221,7 +232,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @since 4.5.4
  */
-@property (nonatomic, copy) NSString *applicationExtensionSharedGroupIdentifier  NS_SWIFT_NAME(applicationExtensionSharedGroupIdentifier) NS_AVAILABLE(10_10, 8_0);
+@property (nonatomic, copy) NSString *applicationExtensionSharedGroupIdentifier NS_SWIFT_NAME(applicationExtensionSharedGroupIdentifier) NS_AVAILABLE(10_10, 8_0);
 
 /**
  @brief      Number of maximum expected messages from \b PubNub service in single response.
@@ -232,7 +243,22 @@ NS_ASSUME_NONNULL_BEGIN
  
  @since 4.5.4
  */
-@property (nonatomic, assign) NSUInteger requestMessageCountThreshold  NS_SWIFT_NAME(requestMessageCountThreshold);
+@property (nonatomic, assign) NSUInteger requestMessageCountThreshold NS_SWIFT_NAME(requestMessageCountThreshold);
+
+/**
+ @brief      Messages de-duplication cache size.
+ @discussion This value is responsible for messages cache size which is used during messages de-duplication 
+             process. In various situations (for rexample in case of enabled multi-regional support) \b PubNub
+             service may decide to re-send few messages to ensure what they won't be missed (for example when 
+             region switched for better performance).
+             De-duplication ensure what at the end listeners won't receive message which has been processed 
+             already through real-time channels.
+ @default    By default this cache is set to \b 100 messages. It is possible to disable de-duplication by 
+             passing \b 0 to this property.
+ 
+ @since 4.5.8
+ */
+@property (nonatomic, assign) NSUInteger maximumMessagesCacheSize NS_SWIFT_NAME(maximumMessagesCacheSize);
 
 #if TARGET_OS_IOS
 /**

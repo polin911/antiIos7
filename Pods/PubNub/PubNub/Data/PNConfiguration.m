@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import <Foundation/Foundation.h>
 #if TARGET_OS_IOS
@@ -24,6 +24,8 @@
  @brief  Stores reference on key under which device ID will be stored persistently.
  */
 static NSString * const kPNConfigurationDeviceIDKey = @"PNConfigurationDeviceID";
+
+NSString * const kPNConfigurationUUIDKey = @"PNConfigurationUUID";
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -53,7 +55,18 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Misc
 
 /**
- @brief  Fetch unique device idenrifier from user defaults or generate new one.
+ @brief      Fetch unique user identifier from keychain or generate new one.
+ @discussion This value updates with every client configuration (if different from previous one). If user 
+             doesn't provide custom \c uuid during client configuration, client will generate and store new 
+             unique value which will be re-used during next client configuration (if not provided custom 
+             \c uuid).
+ 
+ @return Unique user identifier.
+ */
+- (NSString *)uniqueUserIdentifier;
+
+/**
+ @brief  Fetch unique device idenrifier from keychain or generate new one.
  
  @return Unique device identifier which depends on platform for which client has been compiled.
  
@@ -140,15 +153,16 @@ NS_ASSUME_NONNULL_END
         _origin = [kPNDefaultOrigin copy];
         _publishKey = [publishKey copy];
         _subscribeKey = [subscribeKey copy];
-        _uuid = [[[NSUUID UUID] UUIDString] copy];
+        _uuid = [[self uniqueUserIdentifier] copy];
         _subscribeMaximumIdleTime = kPNDefaultSubscribeMaximumIdleTime;
         _nonSubscribeRequestTimeout = kPNDefaultNonSubscribeRequestTimeout;
         _TLSEnabled = kPNDefaultIsTLSEnabled;
         _heartbeatNotificationOptions = kPNDefaultHeartbeatNotificationOptions;
+        _suppressLeaveEvents = kPNDefaultShouldSuppressLeaveEvents;
         _keepTimeTokenOnListChange = kPNDefaultShouldKeepTimeTokenOnListChange;
-        _restoreSubscription = kPNDefaultShouldRestoreSubscription;
         _catchUpOnSubscriptionRestore = kPNDefaultShouldTryCatchUpOnSubscriptionRestore;
         _requestMessageCountThreshold = kPNDefaultRequestMessageCountThreshold;
+        _maximumMessagesCacheSize = kPNDefaultMaximumMessagesCacheSize;
 #if TARGET_OS_IOS
         _completeRequestsBeforeSuspension = kPNDefaultShouldCompleteRequestsBeforeSuspension;
 #endif // TARGET_OS_IOS
@@ -172,23 +186,44 @@ NS_ASSUME_NONNULL_END
     configuration.nonSubscribeRequestTimeout = self.nonSubscribeRequestTimeout;
     configuration.presenceHeartbeatValue = self.presenceHeartbeatValue;
     configuration.presenceHeartbeatInterval = self.presenceHeartbeatInterval;
-    configuration.TLSEnabled = self.isTLSEnabled;
     configuration.heartbeatNotificationOptions = self.heartbeatNotificationOptions;
+    configuration.suppressLeaveEvents = self.shouldSuppressLeaveEvents;
+    configuration.TLSEnabled = self.isTLSEnabled;
     configuration.keepTimeTokenOnListChange = self.shouldKeepTimeTokenOnListChange;
-    configuration.restoreSubscription = self.shouldRestoreSubscription;
     configuration.catchUpOnSubscriptionRestore = self.shouldTryCatchUpOnSubscriptionRestore;
     configuration.applicationExtensionSharedGroupIdentifier = self.applicationExtensionSharedGroupIdentifier;
     configuration.requestMessageCountThreshold = self.requestMessageCountThreshold;
+    configuration.maximumMessagesCacheSize = self.maximumMessagesCacheSize;
 #if TARGET_OS_IOS
     configuration.completeRequestsBeforeSuspension = self.shouldCompleteRequestsBeforeSuspension;
 #endif // TARGET_OS_IOS
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     configuration.stripMobilePayload = self.shouldStripMobilePayload;
+#pragma clang diagnostic pop
     
     return configuration;
 }
 
 
 #pragma mark - Misc
+
+- (NSString *)uniqueUserIdentifier {
+    
+    __block NSString *identifier = nil;
+    [PNKeychain valueForKey:kPNConfigurationUUIDKey withCompletionBlock:^(id value) {
+        
+        if (!value) {
+            
+            identifier = [@"pn-" stringByAppendingString:[[NSUUID UUID] UUIDString]];
+            [PNKeychain storeValue:identifier forKey:kPNConfigurationUUIDKey
+               withCompletionBlock:NULL];
+        }
+        else { identifier = value; }
+    }];
+    
+    return identifier;
+}
 
 - (NSString *)uniqueDeviceIdentifier {
     

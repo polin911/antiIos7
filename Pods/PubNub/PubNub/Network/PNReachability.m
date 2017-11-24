@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PNReachability.h"
 #import "PubNub+CorePrivate.h"
@@ -166,11 +166,11 @@ NS_ASSUME_NONNULL_END
     BOOL successfulPing = (result.data != nil);
     if (self.reachable && !successfulPing) {
         
-        DDLogReachability(self.client.logger, @"<PubNub::Reachability> Connection went down.");
+        PNLogReachability(self.client.logger, @"<PubNub::Reachability> Connection went down.");
     }
     if (!self.reachable && successfulPing) {
         
-        DDLogReachability(self.client.logger, @"<PubNub::Reachability> Connection restored.");
+        PNLogReachability(self.client.logger, @"<PubNub::Reachability> Connection restored.");
     }
     if (self.pingCompleteBlock) { self.pingCompleteBlock(successfulPing); }
     if (self.pingingRemoteService) {

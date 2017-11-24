@@ -11,7 +11,7 @@ pod 'JSQMessagesViewController'
 pod 'Parse'
 pod 'SDWebImage', '~> 4.0'
 pod "SwiftyCam"
-pod 'PubNub'
+pod "PubNub", "~> 4"
 
 
 end

@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 @interface PNRequestParameters : NSObject
 
@@ -19,6 +19,13 @@ NS_ASSUME_NONNULL_BEGIN
 ///------------------------------------------------
 /// @name Information
 ///------------------------------------------------
+
+/**
+ @brief  Stores reference on expected HTTP method for request.
+ 
+ @since 4.7.0
+ */
+@property (nonatomic, copy) NSString *HTTPMethod;
 
 /**
  @brief  Stores reference on key/value pairs which should be expanded in remote resource path.

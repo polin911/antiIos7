@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PubNub+State.h"
 #import "PNClientStateUpdateStatus.h"
@@ -169,19 +169,12 @@ NS_ASSUME_NONNULL_END
                              forFieldName:@"channel-group"];
         }
         
-        DDLogAPICall(strongSelf.logger, @"<PubNub::API> Set %@'s state on '%@' channel%@: %@.", 
+        PNLogAPICall(strongSelf.logger, @"<PubNub::API> Set %@'s state on '%@' channel%@: %@.",
                      (uuid?: @"<error>"), (object?: @"<error>"), (!onChannel ? @" group" : @""), 
                      parameters.query[@"state"]);
         
         [strongSelf processOperation:PNSetStateOperation withParameters:parameters
                      completionBlock:^(PNStatus *status) {
-                   
-           // Silence static analyzer warnings.
-           // Code is aware about this case and at the end will simply call on 'nil' object method.
-           // In most cases if referenced object become 'nil' it mean what there is no more need in
-           // it and probably whole client instance has been deallocated.
-           #pragma clang diagnostic push
-           #pragma clang diagnostic ignored "-Wreceiver-is-weak"
            if (status.isError) {
                 
                status.retryBlock = ^{
@@ -192,7 +185,6 @@ NS_ASSUME_NONNULL_END
            }
            [weakSelf handleSetStateStatus:(PNClientStateUpdateStatus *)status
                                   forUUID:uuid atObject:object withCompletion:block];
-           #pragma clang diagnostic pop
        }];
     });
 }
@@ -227,20 +219,13 @@ NS_ASSUME_NONNULL_END
         [parameters addQueryParameter:[PNString percentEscapedString:object] forFieldName:@"channel-group"];
     }
     
-    DDLogAPICall(self.logger, @"<PubNub::API> State request on '%@' channel%@: %@.", (uuid?: @"<error>"), 
+    PNLogAPICall(self.logger, @"<PubNub::API> State request on '%@' channel%@: %@.", (uuid?: @"<error>"),
                  (object?: @"<error>"), (!onChannel ? @" group" : @""));
     
     __weak __typeof(self) weakSelf = self;
     [self processOperation:(onChannel ? PNStateForChannelOperation : PNStateForChannelGroupOperation)
             withParameters:parameters 
            completionBlock:^(PNResult *result, PNStatus *status) {
-               
-        // Silence static analyzer warnings.
-        // Code is aware about this case and at the end will simply call on 'nil' object method.
-        // In most cases if referenced object become 'nil' it mean what there is no more need in
-        // it and probably whole client instance has been deallocated.
-        #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wreceiver-is-weak"
         if (status.isError) {
             
             status.retryBlock = ^{
@@ -250,7 +235,6 @@ NS_ASSUME_NONNULL_END
         }
         [weakSelf handleStateResult:(PNChannelClientStateResult *)result withStatus:status
                             forUUID:uuid atChannel:onChannel object:object withCompletion:block];
-        #pragma clang diagnostic pop
     }];
 }
 

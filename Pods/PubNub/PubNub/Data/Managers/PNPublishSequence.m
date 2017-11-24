@@ -7,10 +7,10 @@
     #import <AppKit/AppKit.h>
 #endif // TARGET_OS_OSX
 
-#import <libkern/OSAtomic.h>
 #import "PNConfiguration.h"
 #import "PubNub+Core.h"
 #import "PNKeychain.h"
+#import "PNHelpers.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -39,7 +39,7 @@ static NSUInteger const kPNMaximumPublishSequenceDataAge = (30 * 24 * 60 * 60);
  
  @since 4.5.2
  */
-static OSSpinLock publishSequenceKeychainAccessLock = OS_SPINLOCK_INIT;
+static os_unfair_lock publishSequenceKeychainAccessLock = OS_UNFAIR_LOCK_INIT;
 
 
 #pragma mark - Structures
@@ -83,7 +83,7 @@ struct PNPublishSequenceDataStructure PNPublishSequenceData = {
      
      @since 4.5.2
      */
-    OSSpinLock _lock;
+    os_unfair_lock _lock;
 }
 
 
@@ -172,14 +172,13 @@ struct PNPublishSequenceDataStructure PNPublishSequenceData = {
 #pragma mark - Misc
 
 /**
- @brief      Subscribe / unsubscribe to/from application context change notifications.
+ @brief      Subscribe to application context change notifications.
  @discussion Context change allow to react and if required save sequence data information into persistent 
              storage.
  
  @since 4.5.2
  */
 - (void)subscribeOnNotifications;
-- (void)unsubscribeFromNotifications;
 
 #pragma mark -
 
@@ -198,19 +197,19 @@ NS_ASSUME_NONNULL_END
 
 - (NSUInteger)sequenceNumber {
     
-    OSSpinLockLock(&_lock);
-    NSUInteger sequenceNumber = _sequenceNumber;
-    OSSpinLockUnlock(&_lock);
+    __block NSUInteger sequenceNumber = 0;
+    pn_lock(&_lock, ^{ sequenceNumber = _sequenceNumber; });
     
     return sequenceNumber;
 }
 
 - (NSUInteger)nextSequenceNumber:(BOOL)shouldUpdateCurrent {
     
-    OSSpinLockLock(&_lock);
-    NSUInteger sequenceNumber = (_sequenceNumber == NSUIntegerMax ? 1 : _sequenceNumber + 1);
-    if (shouldUpdateCurrent) { _sequenceNumber = sequenceNumber; }
-    OSSpinLockUnlock(&_lock);
+    __block NSUInteger sequenceNumber = 0;
+    pn_lock(&_lock, ^{
+        sequenceNumber = (_sequenceNumber == NSUIntegerMax ? 1 : _sequenceNumber + 1);
+        if (shouldUpdateCurrent) { _sequenceNumber = sequenceNumber; }
+    });
     
     return sequenceNumber;
 }
@@ -230,6 +229,9 @@ NS_ASSUME_NONNULL_END
             manager = [[self alloc] initForClient:client];
             sequenceManagers[client.currentConfiguration.publishKey] = manager;
         }
+        // In case if received manager which existed after PubNub client has been deallocated it should be set
+        // new reference on client.
+        if (manager.client == nil) { manager.client = client; }
     }
     
     return manager;
@@ -251,7 +253,7 @@ NS_ASSUME_NONNULL_END
         
         _client = client;
         _publishKey = client.currentConfiguration.publishKey;
-        _lock = OS_SPINLOCK_INIT;
+        _lock = OS_UNFAIR_LOCK_INIT;
         
         [self loadFromPersistentStorage];
         [self cleanUpIfRequired];
@@ -263,9 +265,7 @@ NS_ASSUME_NONNULL_END
 
 - (void)reset {
     
-    OSSpinLockLock(&_lock);
-    _sequenceNumber = 0;
-    OSSpinLockUnlock(&_lock);
+    pn_lock(&_lock, ^{ _sequenceNumber = 0; });
     [self saveToPersistentStorage];
 }
 
@@ -274,58 +274,70 @@ NS_ASSUME_NONNULL_END
 
 - (void)loadFromPersistentStorage {
     
-    OSSpinLockLock(&publishSequenceKeychainAccessLock);
-    [PNKeychain valueForKey:kPNPublishSequenceDataKey withCompletionBlock:^(NSDictionary *sequences) {
+    pn_lock_async(&publishSequenceKeychainAccessLock, ^(dispatch_block_t completion) {
         
-        NSMutableDictionary *mutableSequences = [(sequences?: @{}) mutableCopy];
-        NSMutableDictionary *sequenceData = [(mutableSequences[self.publishKey]?: @{}) mutableCopy];
-        NSNumber *sequenceNumber = (NSNumber *)sequenceData[PNPublishSequenceData.sequence];
-        sequenceData[PNPublishSequenceData.lastSaveDate] = @([NSDate date].timeIntervalSince1970);
-        _sequenceNumber = sequenceNumber.unsignedIntegerValue;
-        [PNKeychain storeValue:mutableSequences forKey:kPNPublishSequenceDataKey
-           withCompletionBlock:^(BOOL stored) { OSSpinLockUnlock(&publishSequenceKeychainAccessLock); }];
-    }];
+        [PNKeychain valueForKey:kPNPublishSequenceDataKey withCompletionBlock:^(NSDictionary *sequences) {
+            
+            NSMutableDictionary *mutableSequences = [(sequences?: @{}) mutableCopy];
+            NSMutableDictionary *sequenceData = [(mutableSequences[self.publishKey]?: @{}) mutableCopy];
+            NSNumber *sequenceNumber = (NSNumber *)sequenceData[PNPublishSequenceData.sequence];
+            sequenceData[PNPublishSequenceData.lastSaveDate] = @([NSDate date].timeIntervalSince1970);
+            _sequenceNumber = sequenceNumber.unsignedIntegerValue;
+            [PNKeychain storeValue:mutableSequences forKey:kPNPublishSequenceDataKey
+               withCompletionBlock:^(BOOL stored) { completion(); }];
+        }];
+    });
 }
 
 - (void)saveToPersistentStorage {
     
-    OSSpinLockLock(&publishSequenceKeychainAccessLock);
-    [PNKeychain valueForKey:kPNPublishSequenceDataKey withCompletionBlock:^(NSDictionary *sequences) {
+    pn_lock_async(&publishSequenceKeychainAccessLock, ^(dispatch_block_t completion) {
         
-        NSMutableDictionary *mutableSequences = [(sequences?: @{}) mutableCopy];
-        NSMutableDictionary *sequenceData = [(mutableSequences[self.publishKey]?: @{}) mutableCopy];
-        sequenceData[PNPublishSequenceData.sequence] = @(self.sequenceNumber);
-        sequenceData[PNPublishSequenceData.lastSaveDate] = @([NSDate date].timeIntervalSince1970);
-        mutableSequences[self.publishKey] = sequenceData;
-        [PNKeychain storeValue:mutableSequences forKey:kPNPublishSequenceDataKey
-           withCompletionBlock:^(BOOL stored) { OSSpinLockUnlock(&publishSequenceKeychainAccessLock); }];
-    }];
+        // Perform data maniupulation only if PubNub client, for which manager has been created, still 
+        // available. 
+        if (self.client != nil) {
+            
+            [PNKeychain valueForKey:kPNPublishSequenceDataKey withCompletionBlock:^(NSDictionary *sequences) {
+                
+                NSMutableDictionary *mutableSequences = [(sequences?: @{}) mutableCopy];
+                NSMutableDictionary *sequenceData = [(mutableSequences[self.publishKey]?: @{}) mutableCopy];
+                sequenceData[PNPublishSequenceData.sequence] = @(self.sequenceNumber);
+                sequenceData[PNPublishSequenceData.lastSaveDate] = @([NSDate date].timeIntervalSince1970);
+                mutableSequences[self.publishKey] = sequenceData;
+                [PNKeychain storeValue:mutableSequences forKey:kPNPublishSequenceDataKey
+                   withCompletionBlock:^(BOOL stored) { completion(); }];
+            }];
+        }
+    });
 }
 
 - (void)cleanUpIfRequired {
 
     NSTimeInterval currentTimestamp = [NSDate date].timeIntervalSince1970;
-    OSSpinLockLock(&publishSequenceKeychainAccessLock);
-    [PNKeychain valueForKey:kPNPublishSequenceDataKey withCompletionBlock:^(NSDictionary *sequences) {
+    pn_lock_async(&publishSequenceKeychainAccessLock, ^(dispatch_block_t completion) {
         
-        NSMutableDictionary *mutableSequences = [(sequences?: @{}) mutableCopy];
-        [mutableSequences enumerateKeysAndObjectsUsingBlock:^(NSString *publishKey, NSDictionary *sequenceData,
-                                                              BOOL *sequencesEnumeratorStop) {
+        [PNKeychain valueForKey:kPNPublishSequenceDataKey withCompletionBlock:^(NSDictionary *sequences) {
             
-            if (![publishKey isEqualToString:self.publishKey]) {
+            NSMutableDictionary *mutableSequences = [(sequences?: @{}) mutableCopy];
+            [mutableSequences enumerateKeysAndObjectsUsingBlock:^(NSString *publishKey, 
+                                                                  NSDictionary *sequenceData,
+                                                                  BOOL *sequencesEnumeratorStop) {
                 
-                NSNumber *lastUpdateDate = sequenceData[PNPublishSequenceData.lastSaveDate];
-                NSTimeInterval lastUpdateTimestamp = lastUpdateDate.doubleValue;
-                if (ABS(currentTimestamp - lastUpdateTimestamp) > kPNMaximumPublishSequenceDataAge) {
+                if (![publishKey isEqualToString:self.publishKey]) {
                     
-                    mutableSequences[publishKey] = nil;
+                    NSNumber *lastUpdateDate = sequenceData[PNPublishSequenceData.lastSaveDate];
+                    NSTimeInterval lastUpdateTimestamp = lastUpdateDate.doubleValue;
+                    if (ABS(currentTimestamp - lastUpdateTimestamp) > kPNMaximumPublishSequenceDataAge) {
+                        
+                        mutableSequences[publishKey] = nil;
+                    }
                 }
-            }
+            }];
+            
+            [PNKeychain storeValue:mutableSequences forKey:kPNPublishSequenceDataKey
+               withCompletionBlock:^(BOOL stored) { completion(); }];
         }];
-        
-        [PNKeychain storeValue:mutableSequences forKey:kPNPublishSequenceDataKey
-           withCompletionBlock:^(BOOL stored) { OSSpinLockUnlock(&publishSequenceKeychainAccessLock); }];
-    }];
+    });
 }
 
 
@@ -362,30 +374,6 @@ NS_ASSUME_NONNULL_END
     [notificationCenter addObserver:self selector:@selector(handleContextTransition:)
                                name:NSWorkspaceDidDeactivateApplicationNotification object:nil];
 #endif // TARGET_OS_OSX
-}
-
-- (void)unsubscribeFromNotifications {
-    
-#if TARGET_OS_IOS
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    [notificationCenter removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
-    [notificationCenter removeObserver:self name:UIApplicationDidEnterBackgroundNotification object:nil];
-#elif TARGET_OS_WATCH
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    [notificationCenter removeObserver:self name:NSExtensionHostWillResignActiveNotification object:nil];
-    [notificationCenter removeObserver:self name:NSExtensionHostDidEnterBackgroundNotification object:nil];
-#elif TARGET_OS_OSX
-    NSNotificationCenter *notificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-    [notificationCenter removeObserver:self name:NSWorkspaceWillSleepNotification object:nil];
-    [notificationCenter removeObserver:self name:NSWorkspaceSessionDidResignActiveNotification object:nil];
-    [notificationCenter removeObserver:self name:NSWorkspaceDidDeactivateApplicationNotification object:nil];
-    
-#endif
-}
-
-- (void)dealloc {
-    
-    [self unsubscribeFromNotifications];
 }
 
 #pragma mark -

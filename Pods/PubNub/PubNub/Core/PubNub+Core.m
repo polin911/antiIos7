@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PubNub+CorePrivate.h"
 #define PN_CORE_PROTOCOLS PNObjectEventListener
@@ -20,6 +20,7 @@
 #endif // TARGET_OS_OSX
 #import "PubNub+SubscribePrivate.h"
 #import "PNObjectEventListener.h"
+#import "PNPrivateStructures.h"
 #import "PNClientInformation.h"
 #import "PNRequestParameters.h"
 #import "PNSubscribeStatus.h"
@@ -28,6 +29,7 @@
 #import "PNConfiguration.h"
 #import "PNReachability.h"
 #import "PNConstants.h"
+#import "PNKeychain.h"
 #import "PNLogMacro.h"
 #import "PNNetwork.h"
 #import "PNHelpers.h"
@@ -69,22 +71,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) PNClientState *clientStateManager;
 @property (nonatomic, strong) PNStateListener *listenersManager;
 @property (nonatomic, strong) PNHeartbeat *heartbeatManager;
+@property (nonatomic, strong) PNTelemetry *telemetryManager;
 @property (nonatomic, assign) PNStatusCategory recentClientStatus;
-
-/**
- @brief Stores reference on \b PubNub network manager configured to be used for 'subscription' API 
-        group with long-polling.
- 
- @since 4.0
- */
 @property (nonatomic, strong) PNNetwork *subscriptionNetwork;
-
-/**
- @brief Stores reference on \b PubNub network manager configured to be used for 'non-subscription'
-        API group.
- 
- @since 4.0
- */
 @property (nonatomic, strong) PNNetwork *serviceNetwork;
 
 /**
@@ -152,6 +141,15 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Misc
 
 /**
+ @brief  Store provided unique user identifier in keychain.
+ 
+ @param uuid  Reference on unique user identifier which has been provided with \b PNConfiguration instance.
+ 
+ @since 4.5.15
+ */
+- (void)storeUUID:(NSString *)uuid;
+
+/**
  @brief  Create and configure \b PubNub client logger instance.
  
  @since 4.5.0
@@ -164,6 +162,13 @@ NS_ASSUME_NONNULL_BEGIN
  @since 4.5.0
  */
 - (void)printLogVerbosityInformation;
+
+/**
+ @brief  Check client configuration and notify about outdated API and options.
+ 
+ @since 4.5.13
+ */
+- (void)notifyDeprecatedAPI;
 
 #pragma mark -
 
@@ -222,8 +227,9 @@ NS_ASSUME_NONNULL_END
     // Check whether initialization has been successful or not
     if ((self = [super init])) {
         
+        [self storeUUID:configuration.uuid];
         [self setupClientLogger];
-        DDLogClientInfo(self.logger, @"<PubNub> PubNub SDK %@ (%@)", kPNLibraryVersion, kPNCommit);
+        PNLogClientInfo(self.logger, @"<PubNub> PubNub SDK %@ (%@)", kPNLibraryVersion, kPNCommit);
         
         _configuration = [configuration copy];
         _callbackQueue = callbackQueue;
@@ -235,12 +241,14 @@ NS_ASSUME_NONNULL_END
             _instanceID = [@"58EB05C9-9DE4-4118-B5D7-EE059FBF19A9" copy];
         }
         [self prepareNetworkManagers];
+        [self notifyDeprecatedAPI];
         
         _subscriberManager = [PNSubscriber subscriberForClient:self];
         _sequenceManager = [PNPublishSequence sequenceForClient:self];
         _clientStateManager = [PNClientState stateForClient:self];
         _listenersManager = [PNStateListener stateListenerForClient:self];
         _heartbeatManager = [PNHeartbeat heartbeatForClient:self];
+        _telemetryManager = [PNTelemetry new];
         [self addListener:self];
         [self prepareReachability];
 #if TARGET_OS_IOS
@@ -287,6 +295,9 @@ NS_ASSUME_NONNULL_END
     [client.listenersManager inheritStateFromListener:self.listenersManager];
     [client removeListener:self];
     [self.listenersManager removeAllListeners];
+    // Because inheritence replace current event subscribers with set from old client new should add
+    // itself back.
+    [client addListener:client];
     
     dispatch_block_t subscriptionRestoreBlock = ^{
         
@@ -299,17 +310,12 @@ NS_ASSUME_NONNULL_END
         
         if (![configuration.uuid isEqualToString:self.configuration.uuid] ||
             ![configuration.authKey isEqualToString:self.configuration.authKey]) {
-            __weak __typeof(self) weakSelf = self;
-            [self unsubscribeFromChannels:self.subscriberManager.channels withPresence:YES
-                               completion:^(__unused PNSubscribeStatus *status1) {
-                   
-                 __strong __typeof(self) strongSelf = weakSelf;
-                [strongSelf unsubscribeFromChannelGroups:strongSelf.subscriberManager.channelGroups
-                                            withPresence:YES
-                                              completion:^(__unused PNSubscribeStatus *status2) {
-                                          
-                    subscriptionRestoreBlock();
-                }];
+            
+            [self unsubscribeFromChannels:self.subscriberManager.channels 
+                                   groups:self.subscriberManager.channelGroups withPresence:YES
+                               completion:^(__unused PNSubscribeStatus *status) {
+                                   
+                subscriptionRestoreBlock();
             }];
         }
         else { subscriptionRestoreBlock(); }
@@ -344,15 +350,7 @@ NS_ASSUME_NONNULL_END
             __weak __typeof(self) weakSelf = self;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)),
                            dispatch_get_main_queue(), ^{
-                               
-                // Silence static analyzer warnings.
-                // Code is aware about this case and at the end will simply call on 'nil' object
-                // method. In most cases if referenced object become 'nil' it mean what there is no
-                // more need in it and probably whole client instance has been deallocated.
-                #pragma clang diagnostic push
-                #pragma clang diagnostic ignored "-Wreceiver-is-weak"
                 [weakSelf.reachability startServicePing];
-                #pragma clang diagnostic pop
             });
         }
     }
@@ -387,7 +385,6 @@ NS_ASSUME_NONNULL_END
             // In most cases if referenced object become 'nil' it mean what there is no more need in
             // it and probably whole client instance has been deallocated.
             #pragma clang diagnostic push
-            #pragma clang diagnostic ignored "-Wreceiver-is-weak"
             #pragma clang diagnostic ignored "-Warc-repeated-use-of-weak"
             [weakSelf.reachability stopServicePing];
             [weakSelf.subscriberManager restoreSubscriptionCycleIfRequiredWithCompletion:nil];
@@ -440,11 +437,6 @@ NS_ASSUME_NONNULL_END
     }
 }
 
-- (void)cancelAllLongPollingOperations {
-    
-    [self.subscriptionNetwork cancelAllRequests];
-}
-
 
 #pragma mark - Operation information
 
@@ -474,15 +466,15 @@ NS_ASSUME_NONNULL_END
 - (void)callBlock:(id)block status:(BOOL)callingStatusBlock withResult:(PNResult *)result 
         andStatus:(PNStatus *)status {
     
-    if (result) { DDLogResult(self.logger, @"<PubNub> %@", [result stringifiedRepresentation]); }
+    if (result) { PNLogResult(self.logger, @"<PubNub> %@", [result stringifiedRepresentation]); }
     
     if (status) {
         
         if (status.isError) {
             
-            DDLogFailureStatus(self.logger, @"<PubNub> %@", [status stringifiedRepresentation]);
+            PNLogFailureStatus(self.logger, @"<PubNub> %@", [status stringifiedRepresentation]);
         }
-        else { DDLogStatus(self.logger, @"<PubNub> %@", [status stringifiedRepresentation]); }
+        else { PNLogStatus(self.logger, @"<PubNub> %@", [status stringifiedRepresentation]); }
     }
 
     if (block) {
@@ -512,7 +504,7 @@ NS_ASSUME_NONNULL_END
 #if TARGET_OS_IOS
     if ([notification.name isEqualToString:UIApplicationDidEnterBackgroundNotification]) {
         
-        DDLogClientInfo(self.logger, @"<PubNub> Did enter background execution context.");
+        PNLogClientInfo(self.logger, @"<PubNub> Did enter background execution context.");
         if (self.configuration.shouldCompleteRequestsBeforeSuspension) {
             
             [self.subscriptionNetwork handleClientWillResignActive];
@@ -521,7 +513,7 @@ NS_ASSUME_NONNULL_END
     }
     else if ([notification.name isEqualToString:UIApplicationWillEnterForegroundNotification]) {
         
-        DDLogClientInfo(self.logger, @"<PubNub> Will enter foreground execution context.");
+        PNLogClientInfo(self.logger, @"<PubNub> Will enter foreground execution context.");
         if (self.configuration.shouldCompleteRequestsBeforeSuspension) {
             
             [self.subscriptionNetwork handleClientDidBecomeActive];
@@ -531,28 +523,33 @@ NS_ASSUME_NONNULL_END
 #elif TARGET_OS_WATCH
     if ([notification.name isEqualToString:NSExtensionHostDidEnterBackgroundNotification]) {
         
-        DDLogClientInfo(self.logger, @"<PubNub> Did enter background execution context.");
+        PNLogClientInfo(self.logger, @"<PubNub> Did enter background execution context.");
     }
     else if ([notification.name isEqualToString:NSExtensionHostWillEnterForegroundNotification]) {
         
-        DDLogClientInfo(self.logger, @"<PubNub> Will enter foreground execution context.");
+        PNLogClientInfo(self.logger, @"<PubNub> Will enter foreground execution context.");
     }
 #elif TARGET_OS_OSX
     if ([notification.name isEqualToString:NSWorkspaceWillSleepNotification] ||
         [notification.name isEqualToString:NSWorkspaceSessionDidResignActiveNotification]) {
         
-        DDLogClientInfo(self.logger, @"<PubNub> Workspace became inactive.");
+        PNLogClientInfo(self.logger, @"<PubNub> Workspace became inactive.");
     }
     else if ([notification.name isEqualToString:NSWorkspaceDidWakeNotification] ||
              [notification.name isEqualToString:NSWorkspaceSessionDidBecomeActiveNotification]) {
         
-        DDLogClientInfo(self.logger, @"<PubNub> Workspace became active.");
+        PNLogClientInfo(self.logger, @"<PubNub> Workspace became active.");
     }
 #endif // TARGET_OS_OSX
 }
 
 
 #pragma mark - Misc
+
+- (void)storeUUID:(NSString *)uuid {
+    
+    [PNKeychain storeValue:uuid forKey:kPNConfigurationUUIDKey withCompletionBlock:NULL];
+}
 
 - (void)setupClientLogger {
     
@@ -602,8 +599,64 @@ NS_ASSUME_NONNULL_END
     if (verbosityFlags & PNAESErrorLogLevel) { [enabledFlags addObject:@"AES error"]; }
     if (verbosityFlags & PNAPICallLogLevel) { [enabledFlags addObject:@"API Call"]; }
     
-    DDLogClientInfo(self.logger, @"<PubNub::Logger> Enabled verbosity level flags: %@",
+    PNLogClientInfo(self.logger, @"<PubNub::Logger> Enabled verbosity level flags: %@",
                     [enabledFlags componentsJoinedByString:@", "]);
+}
+
+- (void)notifyDeprecatedAPI {
+    
+    NSMutableString *deprecation = [NSMutableString new];
+    [deprecation appendString:@"\n\n\n--------------------------------------------\n- PubNub deprecated API "
+                               "usage notification -\n--------------------------------------------\n\n"];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    if (self.configuration.shouldStripMobilePayload) {
+#pragma clang diagnostic pop
+        
+        [deprecation appendString:@"- Deprecated: PNConfiguration.shouldStripMobilePayload property.-\n"
+         "When set to YES SDK automatically stripped out original message\nfrompayload which combined message"
+         " and push notification payloads.\n\n"];
+        [deprecation appendString:@"!!! To disable this warning set stripMobilePayload to NO.\n\n"];
+        [deprecation appendString:@"This deprecation may affect application in case if it used\npublish API "
+         "to send messages along with push notification payloads.\nProperty completely will be deprecated "
+         "with next 'major' SDK update.\n\n"];
+        
+        [deprecation appendString:@"If application's code rely on automatic messages clean up (send\nmobile "
+         "push notifications along with messages or store message\ninside payload) it is suggested to update "
+         "this code before property\nwill be completely removed from SDK.\nAt first "
+         "`shouldStripMobilePayload` should be set to NO (YES by\ndefault). Next will be update callback "
+         "which handle new messages:\n\n"
+         "\t- (void)client:(PubNub *)client didReceiveMessage:(PNMessageResult *)message {\n\n"
+         "\t\tid messageData = message.data.message;\n"
+         "\t\tif ([messageData isKindOfClass:[NSDictionary class]]) {\n\n"
+         "\t\t\t// It will be better to access cipher key directly, because 'currentConfiguration'\n"
+         "\t\t\t// make copy of PNConfiguration each time.\n"
+         "\t\t\tNSString *cipherKey = [client currentConfiguration].cipherKey;\n"
+         "\t\t\tNSMutableDictionary *messagePayload = [messageData mutableCopy];\n"
+         "\t\t\tif (cipherKey.length && messagePayload[@\"pn_other\"]) {\n\n"
+         "\t\t\t\tNSError *parseError = nil;\n"
+         "\t\t\t\tid decryptedMessageData = [PNAES decrypt:messagePayload[@\"pn_other\"] withKey:cipherKey \n"
+         "\t\t\t\t                                andError:&parseError];\n"
+         "\t\t\t\tif (decryptedMessageData) {\n\n"
+         "\t\t\t\t\tmessageData = [NSJSONSerialization JSONObjectWithData:decryptedMessageData\n"
+         "\t\t\t\t\t                                              options:NSJSONReadingAllowFragments\n"
+         "\t\t\t\t\t                                                error:&parseError];\n"
+         "\t\t\t\t}\n"
+         "\t\t\t\tif (!parseError) {\n\n"
+         "\t\t\t\t\tif (![messageData isKindOfClass:[NSDictionary class]]) {\n\n"
+         "\t\t\t\t\t\tmessagePayload[@\"pn_other\"] = messageData;\n"
+         "\t\t\t\t\t} else { [messagePayload addEntriesFromDictionary:messageData]; }\n"
+         "\t\t\t\t}\n"
+         "\t\t\t\telse { /* Handle message decryption and JSON decode. */ }\n"
+         "\t\t\t}\n"
+         "\t\t\t// Remove keys for any used push notification provider.\n"
+         "\t\t\t[messagePayload removeObjectsForKeys:@[@\"pn_apns\", @\"pn_gcm\", @\"pn_mpns\"]];\n"
+         "\t\t\tmessageData = (messagePayload[@\"pn_other\"]?: messagePayload);\n"
+         "\t\t}\n"
+         "\t\tNSLog(@\"Received message: %@\", messageData);\n"
+         "\t}\n\n\n"];
+        NSLog(@"%@", deprecation);
+    }
 }
 
 - (void)dealloc {
@@ -627,6 +680,7 @@ NS_ASSUME_NONNULL_END
     _subscriptionNetwork = nil;
     [_serviceNetwork invalidate];
     _serviceNetwork = nil;
+    [_telemetryManager invalidate];
 }
 
 #pragma mark -

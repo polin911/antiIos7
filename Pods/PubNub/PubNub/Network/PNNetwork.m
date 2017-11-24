@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PNNetwork.h"
 #import "NSURLSessionConfiguration+PNConfigurationPrivate.h"
@@ -11,7 +11,6 @@
 #import "PubNub+CorePrivate.h"
 #import "PNResult+Private.h"
 #import "PNStatus+Private.h"
-#import <libkern/OSAtomic.h>
 #import "PNConfiguration.h"
 #import "PNErrorStatus.h"
 #import "PNErrorParser.h"
@@ -122,7 +121,14 @@ NS_ASSUME_NONNULL_BEGIN
  
  @since 4.0.2
  */
-@property (nonatomic, strong) NSURLSession *session;
+@property (nonatomic, strong, nullable) NSURLSession *session;
+
+/**
+ @brief  Stores unique session identifier which is used by telemetry.
+ 
+ @since 4.6.1
+ */
+@property (nonatomic, copy) NSString *sessionIdentifier;
 
 /**
  @brief      Stores reference on data task completion block which should be used to notify caller about task 
@@ -172,6 +178,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, strong) NSDictionary *defaultQueryComponents;
 
+#if PN_URLSESSION_TRANSACTION_METRICS_AVAILABLE
+/**
+ @brief      Stores reference on linkage of scheduled data task and it's operation type.
+ @discussion NSURLSession metrics arrive through callbacs and there is no information about type of operation 
+             which has been processed by task. This map allow to link tasks to API operation type.
+ 
+ @since 4.6.2
+ */
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSNumber *> *dataTaskToOperationMap;
+#endif
+
 #if TARGET_OS_IOS
 
 /**
@@ -218,7 +235,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @since 4.0.2
  */
-@property (nonatomic, assign) OSSpinLock lock;
+@property (nonatomic, assign) os_unfair_lock lock;
 
 
 #pragma mark - Initialization and Configuration
@@ -263,27 +280,31 @@ NS_ASSUME_NONNULL_BEGIN
  @brief  Construct URL request suitable to send POST request (if required).
  
  @param requestURL Reference on complete remote resource URL which should be used for request.
+ @param method     Reference on string with HTTP method which should be used to send request.
  @param postData   Reference on data which should be sent as POST body (if passed).
  
  @return Constructed and ready to use request object.
  
  @since 4.0
  */
-- (NSURLRequest *)requestWithURL:(NSURL *)requestURL data:(NSData *)postData;
+- (NSURLRequest *)requestWithURL:(NSURL *)requestURL method:(NSString *)method data:(NSData *)postData;
 
 /**
  @brief  Construct data task which should be used to process provided request.
  
- @param request Reference on request which should be issued with data task to NSURL session.
- @param success Reference on data task success handling block which will be called by network manager.
- @param failure Reference on data task processing failure handling block which will be called by network 
-                manager.
+ @param request       Reference on request which should be issued with data task to NSURL session.
+ @param operationType One of \b PNOperationType enumerator fields which describe what kind of operation will 
+                      be performed by passed \c request.
+ @param success       Reference on data task success handling block which will be called by network manager.
+ @param failure       Reference on data task processing failure handling block which will be called by network 
+                      manager.
  
  @return Constructed and ready to use data task.
  
  @since 4.0
  */
-- (NSURLSessionDataTask *)dataTaskWithRequest:(NSURLRequest *)request
+- (NSURLSessionDataTask *)dataTaskWithRequest:(NSURLRequest *)request 
+                                 forOperation:(PNOperationType)operationType
                                       success:(NSURLSessionDataTaskSuccess)success
                                       failure:(NSURLSessionDataTaskFailure)failure;
 
@@ -431,12 +452,12 @@ NS_ASSUME_NONNULL_BEGIN
  @discussion Depending on received metadata and data code will call passed success or failure blocks after 
              serialization process completion on secondary queue.
  
- @param data    Reference on RAW data received from service.
- @param task    Reference on data task which has been used to communicate with \b PubNub network.
- @param error   Reference on data/request processing error.
- @param success Reference on data task success handling block which will be called by network manager.
- @param failure Reference on data task processing failure handling block which will be called by network 
-                manager.
+ @param data         Reference on RAW data received from service.
+ @param task         Reference on data task which has been used to communicate with \b PubNub network.
+ @param requestError Reference on data/request processing error.
+ @param success      Reference on data task success handling block which will be called by network manager.
+ @param failure      Reference on data task processing failure handling block which will be called by network 
+                     manager.
  
  @since 4.0
  */
@@ -537,6 +558,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 #endif // TARGET_OS_IOS
 
+#if PN_URLSESSION_TRANSACTION_METRICS_AVAILABLE
+/**
+ @brief  Compose string with important request metrics.
+ 
+ @since 4.5.13
+ 
+ @param transaction   Reference on object which contain useful metrics which can be used in debug purposes.
+ @param isRedirection Whether metrics data has been provided for non-original request.
+ 
+ @return String with request metrics which can be printed into PubNub's log file/Xcode console.
+ */
+- (NSMutableString *)formattedMetricsDataFrom:(NSURLSessionTaskTransactionMetrics *)transaction 
+                                  redirection:(BOOL)isRedirection;
+#endif
+
 /**
  @brief  Print out any session configuration instance customizations which has been done by developer.
  
@@ -586,9 +622,12 @@ NS_ASSUME_NONNULL_END
             _processingQueue = dispatch_queue_create([_identifier UTF8String], DISPATCH_QUEUE_CONCURRENT);
         } 
         else { _processingQueue = dispatch_get_main_queue(); }
+#if PN_URLSESSION_TRANSACTION_METRICS_AVAILABLE
+        _dataTaskToOperationMap = [NSMutableDictionary new];
+#endif // PN_URLSESSION_TRANSACTION_METRICS_AVAILABLE
         _serializer = [PNNetworkResponseSerializer new];
         _baseURL = [self requestBaseURL];
-        _lock = OS_SPINLOCK_INIT;
+        _lock = OS_UNFAIR_LOCK_INIT;
         [self prepareRequiredParameters];
         [self prepareSessionWithRequestTimeout:timeout maximumConnections:maximumConnections];
     }
@@ -603,6 +642,7 @@ NS_ASSUME_NONNULL_END
     
     [parameters addPathComponents:self.defaultPathComponents];
     [parameters addQueryParameters:self.defaultQueryComponents];
+    [parameters addQueryParameters:[self.client.telemetryManager operationsLatencyForRequest]];
     
     // In case if we client used from tests environment unique request identifier should be excluded from
     // default query components.
@@ -619,24 +659,28 @@ NS_ASSUME_NONNULL_END
     
     _defaultPathComponents = @{@"{sub-key}": (self.configuration.subscribeKey?: @""),
                                @"{pub-key}": (self.configuration.publishKey?: @"")};
-    NSMutableDictionary *queryComponents = [@{@"uuid": (self.configuration.uuid?: @""),
-                                              @"deviceid": (self.configuration.deviceID?: @""),
-                                              @"instanceid": self.client.instanceID,
-                                              @"pnsdk":[NSString stringWithFormat:@"PubNub-%@%%2F%@",
-                                                        kPNClientName, kPNLibraryVersion]} mutableCopy];
-    if (self.configuration.authKey.length) { queryComponents[@"auth"] = self.configuration.authKey; }
+    NSMutableDictionary *queryComponents = [@{
+        @"uuid": [PNString percentEscapedString:(self.configuration.uuid?: @"")],
+        @"deviceid": (self.configuration.deviceID?: @""),
+        @"instanceid": self.client.instanceID,
+        @"pnsdk":[NSString stringWithFormat:@"PubNub-%@%%2F%@", kPNClientName, kPNLibraryVersion]
+    } mutableCopy];
+    if (self.configuration.authKey.length) { 
+        queryComponents[@"auth"] = [PNString percentEscapedString:self.configuration.authKey];
+    }
     _defaultQueryComponents = [queryComponents copy];
 }
 
-- (NSURLRequest *)requestWithURL:(NSURL *)requestURL data:(NSData *)postData {
+- (NSURLRequest *)requestWithURL:(NSURL *)requestURL method:(NSString *)method data:(NSData *)postData {
     
     NSURL *fullURL = [NSURL URLWithString:requestURL.absoluteString relativeToURL:self.baseURL];
     NSMutableURLRequest *httpRequest = [NSMutableURLRequest requestWithURL:fullURL];
-    httpRequest.HTTPMethod = ([postData length] ? @"POST" : @"GET");
-    OSSpinLockLock(&_lock);
-    httpRequest.cachePolicy = self.session.configuration.requestCachePolicy;
-    httpRequest.allHTTPHeaderFields = self.session.configuration.HTTPAdditionalHeaders;
-    OSSpinLockUnlock(&_lock);
+    httpRequest.HTTPMethod = method;
+    pn_lock(&_lock, ^{
+        
+        httpRequest.cachePolicy = self.session.configuration.requestCachePolicy;
+        httpRequest.allHTTPHeaderFields = self.session.configuration.HTTPAdditionalHeaders;
+    });
     if (postData) {
         
         NSMutableDictionary *allHeaders = [httpRequest.allHTTPHeaderFields mutableCopy];
@@ -652,39 +696,37 @@ NS_ASSUME_NONNULL_END
 }
 
 - (NSURLSessionDataTask *)dataTaskWithRequest:(NSURLRequest *)request
+                                 forOperation:(PNOperationType)operationType
                                       success:(NSURLSessionDataTaskSuccess)success
                                       failure:(NSURLSessionDataTaskFailure)failure {
     
     __block NSURLSessionDataTask *task = nil;
     __weak __typeof(self) weakSelf = self;
     NSURLSessionDataTaskCompletion handler = ^(NSData *data, NSURLResponse *response, NSError *error) {
-        
-        // Silence static analyzer warnings.
-        // Code is aware about this case and at the end will simply call on 'nil' object method.
-        // In most cases if referenced object become 'nil' it mean what there is no more need in
-        // it and probably whole client instance has been deallocated.
-        #pragma clang diagnostic push
-        #pragma clang diagnostic ignored "-Wreceiver-is-weak"
+#if !PN_URLSESSION_TRANSACTION_METRICS_AVAILABLE
+        NSString *taskIdentifier = [self.sessionIdentifier stringByAppendingString:@(task.taskIdentifier).stringValue];
+        [weakSelf.client.telemetryManager stopLatencyMeasureFor:operationType withIdentifier:taskIdentifier];
+#endif
         [weakSelf handleData:data loadedWithTask:task error:(error?: task.error)
                 usingSuccess:success failure:failure];
-        #pragma clang diagnostic pop
     };
-    OSSpinLockLock(&_lock);
-    if (_configuration.applicationExtensionSharedGroupIdentifier != nil) { 
-        self.previousDataTaskCompletionHandler = handler;
-        self.fetchedData = [NSMutableData new];
-        task = [self.session dataTaskWithRequest:request];
-    }
-    else { task = [self.session dataTaskWithRequest:request completionHandler:[handler copy]]; }
-    
-#if TARGET_OS_IOS
-    if (self.configuration.applicationExtensionSharedGroupIdentifier == nil && 
-        self.configuration.shouldCompleteRequestsBeforeSuspension) {
+    pn_lock(&_lock, ^{
         
-        [self.scheduledDataTasks addObject:task];
-    }
+        if (_configuration.applicationExtensionSharedGroupIdentifier != nil) { 
+            self.previousDataTaskCompletionHandler = handler;
+            self.fetchedData = [NSMutableData new];
+            task = [self.session dataTaskWithRequest:request];
+        }
+        else { task = [self.session dataTaskWithRequest:request completionHandler:[handler copy]]; }
+        
+#if TARGET_OS_IOS
+        if (self.configuration.applicationExtensionSharedGroupIdentifier == nil && 
+            self.configuration.shouldCompleteRequestsBeforeSuspension) {
+            
+            [self.scheduledDataTasks addObject:task];
+        }
 #endif // TARGET_OS_IOS
-    OSSpinLockUnlock(&_lock);
+    });
     
     return task;
 }
@@ -699,11 +741,12 @@ NS_ASSUME_NONNULL_END
     dispatch_once(&onceToken, ^{
         
         _resultExpectingOperations = @[
-                   @(PNHistoryOperation), @(PNWhereNowOperation), @(PNHereNowGlobalOperation),
-                   @(PNHereNowForChannelOperation), @(PNHereNowForChannelGroupOperation),
-                   @(PNStateForChannelOperation), @(PNStateForChannelGroupOperation),
-                   @(PNChannelGroupsOperation), @(PNChannelsForGroupOperation),
-                   @(PNPushNotificationEnabledChannelsOperation), @(PNTimeOperation)];
+                   @(PNHistoryOperation), @(PNHistoryForChannelsOperation), @(PNWhereNowOperation), 
+                   @(PNHereNowGlobalOperation), @(PNHereNowForChannelOperation), 
+                   @(PNHereNowForChannelGroupOperation), @(PNStateForChannelOperation), 
+                   @(PNStateForChannelGroupOperation), @(PNChannelGroupsOperation), 
+                   @(PNChannelsForGroupOperation), @(PNPushNotificationEnabledChannelsOperation), 
+                   @(PNTimeOperation)];
     });
     
     return [_resultExpectingOperations containsObject:@(operation)];
@@ -715,10 +758,18 @@ NS_ASSUME_NONNULL_END
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         
+        // Registering known PubNub service response parsers.
+        NSArray<NSString *> *parserNames = @[
+            @"PNChannelGroupAuditionParser", @"PNChannelGroupModificationParser", @"PNClientStateParser", 
+            @"PNErrorParser", @"PNHeartbeatParser", @"PNHistoryParser", @"PNMessageDeleteParser",
+            @"PNLeaveParser", @"PNMessagePublishParser", @"PNPresenceHereNowParser",
+            @"PNPresenceWhereNowParser", @"PNPushNotificationsAuditParser",
+            @"PNPushNotificationsStateModificationParser", @"PNSubscribeParser",@"PNTimeParser"];
         NSMutableDictionary *parsers = [NSMutableDictionary new];
-        for (Class class in [PNClass classesConformingToProtocol:@protocol(PNParser)]) {
+        for (NSString *className in parserNames) {
             
-            NSArray<NSNumber *> *operations = [(Class<PNParser>)class operations];
+            Class<PNParser> class = NSClassFromString(className);
+            NSArray<NSNumber *> *operations = [class operations];
             for (NSNumber *operationType in operations) { parsers[operationType] = class; }
         }
         _parsers = [parsers copy];
@@ -752,36 +803,34 @@ NS_ASSUME_NONNULL_END
 - (void)processOperation:(PNOperationType)operationType withParameters:(PNRequestParameters *)parameters 
                     data:(NSData *)data completionBlock:(id)block {
     
-    if (operationType == PNSubscribeOperation || operationType == PNUnsubscribeOperation) {
-        
-        [self cancelAllRequests];
-    }
-    
     [self appendRequiredParametersTo:parameters];
-    // Silence static analyzer warnings.
-    // Code is aware about this case and at the end will simply call on 'nil' object method.
-    // In most cases if referenced object become 'nil' it mean what there is no more need in
-    // it and probably whole client instance has been deallocated.
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wreceiver-is-weak"
     NSURL *requestURL = [PNURLBuilder URLForOperation:operationType withParameters:parameters];
     if (requestURL) {
         
-        DDLogRequest(self.client.logger, @"<PubNub::Network> %@ %@", (data.length ? @"POST" : @"GET"), 
+        PNLogRequest(self.client.logger, @"<PubNub::Network> %@ %@", parameters.HTTPMethod,
                      requestURL.absoluteString);
         
         __weak __typeof(self) weakSelf = self;
-        [[self dataTaskWithRequest:[self requestWithURL:requestURL data:data]
-                           success:^(NSURLSessionDataTask *task, id responseObject) {
-                               
-               [weakSelf handleOperation:operationType taskDidComplete:task withData:responseObject
-                         completionBlock:block];
-           }
-           failure:^(NSURLSessionDataTask *task, id error) {
-               
-               [weakSelf handleOperation:operationType taskDidFail:task withError:error
-                         completionBlock:block];
-           }] resume];
+        NSURLRequest *request = [self requestWithURL:requestURL method:parameters.HTTPMethod data:data];
+        NSURLSessionDataTask *task = [self dataTaskWithRequest:request forOperation:operationType
+                                                       success:^(NSURLSessionDataTask *completedTask,
+                                                                 id responseObject) {
+                                                           
+            [weakSelf handleOperation:operationType taskDidComplete:completedTask withData:responseObject
+                      completionBlock:block];
+        }
+                                                       failure:^(NSURLSessionDataTask *failedTask, id error) {
+
+            [weakSelf handleOperation:operationType taskDidFail:failedTask withError:error
+                      completionBlock:block];
+        }];
+        NSString *taskIdentifier = [self.sessionIdentifier stringByAppendingString:@(task.taskIdentifier).stringValue];
+#if !PN_URLSESSION_TRANSACTION_METRICS_AVAILABLE
+        [self.client.telemetryManager startLatencyMeasureFor:operationType withIdentifier:taskIdentifier];
+#else   
+        pn_lock(&_lock, ^{ self.dataTaskToOperationMap[taskIdentifier] = @(operationType); });
+#endif
+        [task resume];
     }
     else {
         
@@ -798,7 +847,6 @@ NS_ASSUME_NONNULL_END
             else { ((PNStatusBlock)block)(badRequestStatus); }
         }
     }
-    #pragma clang diagnostic pop
 }
 
 - (void)parseData:(id)data withParser:(Class <PNParser>)parser 
@@ -812,26 +860,21 @@ NS_ASSUME_NONNULL_END
             block(processedData, (parser == [PNErrorParser class]));
         }
         else {
-            
-            // Silence static analyzer warnings.
-            // Code is aware about this case and at the end will simply call on 'nil' object method.
-            // In most cases if referenced object become 'nil' it mean what there is no more need in
-            // it and probably whole client instance has been deallocated.
-            #pragma clang diagnostic push
-            #pragma clang diagnostic ignored "-Wreceiver-is-weak"
             [weakSelf parseData:data withParser:[PNErrorParser class] completion:[block copy]];
-            #pragma clang diagnostic pop
         }
     };
     
     if (![parser requireAdditionalData]) {
         
-        parseCompletion([parser parsedServiceResponse:data]);
+        parseCompletion(data ? [parser parsedServiceResponse:data] : nil);
     }
     else {
 
         NSMutableDictionary *additionalData = [NSMutableDictionary new];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         additionalData[@"stripMobilePayload"] = @(self.configuration.shouldStripMobilePayload);
+#pragma clang diagnostic pop
         if ([self.configuration.cipherKey length]) {
 
             additionalData[@"cipherKey"] = self.configuration.cipherKey;
@@ -866,45 +909,50 @@ NS_ASSUME_NONNULL_END
     
     if (incompleteTasksCount == 0) {
         
-        DDLogRequest(self.client.logger, @"<PubNub::Network> All tasks completed. There is no need in "
+        PNLogRequest(self.client.logger, @"<PubNub::Network> All tasks completed. There is no need in "
                      "additional execution time in background context.");
         [self endBackgroundTasksCompletionIfRequired];
     }
     else if (!onCompletion) {
         
-        DDLogRequest(self.client.logger, @"<PubNub::Network> There is %lu incompleted tasks. Required "
+        PNLogRequest(self.client.logger, @"<PubNub::Network> There is %lu incompleted tasks. Required "
                      "additional execution time in background context.", (unsigned long)incompleteTasksCount);
     }
 }
 #endif // TARGET_OS_IOS
 
-- (void)cancelAllRequests {
-
-    OSSpinLockLock(&_lock);
-#if TARGET_OS_IOS
-    if (self.configuration.applicationExtensionSharedGroupIdentifier == nil && 
-        self.configuration.shouldCompleteRequestsBeforeSuspension) {
-        
-        [self.scheduledDataTasks removeAllObjects];
-    }
-#endif // TARGET_OS_IOS
+- (void)cancelAllOperationsWithURLPrefix:(NSString *)prefix {
     
-    [self.session getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks,
-                                                  NSArray *downloadTasks) {
+    pn_lock_async(&_lock, ^(dispatch_block_t complete) {
+#if TARGET_OS_IOS
+        if (self.configuration.applicationExtensionSharedGroupIdentifier == nil && 
+            self.configuration.shouldCompleteRequestsBeforeSuspension) {
+            
+            [self.scheduledDataTasks removeAllObjects];
+        }
+#endif // TARGET_OS_IOS
         
-        [dataTasks makeObjectsPerformSelector:@selector(cancel)];
-        [uploadTasks makeObjectsPerformSelector:@selector(cancel)];
-        [downloadTasks makeObjectsPerformSelector:@selector(cancel)];
-        OSSpinLockUnlock(&self->_lock);
-    }];
+        [self.session getTasksWithCompletionHandler:^(NSArray *dataTasks, NSArray *uploadTasks,
+                                                      NSArray *downloadTasks) {
+            
+            if (prefix) {
+                for (NSURLSessionDataTask *dataTask in dataTasks) {
+                    if ([dataTask.originalRequest.URL.path hasPrefix:prefix]) { [dataTask cancel]; }
+                }
+            }
+            else { [dataTasks makeObjectsPerformSelector:@selector(cancel)]; }
+            complete();
+        }];
+    });
 }
 
 - (void)invalidate {
     
-    OSSpinLockLock(&_lock);
-    [_session invalidateAndCancel];
-    _session = nil;
-    OSSpinLockUnlock(&self->_lock);
+    pn_lock(&_lock, ^{
+        
+        [_session invalidateAndCancel];
+        _session = nil;
+    });
 }
 
 
@@ -918,7 +966,8 @@ NS_ASSUME_NONNULL_END
     NSURL *requestURL = [PNURLBuilder URLForOperation:operationType withParameters:parameters];
     if (requestURL) {
         
-        size = [PNURLRequest packetSizeForRequest:[self requestWithURL:requestURL data:data]];
+        size = [PNURLRequest packetSizeForRequest:[self requestWithURL:requestURL method:parameters.HTTPMethod 
+                                                                  data:data]];
     }
     
     return size;
@@ -936,6 +985,7 @@ NS_ASSUME_NONNULL_END
                                                            maximumConnections:maximumConnections];
     _delegateQueue = [self operationQueueWithConfiguration:config];
     _session = [self sessionWithConfiguration:config];
+    _sessionIdentifier = [[NSUUID UUID] UUIDString];
     [self printIfRequiredSessionCustomizationInformation];
     
 }
@@ -995,34 +1045,36 @@ NS_ASSUME_NONNULL_END
     
     if (self.configuration.applicationExtensionSharedGroupIdentifier == nil) {
         
-        OSSpinLockLock(&_lock);
-        UIApplication *application = [UIApplication performSelector:NSSelectorFromString(@"sharedApplication")];
-        if (self.tasksCompletionIdentifier == UIBackgroundTaskInvalid) {
+        pn_lock(&_lock, ^{
             
-            // Give manager some time to figure out whether background task should be used to complete all 
-            // scheduled data tasks or not.
-            __weak __typeof__(self) weakSelf = self;
-            self.tasksCompletionIdentifier = [application beginBackgroundTaskWithExpirationHandler:^{
+            UIApplication *application = [UIApplication performSelector:NSSelectorFromString(@"sharedApplication")];
+            if (self.tasksCompletionIdentifier == UIBackgroundTaskInvalid) {
                 
-                [weakSelf endBackgroundTasksCompletionIfRequired];
-            }];
-                 
-            // Give some time before checking whether tasks has been scheduled for execution or not.
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3f * NSEC_PER_SEC)),
-                           dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                               
-                // Get list of scheduled operation.
-                __strong __typeof__(weakSelf) strongSelf = weakSelf;
-                OSSpinLockLock(&strongSelf->_lock);
-                if (strongSelf.tasksCompletionIdentifier != UIBackgroundTaskInvalid) {
+                // Give manager some time to figure out whether background task should be used to complete all 
+                // scheduled data tasks or not.
+                __weak __typeof__(self) weakSelf = self;
+                self.tasksCompletionIdentifier = [application beginBackgroundTaskWithExpirationHandler:^{
                     
-                    [strongSelf processIncompleteBeforeClientResignActiveTasks:self.scheduledDataTasks
-                                                          onDataTaskCompletion:NO];
-                }
-                OSSpinLockUnlock(&strongSelf->_lock);
-            });
-        } 
-        OSSpinLockUnlock(&_lock);
+                    [weakSelf endBackgroundTasksCompletionIfRequired];
+                }];
+                     
+                // Give some time before checking whether tasks has been scheduled for execution or not.
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3f * NSEC_PER_SEC)),
+                               dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                                   
+                    // Get list of scheduled operation.
+                    __strong __typeof__(weakSelf) strongSelf = weakSelf;
+                    pn_lock(&strongSelf->_lock, ^{
+                        
+                        if (strongSelf.tasksCompletionIdentifier != UIBackgroundTaskInvalid) {
+                            
+                            [strongSelf processIncompleteBeforeClientResignActiveTasks:self.scheduledDataTasks
+                                                                  onDataTaskCompletion:NO];
+                        }
+                    });
+                });
+            } 
+        });
     }
 }
 
@@ -1038,20 +1090,20 @@ NS_ASSUME_NONNULL_END
     
     if (error) {
         
-        OSSpinLockLock(&_lock);
-        // Clean up cached tasks if required.
+        pn_lock(&_lock, ^{
+            // Clean up cached tasks if required.
 #if TARGET_OS_IOS
-        if (self.configuration.applicationExtensionSharedGroupIdentifier == nil &&
-            self.configuration.shouldCompleteRequestsBeforeSuspension) {
-            
-            [self.scheduledDataTasks removeAllObjects];
-        }
+            if (self.configuration.applicationExtensionSharedGroupIdentifier == nil &&
+                self.configuration.shouldCompleteRequestsBeforeSuspension) {
+                
+                [self.scheduledDataTasks removeAllObjects];
+            }
 #endif // TARGET_OS_IOS
-        
-        // Replace invalidated session with new one which can be used for next requests.
-        [self prepareSessionWithRequestTimeout:self.requestTimeout
-                            maximumConnections:self.maximumConnections];
-        OSSpinLockUnlock(&_lock);
+            
+            // Replace invalidated session with new one which can be used for next requests.
+            [self prepareSessionWithRequestTimeout:self.requestTimeout
+                                maximumConnections:self.maximumConnections];
+        });
     }
 }
 
@@ -1081,7 +1133,7 @@ NS_ASSUME_NONNULL_END
     }
 }
 
-- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
+- (void)URLSession:(NSURLSession *)__unused session dataTask:(NSURLSessionDataTask *)__unused dataTask
     didReceiveData:(NSData *)data {
     
     if (self.configuration.applicationExtensionSharedGroupIdentifier != nil && data.length) {
@@ -1109,17 +1161,9 @@ NS_ASSUME_NONNULL_END
     __weak __typeof(self) weakSelf = self;
     [self parseData:responseObject withParser:[self parserForOperation:operation]
          completion:^(NSDictionary *parsedData, BOOL parseError) {
-
-             // Silence static analyzer warnings.
-             // Code is aware about this case and at the end will simply call on 'nil' object method.
-             // In most cases if referenced object become 'nil' it mean what there is no more need in
-             // it and probably whole client instance has been deallocated.
-             #pragma clang diagnostic push
-             #pragma clang diagnostic ignored "-Wreceiver-is-weak"
              [weakSelf handleParsedData:parsedData loadedWithTask:task forOperation:operation
                           parsedAsError:parseError processingError:task.error
                         completionBlock:[block copy]];
-             #pragma clang diagnostic pop
          }];
 }
 
@@ -1190,14 +1234,14 @@ NS_ASSUME_NONNULL_END
     if (self.configuration.applicationExtensionSharedGroupIdentifier == nil && 
         self.configuration.shouldCompleteRequestsBeforeSuspension) {
         
-        OSSpinLockLock(&_lock);
-        [self.scheduledDataTasks removeObject:task];
-        if (self.tasksCompletionIdentifier != UIBackgroundTaskInvalid) {
-            
-            [self processIncompleteBeforeClientResignActiveTasks:self.scheduledDataTasks
-                                            onDataTaskCompletion:YES];
-        }
-        OSSpinLockUnlock(&_lock); 
+        pn_lock(&_lock, ^{
+            [self.scheduledDataTasks removeObject:task];
+            if (self.tasksCompletionIdentifier != UIBackgroundTaskInvalid) {
+                
+                [self processIncompleteBeforeClientResignActiveTasks:self.scheduledDataTasks
+                                                onDataTaskCompletion:YES];
+            }
+        });
     }
 #endif // TARGET_OS_IOS
 }
@@ -1210,10 +1254,9 @@ NS_ASSUME_NONNULL_END
     // In most cases if referenced object become 'nil' it mean what there is no more need in
     // it and probably whole client instance has been deallocated.
     #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wreceiver-is-weak"
     #pragma clang diagnostic ignored "-Warc-repeated-use-of-weak"
-    [self.client appendClientInformation:result];
-    [self.client appendClientInformation:status];
+    if (result) { [self.client appendClientInformation:result]; }
+    if (status) { [self.client appendClientInformation:status]; }
     if (block) {
         
         if ([self operationExpectResult:operation]) {
@@ -1227,6 +1270,44 @@ NS_ASSUME_NONNULL_END
     }
     #pragma clang diagnostic pop
 }
+
+#if PN_URLSESSION_TRANSACTION_METRICS_AVAILABLE
+- (void)          URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task 
+  didFinishCollectingMetrics:(NSURLSessionTaskMetrics *)metrics {
+        
+    NSMutableArray *redirections = metrics.transactionMetrics.count > 1 ? [NSMutableArray new] : nil;
+    __block NSMutableString *metricsData = nil;
+    NSArray<NSURLSessionTaskTransactionMetrics *> *transactions = metrics.transactionMetrics;
+    [transactions enumerateObjectsUsingBlock:^(NSURLSessionTaskTransactionMetrics *transaction,
+                                               NSUInteger transactionIdx, BOOL *trabsactionsEnumeratorStop) {
+        
+        if (self.client.logger.logLevel & PNRequestMetricsLogLevel) {
+            
+            if (transactionIdx == 0) { metricsData = [self formattedMetricsDataFrom:transaction redirection:NO]; }
+            else { [redirections addObject:[self formattedMetricsDataFrom:transaction redirection:YES]]; }
+        }
+        
+        NSTimeInterval latency = [transaction.responseEndDate timeIntervalSince1970] - [transaction.requestStartDate timeIntervalSince1970];
+        if (latency > 0.f) {
+            pn_lock(&_lock, ^{
+                NSString *taskIdentifier = [self.sessionIdentifier stringByAppendingString:@(task.taskIdentifier).stringValue];
+
+                if (taskIdentifier) {
+                    PNOperationType operationType = self.dataTaskToOperationMap[taskIdentifier].integerValue;
+                    [self.dataTaskToOperationMap removeObjectForKey:taskIdentifier];
+                    [self.client.telemetryManager setLatency:latency forOperation:operationType];
+                }
+            });
+        }
+    }];
+    if (redirections.count && metricsData) {
+        
+        [metricsData appendFormat:@"\nWARNING: Request redirections has been noticed:\n\t%@", 
+         [redirections componentsJoinedByString:@"\n\t"]];
+    }
+    PNLogRequestMetrics(self.client.logger, @"%@", metricsData);
+}
+#endif
 
 
 #pragma mark - Misc
@@ -1252,49 +1333,110 @@ NS_ASSUME_NONNULL_END
 
     if (self.configuration.applicationExtensionSharedGroupIdentifier == nil) {
         
-        bool locked = OSSpinLockTry(&_lock);
-        UIApplication *application = [UIApplication performSelector:NSSelectorFromString(@"sharedApplication")];
-        
-        if (self.tasksCompletionIdentifier != UIBackgroundTaskInvalid) {
+        pn_trylock(&_lock, ^{
             
-            [application endBackgroundTask:self.tasksCompletionIdentifier];
-            self.tasksCompletionIdentifier = UIBackgroundTaskInvalid;
-        }
-        if (locked) { OSSpinLockUnlock(&_lock); }
+            UIApplication *application = [UIApplication performSelector:NSSelectorFromString(@"sharedApplication")];
+            
+            if (self.tasksCompletionIdentifier != UIBackgroundTaskInvalid) {
+                
+                [application endBackgroundTask:self.tasksCompletionIdentifier];
+                self.tasksCompletionIdentifier = UIBackgroundTaskInvalid;
+            }
+        });
     }
 }
 
 #endif // TARGET_OS_IOS
 
+#if PN_URLSESSION_TRANSACTION_METRICS_AVAILABLE
+- (NSMutableString *)formattedMetricsDataFrom:(NSURLSessionTaskTransactionMetrics *)transaction 
+                                  redirection:(BOOL)isRedirection {
+    
+    NSURLRequest *request = transaction.request;
+    NSMutableString *metricsData = [NSMutableString stringWithFormat:@"<PubNub::Network::Metrics> %@ ", 
+                                    request.HTTPMethod];
+    if (!isRedirection) {
+        
+        [metricsData appendFormat:@"%@?%@", request.URL.relativePath,
+         [request.URL.query stringByReplacingOccurrencesOfString:@"%2F" withString:@"/"]];
+    }
+    else {
+        
+        [metricsData appendString:[request.URL.absoluteString stringByReplacingOccurrencesOfString:@"%2F" withString:@"/"]];
+    }
+    [metricsData appendFormat:@" (%@; ", transaction.networkProtocolName?: @"<unknown>"];
+    [metricsData appendFormat:@"persistent: %@; ", transaction.isReusedConnection ? @"YES": @"NO"];
+    [metricsData appendFormat:@"proxy: %@; ", transaction.isProxyConnection ? @"YES": @"NO"];
+    
+    // Add request duration.
+    NSDate *fetchStartDate = transaction.fetchStartDate;
+    NSDate *fetchEndDate = transaction.responseEndDate;
+    NSTimeInterval fetchDuration = [fetchEndDate timeIntervalSinceDate:(fetchStartDate?:fetchEndDate)];
+    [metricsData appendFormat:@"fetch: %@ (%fs); ", fetchStartDate, fetchDuration];
+    
+    // Add DNS lookup duration.
+    NSDate *lookupStartDate = transaction.domainLookupStartDate;
+    NSDate *lookupEndDate = transaction.domainLookupEndDate;
+    NSTimeInterval lookupDuration = [lookupEndDate timeIntervalSinceDate:(lookupStartDate?:lookupEndDate)];
+    [metricsData appendFormat:@"lookup: %@ (%fs); ", lookupStartDate?:@"<re-use>", lookupDuration];
+    
+    // Add connection establish duration.
+    NSDate *connectStartDate = transaction.connectStartDate;
+    NSDate *connectEndDate = transaction.connectEndDate;
+    NSTimeInterval connectDuration = [connectEndDate timeIntervalSinceDate:(connectStartDate?:connectEndDate)];
+    [metricsData appendFormat:@"connect: %@ (%fs); ", connectStartDate?:@"<re-use>", connectDuration];
+    
+    // Add secure connection establish duration.
+    NSDate *secureStartDate = transaction.secureConnectionStartDate;
+    NSDate *secureEndDate = transaction.secureConnectionEndDate;
+    NSTimeInterval secureDuration = [secureEndDate timeIntervalSinceDate:(secureStartDate?:secureEndDate)];
+    [metricsData appendFormat:@"secure: %@ (%fs); ", secureStartDate?:@"<re-use>", secureDuration];
+    
+    // Add request sending duration.
+    NSDate *requestStartDate = transaction.requestStartDate;
+    NSDate *requestEndDate = transaction.requestEndDate;
+    NSTimeInterval requestDuration = [requestEndDate timeIntervalSinceDate:(requestStartDate?:requestEndDate)];
+    [metricsData appendFormat:@"request: %@ (%fs); ", requestStartDate?:@"<not-started>", requestDuration];
+    
+    // Add response loading duration.
+    NSDate *responseStartDate = transaction.responseStartDate;
+    NSDate *responseEndDate = transaction.responseEndDate;
+    NSTimeInterval responseDuration = [responseEndDate timeIntervalSinceDate:(responseStartDate?:responseEndDate)];
+    [metricsData appendFormat:@"response: %@ (%fs))", responseStartDate?:@"<not-started>", responseDuration];
+    
+    return metricsData;
+}
+#endif
+
 - (void)printIfRequiredSessionCustomizationInformation {
     
     if ([NSURLSessionConfiguration pn_HTTPAdditionalHeaders].count) {
         
-        DDLogClientInfo(self.client.logger, @"<PubNub::Network> Custom HTTP headers is set by user: %@", 
+        PNLogClientInfo(self.client.logger, @"<PubNub::Network> Custom HTTP headers is set by user: %@",
                         [NSURLSessionConfiguration pn_HTTPAdditionalHeaders]);
     }
     
     if ([NSURLSessionConfiguration pn_networkServiceType] != NSURLNetworkServiceTypeDefault) {
         
-        DDLogClientInfo(self.client.logger, @"<PubNub::Network> Custom network service type is set by user: %@",
+        PNLogClientInfo(self.client.logger, @"<PubNub::Network> Custom network service type is set by user: %@",
                         @([NSURLSessionConfiguration pn_networkServiceType]));
     }
     
     if (![NSURLSessionConfiguration pn_allowsCellularAccess]) {
         
-        DDLogClientInfo(self.client.logger, @"<PubNub::Network> User limited access to cellular data and only"
+        PNLogClientInfo(self.client.logger, @"<PubNub::Network> User limited access to cellular data and only"
                         " WiFi connection can be used.");
     }
     
     if ([NSURLSessionConfiguration pn_protocolClasses].count) {
         
-        DDLogClientInfo(self.client.logger, @"<PubNub::Network> Extra requests handling protocols defined by "
+        PNLogClientInfo(self.client.logger, @"<PubNub::Network> Extra requests handling protocols defined by "
                         "user: %@", [NSURLSessionConfiguration pn_protocolClasses]);
     }
     
     if ([NSURLSessionConfiguration pn_connectionProxyDictionary].count) {
         
-        DDLogClientInfo(self.client.logger, @"<PubNub::Network> Connection proxy has been set by user: %@", 
+        PNLogClientInfo(self.client.logger, @"<PubNub::Network> Connection proxy has been set by user: %@",
                         [NSURLSessionConfiguration pn_connectionProxyDictionary]);
     }
 }

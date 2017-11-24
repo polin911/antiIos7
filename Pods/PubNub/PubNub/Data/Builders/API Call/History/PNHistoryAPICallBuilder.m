@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.5.4
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PNHistoryAPICallBuilder.h"
 #import "PNAPICallBuilder+Private.h"
@@ -19,6 +19,16 @@
     return ^PNHistoryAPICallBuilder* (NSString *channel) {
         
         [self setValue:channel forParameter:NSStringFromSelector(_cmd)];
+        
+        return self;
+    };
+}
+
+- (PNHistoryAPICallBuilder *(^)(NSArray<NSString *> *))channels {
+    
+    return ^PNHistoryAPICallBuilder* (NSArray<NSString *> *channels) {
+        
+        [self setValue:channels forParameter:NSStringFromSelector(_cmd)];
         
         return self;
     };

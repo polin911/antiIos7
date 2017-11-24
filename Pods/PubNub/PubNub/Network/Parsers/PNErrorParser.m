@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PNErrorParser.h"
 #import "PNDictionary.h"
@@ -39,7 +39,8 @@
         NSMutableDictionary *errorData = [NSMutableDictionary new];
         if (response[@"message"] || response[@"error"]) {
             
-            errorData[@"information"] = (response[@"message"]?: response[@"error"]);
+            id errorDescription = response[@"error"]?: response[@"error_message"];
+            errorData[@"information"] = response[@"message"]?: errorDescription;
         }
         
         if (response[@"payload"]) {

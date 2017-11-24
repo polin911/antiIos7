@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PNClientState.h"
 #import "PubNub+CorePrivate.h"
@@ -140,14 +140,7 @@ NS_ASSUME_NONNULL_END
             
             // Clean up state cache from objects on which client not subscribed at this moment.
             NSMutableArray *objects = [NSMutableArray arrayWithArray:[self.stateCache allKeys]];
-            // Silence static analyzer warnings.
-            // Code is aware about this case and at the end will simply call on 'nil' object method.
-            // In most cases if referenced object become 'nil' it mean what there is no more need in
-            // it and probably whole client instance has been deallocated.
-            #pragma clang diagnostic push
-            #pragma clang diagnostic ignored "-Wreceiver-is-weak"
             [objects removeObjectsInArray:[self.client.subscriberManager allObjects]];
-            #pragma clang diagnostic pop
             [self removeStateForObjects:objects];
         });
     }

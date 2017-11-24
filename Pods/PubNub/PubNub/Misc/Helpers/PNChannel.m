@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PNChannel.h"
 #import "PNString.h"
@@ -73,7 +73,7 @@ static NSString * const kPubNubPresenceChannelNameSuffix = @"-pnpres";
     for (NSString *name in names) {
         
         NSString *targetName = name;
-        if (![name hasSuffix:kPubNubPresenceChannelNameSuffix]) {
+        if (![name hasSuffix:kPubNubPresenceChannelNameSuffix] && ![name hasSuffix:@".*"]) {
             
             targetName = [name stringByAppendingString:kPubNubPresenceChannelNameSuffix];
         }

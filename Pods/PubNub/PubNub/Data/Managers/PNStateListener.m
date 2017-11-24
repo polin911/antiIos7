@@ -1,7 +1,7 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PNStateListener.h"
 #import "PNObjectEventListener.h"
@@ -187,7 +187,6 @@ NS_ASSUME_NONNULL_END
     // In most cases if referenced object become 'nil' it mean what there is no more need in
     // it and probably whole client instance has been deallocated.
     #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wreceiver-is-weak"
     #pragma clang diagnostic ignored "-Warc-repeated-use-of-weak"
     pn_dispatch_async(self.client.callbackQueue, ^{
         
@@ -207,7 +206,6 @@ NS_ASSUME_NONNULL_END
     // In most cases if referenced object become 'nil' it mean what there is no more need in
     // it and probably whole client instance has been deallocated.
     #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wreceiver-is-weak"
     #pragma clang diagnostic ignored "-Warc-repeated-use-of-weak"
     pn_dispatch_async(self.client.callbackQueue, ^{
         
@@ -240,7 +238,6 @@ NS_ASSUME_NONNULL_END
     // In most cases if referenced object become 'nil' it mean what there is no more need in
     // it and probably whole client instance has been deallocated.
     #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wreceiver-is-weak"
     #pragma clang diagnostic ignored "-Warc-repeated-use-of-weak"
     pn_dispatch_async(self.client.callbackQueue, ^{
         

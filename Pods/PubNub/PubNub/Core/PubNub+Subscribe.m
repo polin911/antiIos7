@@ -1,13 +1,25 @@
 /**
  @author Sergey Mamontov
  @since 4.0
- @copyright © 2009-2016 PubNub, Inc.
+ @copyright © 2009-2017 PubNub, Inc.
  */
 #import "PubNub+Subscribe.h"
 #import "PNAPICallBuilder+Private.h"
 #import "PubNub+CorePrivate.h"
 #import "PNSubscriber.h"
+#import "PNNetwork.h"
 #import "PNHelpers.h"
+
+
+#pragma mark - Constants
+
+/**
+ @brief      Stored reference on subscribe REST API path prefix. 
+ @discussion Prefix used for faster request identification (w/o performing search of range with options).
+ 
+ @since 4.6.2
+ */
+static NSString * const kPNSubscribeAPIPrefix = @"/v2/subscribe/";
 
 
 #pragma mark - Interface implementation
@@ -79,20 +91,17 @@
         NSDictionary *state = parameters[NSStringFromSelector(@selector(state))];
         NSNumber *withPresence = parameters[NSStringFromSelector(@selector(withPresence))];
         NSNumber *timetoken = parameters[NSStringFromSelector(@selector(withTimetoken))];
-        NSArray<NSString *> *objects = nil;
-        if ((objects = parameters[NSStringFromSelector(@selector(channels))]).count) {
+        NSArray<NSString *> *channels = parameters[NSStringFromSelector(@selector(channels))];
+        NSArray<NSString *> *groups = parameters[NSStringFromSelector(@selector(channelGroups))];
+        
+        if (channels.count || groups.count) {
          
-            [self subscribeToChannels:objects withPresence:withPresence.boolValue usingTimeToken:timetoken
-                          clientState:state];
+            [self subscribeToChannels:channels groups:groups withPresence:withPresence.boolValue 
+                       usingTimeToken:timetoken clientState:state];
         }
-        else if ((objects = parameters[NSStringFromSelector(@selector(channelGroups))]).count) {
+        else if ((channels = parameters[NSStringFromSelector(@selector(presenceChannels))]).count) {
             
-            [self subscribeToChannelGroups:objects withPresence:withPresence.boolValue usingTimeToken:timetoken
-                               clientState:state];
-        }
-        else if ((objects = parameters[NSStringFromSelector(@selector(presenceChannels))]).count) {
-            
-            [self subscribeToPresenceChannels:objects];
+            [self subscribeToPresenceChannels:channels];
         }
     }];
     
@@ -106,18 +115,16 @@
                                                                        NSDictionary *parameters) {
 
         NSNumber *withPresence = parameters[NSStringFromSelector(@selector(withPresence))];
-        NSArray<NSString *> *objects = nil;
-        if ((objects = parameters[NSStringFromSelector(@selector(channels))]).count) {
+        NSArray<NSString *> *channels = parameters[NSStringFromSelector(@selector(channels))];
+        NSArray<NSString *> *groups = parameters[NSStringFromSelector(@selector(channelGroups))];
+        if (channels.count || groups.count) {
          
-            [self unsubscribeFromChannels:objects withPresence:withPresence.boolValue];
+            [self unsubscribeFromChannels:channels groups:groups withPresence:withPresence.boolValue 
+                               completion:nil];
         }
-        else if ((objects = parameters[NSStringFromSelector(@selector(channelGroups))]).count) {
+        else if ((channels = parameters[NSStringFromSelector(@selector(presenceChannels))]).count) {
             
-            [self unsubscribeFromChannelGroups:objects withPresence:withPresence.boolValue];
-        }
-        else if ((objects = parameters[NSStringFromSelector(@selector(presenceChannels))]).count) {
-            
-            [self unsubscribeFromPresenceChannels:objects];
+            [self unsubscribeFromPresenceChannels:channels];
         }
         else { [self unsubscribeFromAll]; }
     }];
@@ -150,11 +157,8 @@
 - (void)subscribeToChannels:(NSArray<NSString *> *)channels withPresence:(BOOL)shouldObservePresence
              usingTimeToken:(NSNumber *)timeToken clientState:(NSDictionary<NSString *, id> *)state {
     
-    NSArray *presenceChannelsList = nil;
-    if (shouldObservePresence) { presenceChannelsList = [PNChannel presenceChannelsFrom:channels]; }
-    
-    [self.subscriberManager addChannels:[channels arrayByAddingObjectsFromArray:presenceChannelsList]];
-    [self.subscriberManager subscribeUsingTimeToken:timeToken withState:state completion:nil];
+    [self subscribeToChannels:channels groups:nil withPresence:shouldObservePresence
+               usingTimeToken:timeToken clientState:state];
 }
 
 - (void)subscribeToChannelGroups:(NSArray<NSString *> *)groups withPresence:(BOOL)shouldObservePresence {
@@ -179,12 +183,31 @@
 - (void)subscribeToChannelGroups:(NSArray<NSString *> *)groups withPresence:(BOOL)shouldObservePresence
                   usingTimeToken:(NSNumber *)timeToken clientState:(NSDictionary<NSString *, id> *)state {
     
-    NSArray *groupsList = [NSArray arrayWithArray:groups];
-    if (shouldObservePresence) {
+    [self subscribeToChannels:nil groups:groups withPresence:shouldObservePresence
+               usingTimeToken:timeToken clientState:state];
+}
+
+- (void)subscribeToChannels:(NSArray<NSString *> *)channels groups:(NSArray<NSString *> *)groups 
+               withPresence:(BOOL)shouldObservePresence usingTimeToken:(NSNumber *)timeToken 
+                clientState:(NSDictionary<NSString *, id> *)state {
+    
+    channels = (channels?: @[]);
+    groups = (groups?: @[]);
+    
+    if (channels.count) {
         
-        groupsList = [groups arrayByAddingObjectsFromArray:[PNChannel presenceChannelsFrom:groups]];
+        NSArray *presenceChannelsList = nil;
+        if (shouldObservePresence) { presenceChannelsList = [PNChannel presenceChannelsFrom:channels]; }
+        [self.subscriberManager addChannels:[channels arrayByAddingObjectsFromArray:presenceChannelsList]];
     }
-    [self.subscriberManager addChannelGroups:groupsList];
+    
+    if (groups.count) {
+        
+        NSArray *presenceGroupsList = nil;
+        if (shouldObservePresence) { presenceGroupsList = [PNChannel presenceChannelsFrom:groups]; }
+        [self.subscriberManager addChannelGroups:[groups arrayByAddingObjectsFromArray:presenceGroupsList]];
+    }
+    [self cancelSubscribeOperations];
     [self.subscriberManager subscribeUsingTimeToken:timeToken withState:state completion:nil];
 }
 
@@ -192,6 +215,7 @@
     
     channels = [PNChannel presenceChannelsFrom:channels];
     [self.subscriberManager addPresenceChannels:channels];
+    [self cancelSubscribeOperations];
     [self.subscriberManager subscribeUsingTimeToken:nil withState:nil completion:nil];
 }
 
@@ -199,47 +223,68 @@
 #pragma mark - Unsubscription
 
 - (void)unsubscribeFromChannels:(NSArray<NSString *> *)channels withPresence:(BOOL)shouldObservePresence {
-
-    [self unsubscribeFromChannels:channels withPresence:shouldObservePresence completion:nil];
-}
-
-- (void)unsubscribeFromChannels:(NSArray<NSString *> *)channels withPresence:(BOOL)shouldObservePresence
-                     completion:(PNSubscriberCompletionBlock)block {
-
-    NSArray *presenceChannels = nil;
-    if (shouldObservePresence) { presenceChannels = [PNChannel presenceChannelsFrom:channels]; }
-    NSArray *fullChannelsList = [channels arrayByAddingObjectsFromArray:presenceChannels];
-    [self.subscriberManager removeChannels:fullChannelsList];
-    [self.subscriberManager unsubscribeFrom:YES objects:fullChannelsList completion:block];
+    
+    [self unsubscribeFromChannels:channels groups:nil withPresence:shouldObservePresence completion:nil];
 }
 
 - (void)unsubscribeFromChannelGroups:(NSArray<NSString *> *)groups withPresence:(BOOL)shouldObservePresence {
 
-    [self unsubscribeFromChannelGroups:groups withPresence:shouldObservePresence completion:nil];
+    [self unsubscribeFromChannels:nil groups:groups withPresence:shouldObservePresence completion:nil];
 }
 
-- (void)unsubscribeFromChannelGroups:(NSArray<NSString *> *)groups withPresence:(BOOL)shouldObservePresence
-                          completion:(PNSubscriberCompletionBlock)block {
-
-    NSArray *groupsList = [NSArray arrayWithArray:groups];
-    if (shouldObservePresence) {
-
-        groupsList = [groupsList arrayByAddingObjectsFromArray:[PNChannel presenceChannelsFrom:groups]];
+- (void)unsubscribeFromChannels:(NSArray<NSString *> *)channels groups:(NSArray<NSString *> *)groups
+                   withPresence:(BOOL)shouldObservePresence completion:(PNSubscriberCompletionBlock)block {
+    
+    channels = (channels?: @[]);
+    groups = (groups?: @[]);
+    
+    if (channels.count) {
+        
+        NSArray *presenceChannelsList = nil;
+        if (shouldObservePresence) { presenceChannelsList = [PNChannel presenceChannelsFrom:channels]; }
+        [self.subscriberManager removeChannels:[channels arrayByAddingObjectsFromArray:presenceChannelsList]];
     }
-    [self.subscriberManager removeChannelGroups:groupsList];
-    [self.subscriberManager unsubscribeFrom:NO objects:groupsList completion:block];
+    
+    if (groups.count) {
+        
+        NSArray *presenceGroupsList = nil;
+        if (shouldObservePresence) { presenceGroupsList = [PNChannel presenceChannelsFrom:groups]; }
+        [self.subscriberManager removeChannelGroups:[groups arrayByAddingObjectsFromArray:presenceGroupsList]];
+    }
+    
+    if (channels.count || groups.count) {
+
+        [self cancelSubscribeOperations];
+        [self.subscriberManager unsubscribeFromChannels:channels groups:groups completion:block];
+    }
+    else if (block) { pn_dispatch_async(self.callbackQueue, ^{ block(nil); }); }
 }
 
 - (void)unsubscribeFromPresenceChannels:(NSArray<NSString *> *)channels {
     
     channels = [PNChannel presenceChannelsFrom:channels];
     [self.subscriberManager removePresenceChannels:channels];
-    [self.subscriberManager unsubscribeFrom:YES objects:channels completion:nil];
+    [self cancelSubscribeOperations];
+    [self.subscriberManager unsubscribeFromChannels:channels groups:nil completion:nil];
 }
 
 - (void)unsubscribeFromAll {
+
+    [self unsubscribeFromAllWithCompletion:nil];
+}
+
+- (void)unsubscribeFromAllWithCompletion:(void(^)(PNStatus *status))block {
     
-    [self.subscriberManager unsubscribeFromAll];
+    [self cancelSubscribeOperations];
+    [self.subscriberManager unsubscribeFromAllWithCompletion:block];
+}
+
+
+#pragma mark - Misc
+
+- (void)cancelSubscribeOperations {
+    
+    [self.subscriptionNetwork cancelAllOperationsWithURLPrefix:kPNSubscribeAPIPrefix];
 }
 
 #pragma mark -

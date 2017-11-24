@@ -10,6 +10,7 @@ import UIKit
 import MobileCoreServices
 import MediaPlayer
 import Parse
+import SwiftyCam
 
 class VideoViewController: UIViewController {
 
@@ -21,8 +22,18 @@ class VideoViewController: UIViewController {
     }
     
     @IBAction func rec_Btn_Pressed(_ sender: Any) {
-        startCameraFromViewController(viewController: self, withDelegate: self)
+       // startCameraFromViewController(viewController: self, withDelegate: self)
     }
+    //Swifty
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     func startCameraFromViewController(viewController: UIViewController, withDelegate delegate: UIImagePickerControllerDelegate & UINavigationControllerDelegate) -> Bool {
         if UIImagePickerController.isSourceTypeAvailable(.camera) == false {
